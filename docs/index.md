@@ -25,5 +25,5 @@ protein structure prediction with AlphaFold*](https://doi.org/10.1038/s41586-021
 |---|---|---|
 |$\otimes$|向量外积|——————————|
 |$\oplus$|向量外和|——————————|
-|$\odot$|逐元素乘法|$\vec a \odot \vec b = \vec {\{{a_ib_i}\}}$
+|$\odot$|逐元素乘法|$\vec a \odot \vec b = \vec {\{{a_ib_i}\}}$|
 |$a^Tb$|向量内积|——————————|
