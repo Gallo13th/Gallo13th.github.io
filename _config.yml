@@ -106,4 +106,4 @@ theme: next
 deploy:
   type: git
   repo: https://github.com/Gallo13th/Gallo13th.github.io.git
-  branch: master
+  branch: gh-pages
