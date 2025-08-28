@@ -1,0 +1,1412 @@
+
+<!DOCTYPE html><html lang="zh-CN"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>基于电子密度的AI药物设计方法：文献综述与选题报告</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.5.0/mermaid.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'serif': ['Crimson Text', 'serif'],
+                        'sans': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'sage': '#8FA68E',
+                        'clay': '#D4A574',
+                        'stone': '#A8A29E',
+                        'navy': '#1E293B',
+                        'cream': '#FEFCE8',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .hero-gradient {
+            background: linear-gradient(135deg, #1E293B 0%, #334155 50%, #475569 100%);
+        }
+        .text-shadow {
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .toc-fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 280px;
+            overflow-y: auto;
+            z-index: 1000;
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        .content-offset {
+            margin-left: 280px;
+        }
+        /* Mermaid diagram styling */
+        .mermaid-container {
+            display: flex;
+            justify-content: center;
+            min-height: 300px;
+            max-height: 800px;
+            background: #ffffff;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mermaid-container .mermaid {
+            width: 100%;
+            max-width: 100%;
+            height: 100%;
+            cursor: grab;
+            transition: transform 0.3s ease;
+            transform-origin: center center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            touch-action: none; /* 防止触摸设备上的默认行为 */
+            -webkit-user-select: none; /* 防止文本选择 */
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .mermaid-container .mermaid svg {
+            max-width: 100%;
+            height: 100%;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .mermaid-container .mermaid:active {
+            cursor: grabbing;
+        }
+
+        .mermaid-container.zoomed .mermaid {
+            height: 100%;
+            width: 100%;
+            cursor: grab;
+        }
+
+        .mermaid-controls {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            gap: 10px;
+            z-index: 20;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 8px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .mermaid-control-btn {
+            background: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #374151;
+            font-size: 14px;
+            min-width: 36px;
+            height: 36px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mermaid-control-btn:hover {
+            background: #f8fafc;
+            border-color: #3b82f6;
+            color: #3b82f6;
+            transform: translateY(-1px);
+        }
+
+        .mermaid-control-btn:active {
+            transform: scale(0.95);
+        }
+        
+        /* Enhanced mermaid node styling for different colors with proper contrast */
+        .mermaid .node rect,
+        .mermaid .node circle,
+        .mermaid .node ellipse,
+        .mermaid .node polygon {
+            stroke-width: 2px !important;
+            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+        }
+        
+        /* Primary nodes (dark blue) */
+        .mermaid .node.primary rect,
+        .mermaid .node.primary circle,
+        .mermaid .node.primary ellipse,
+        .mermaid .node.primary polygon {
+            fill: #1E293B !important;
+            stroke: #334155 !important;
+        }
+        
+        .mermaid .node.primary .label {
+            color: #FFFFFF !important;
+            font-weight: 600 !important;
+            font-size: 13px !important;
+        }
+        
+        /* Secondary nodes (sage green) */
+        .mermaid .node.secondary rect,
+        .mermaid .node.secondary circle,
+        .mermaid .node.secondary ellipse,
+        .mermaid .node.secondary polygon {
+            fill: #8FA68E !important;
+            stroke: #7A9279 !important;
+        }
+        
+        .mermaid .node.secondary .label {
+            color: #FFFFFF !important;
+            font-weight: 600 !important;
+            font-size: 13px !important;
+        }
+        
+        /* Tertiary nodes (clay orange) */
+        .mermaid .node.tertiary rect,
+        .mermaid .node.tertiary circle,
+        .mermaid .node.tertiary ellipse,
+        .mermaid .node.tertiary polygon {
+            fill: #D4A574 !important;
+            stroke: #C19566 !important;
+        }
+        
+        .mermaid .node.tertiary .label {
+            color: #1E293B !important;
+            font-weight: 600 !important;
+            font-size: 13px !important;
+        }
+        
+        /* Quaternary nodes (stone) */
+        .mermaid .node.quaternary rect,
+        .mermaid .node.quaternary circle,
+        .mermaid .node.quaternary ellipse,
+        .mermaid .node.quaternary polygon {
+            fill: #A8A29E !important;
+            stroke: #928581 !important;
+        }
+        
+        .mermaid .node.quaternary .label {
+            color: #FFFFFF !important;
+            font-weight: 600 !important;
+            font-size: 13px !important;
+        }
+        
+        /* Default nodes with good contrast */
+        .mermaid .node:not(.primary):not(.secondary):not(.tertiary):not(.quaternary) rect,
+        .mermaid .node:not(.primary):not(.secondary):not(.tertiary):not(.quaternary) circle,
+        .mermaid .node:not(.primary):not(.secondary):not(.tertiary):not(.quaternary) ellipse,
+        .mermaid .node:not(.primary):not(.secondary):not(.tertiary):not(.quaternary) polygon {
+            fill: #F8FAFC !important;
+            stroke: #1E293B !important;
+        }
+        
+        .mermaid .node:not(.primary):not(.secondary):not(.tertiary):not(.quaternary) .label {
+            color: #1E293B !important;
+            font-weight: 500 !important;
+            font-size: 12px !important;
+        }
+        
+        /* Edge styling */
+        .mermaid .edgePath .path {
+            stroke: #64748B !important;
+            stroke-width: 2px !important;
+            filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
+        }
+        
+        .mermaid .edgeLabel {
+            background-color: #FFFFFF !important;
+            color: #1E293B !important;
+            font-weight: 500 !important;
+            font-size: 11px !important;
+            padding: 2px 6px !important;
+            border-radius: 4px !important;
+            border: 1px solid #E2E8F0 !important;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+        }
+        
+        /* Cluster styling */
+        .mermaid .cluster rect {
+            fill: rgba(248, 250, 252, 0.8) !important;
+            stroke: #CBD5E1 !important;
+            stroke-width: 1px !important;
+            rx: 8px !important;
+        }
+        
+        .mermaid .cluster .label {
+            color: #334155 !important;
+            font-weight: 600 !important;
+            font-size: 14px !important;
+        }
+        @media (max-width: 1024px) {
+            .toc-fixed {
+                display: none;
+            }
+            .content-offset {
+                margin-left: 0;
+            }
+            .mermaid-control-btn:not(.reset-zoom) {
+                display: none;
+            }
+            .mermaid-controls {
+                top: auto;
+                bottom: 15px;
+                right: 15px;
+            }
+        }
+
+        /* Responsive adjustments for small screens */
+        body {
+            overflow-x: hidden;
+            overflow-wrap: break-word;
+        }
+
+        @media (max-width: 768px) {
+            .content-offset {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+
+            #hero h1 {
+                font-size: 2.25rem;
+                line-height: 2.5rem;
+            }
+
+            #hero p {
+                font-size: 1rem;
+            }
+
+            .mermaid-container {
+                padding: 15px;
+            }
+        }
+
+        /* For very small screens (e.g., 375px) */
+        @media (max-width: 375px) {
+            #hero h1 {
+                font-size: 1.75rem;
+                line-height: 2.25rem;
+            }
+
+            #hero .flex.wrap {
+                flex-direction: column;
+            }
+        }
+    </style>
+  </head>
+
+  <body class="phd-page" class="bg-cream text-navy font-sans">
+    <!-- Fixed Table of Contents -->
+    <div class="phd-container">
+    <nav class="toc-fixed">
+      <div class="p-6">
+        <h3 class="text-white font-semibold mb-4 text-lg">目录</h3>
+        <ul class="space-y-2 text-sm">
+          <li>
+            <a class="text-sage hover:text-white transition-colors" href="#hero">引言</a>
+          </li>
+          <li>
+            <a class="text-sage hover:text-white transition-colors" href="#background">电子密度基础</a>
+          </li>
+          <li>
+            <a class="text-sage hover:text-white transition-colors" href="#ai-models">AI生成模型类型</a>
+          </li>
+          <li>
+            <a class="text-sage hover:text-white transition-colors" href="#pocket-to-ligand">从口袋到配体生成</a>
+          </li>
+          <li>
+            <a class="text-sage hover:text-white transition-colors" href="#ed-methods">电子密度创新方法</a>
+          </li>
+          <li>
+            <a class="text-sage hover:text-white transition-colors" href="#comparison">模型比较分析</a>
+          </li>
+          <li>
+            <a class="text-sage hover:text-white transition-colors" href="#challenges">挑战与未来方向</a>
+          </li>
+          <li>
+            <a class="text-sage hover:text-white transition-colors" href="#conclusion">结论</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="content-offset">
+      <!-- Hero Section -->
+      <section class="hero-gradient min-h-screen flex items-center relative overflow-hidden" id="hero">
+        <div class="absolute inset-0 opacity-20">
+          <img alt="分子电子云抽象艺术图" class="w-full h-full object-cover" src="https://kimi-web-img.moonshot.cn/img/upload.wikimedia.org/30dd0fac653b9affeeb409e8b642cf780fd2b687.png" size="wallpaper" aspect="wide" style="photo" query="分子电子云抽象艺术" referrerpolicy="no-referrer" data-modified="1" data-score="10287.00"/>
+        </div>
+        <div class="container mx-auto px-4 sm:px-6 md:px-8 relative z-10">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-12 items-center">
+            <!-- Title and Abstract -->
+            <div class="text-white">
+              <h1 class="font-serif text-3xl sm:text-4xl lg:text-6xl font-bold leading-tight mb-6 text-shadow">
+                <em>基于电子密度的</em>
+                <br/>
+                AI药物设计方法
+              </h1>
+              <p class="text-lg sm:text-xl lg:text-2xl text-gray-200 mb-8 font-light">
+                从靶点口袋到配体分子的智能化生成路径
+              </p>
+              <div class="glass-effect rounded-lg p-4 sm:p-6 mb-8">
+                <h3 class="text-lg font-semibold mb-3">研究核心</h3>
+                <p class="text-gray-200 leading-relaxed">
+                  本综述系统梳理了将电子密度作为中间表示的AI药物设计创新方法，
+                  探讨了扩散模型与自回归模型在分子生成中的性能差异，
+                  并展望了这一前沿领域的未来发展路径。
+                </p>
+              </div>
+            </div>
+
+            <!-- Key Highlights Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="glass-effect rounded-lg p-4 sm:p-6 text-white">
+                <div class="text-2xl sm:text-3xl mb-3">
+                  <i class="fas fa-atom text-sage"></i>
+                </div>
+                <h4 class="font-semibold mb-2">物理本质</h4>
+                <p class="text-sm text-gray-200">电子密度反映分子真实物理化学性质</p>
+              </div>
+              <div class="glass-effect rounded-lg p-4 sm:p-6 text-white">
+                <div class="text-2xl sm:text-3xl mb-3">
+                  <i class="fas fa-brain text-clay"></i>
+                </div>
+                <h4 class="font-semibold mb-2">AI驱动</h4>
+                <p class="text-sm text-gray-200">深度学习模型实现智能分子设计</p>
+              </div>
+              <div class="glass-effect rounded-lg p-4 sm:p-6 text-white">
+                <div class="text-2xl sm:text-3xl mb-3">
+                  <i class="fas fa-exchange-alt text-stone"></i>
+                </div>
+                <h4 class="font-semibold mb-2">知识迁移</h4>
+                <p class="text-sm text-gray-200">跨生物大分子类型的通用表示</p>
+              </div>
+              <div class="glass-effect rounded-lg p-4 sm:p-6 text-white">
+                <div class="text-2xl sm:text-3xl mb-3">
+                  <i class="fas fa-pills text-sage"></i>
+                </div>
+                <h4 class="font-semibold mb-2">药物发现</h4>
+                <p class="text-sm text-gray-200">加速创新药物研发进程</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Background Section -->
+      <section class="py-16 bg-white" id="background">
+        <div class="container mx-auto px-8">
+          <h2 class="font-serif text-4xl font-bold text-navy mb-12">电子密度在结构生物学与药物设计中的基础</h2>
+
+          <div class="grid lg:grid-cols-2 gap-12 mb-16">
+            <div>
+              <h3 class="text-2xl font-semibold mb-6 text-navy">物理化学意义</h3>
+              <p class="text-gray-700 leading-relaxed mb-4">
+                电子密度是量子化学中的核心概念，描述电子在空间某点出现的概率分布。它不仅决定分子的形状和大小，
+                还直接关联着分子的多种关键性质，如静电势、极性、亲疏水性等。
+                <a class="text-sage hover:underline" href="https://jcheminf.biomedcentral.com/articles/10.1186/s13321-025-01010-7">[128]</a>
+              </p>
+              <p class="text-gray-700 leading-relaxed">
+                在药物设计中，理解配体和靶点口袋的电子密度特征对于预测结合亲和力和特异性至关重要。
+                配体与靶点间的相互作用本质上都是通过双方电子云的重新排布和相互渗透来实现的。
+                <a class="text-sage hover:underline" href="https://cloud.tencent.com/developer/article/1883523">[2]</a>
+              </p>
+            </div>
+            <div>
+              <img alt="小分子电子密度分布3D可视化" class="w-full rounded-lg shadow-lg" src="https://kimi-web-img.moonshot.cn/img/oss.v-suan.com/ccb192fa30d7bcced1d912c1384351783691dbb8.png" size="medium" aspect="wide" query="小分子电子密度分布三维图" referrerpolicy="no-referrer" data-modified="1" data-score="11591.00"/>
+            </div>
+          </div>
+
+          <div class="bg-sage/10 rounded-lg p-8 mb-12">
+            <h3 class="text-2xl font-semibold mb-6 text-navy">电子密度引入AI药物设计的优势</h3>
+            <div class="grid md:grid-cols-2 gap-8">
+              <div>
+                <h4 class="font-semibold text-navy mb-3 flex items-center">
+                  <i class="fas fa-eye text-sage mr-2"></i>
+                  提升可解释性
+                </h4>
+                <p class="text-gray-700">
+                  电子密度具有明确的物理化学意义，能够更直观地反映分子间相互作用机制，
+                  使AI模型的学习过程和生成结果更容易被理解和验证。
+                  <a class="text-sage hover:underline" href="https://www.biorxiv.org/content/10.1101/2022.06.11.495756.full">[69]</a>
+                </p>
+              </div>
+              <div>
+                <h4 class="font-semibold text-navy mb-3 flex items-center">
+                  <i class="fas fa-share-alt text-clay mr-2"></i>
+                  促进知识迁移
+                </h4>
+                <p class="text-gray-700">
+                  电子密度作为普适性物理表征，不依赖特定分子类型，
+                  便于AI模型在不同类型生物大分子（蛋白质、核酸等）间进行知识迁移。
+                  <a class="text-sage hover:underline" href="https://www.biorxiv.org/content/10.1101/2022.06.11.495756.full">[158]</a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- AI Models Section -->
+      <section class="py-16 bg-gray-50" id="ai-models">
+        <div class="container mx-auto px-8">
+          <h2 class="font-serif text-4xl font-bold text-navy mb-12">AI生成模型在药物设计中的主要类型</h2>
+
+          <div class="grid lg:grid-cols-2 gap-8 mb-12">
+            <div class="bg-white rounded-lg p-8 shadow-lg">
+              <div class="flex items-center mb-6">
+                <div class="w-12 h-12 bg-sage rounded-full flex items-center justify-center mr-4">
+                  <i class="fas fa-network-wired text-white"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-navy">生成对抗网络 (GANs)</h3>
+              </div>
+              <p class="text-gray-700 mb-4">
+                通过生成器与判别器的对抗博弈学习数据分布。在药物设计中，
+                GANs已被用于生成配体电子密度，再通过解释模块转换为分子结构。
+                <a class="text-sage hover:underline" href="https://zhuanlan.zhihu.com/p/581900332">[1]</a>
+              </p>
+              <div class="text-sm text-gray-600">
+                <strong>优势：</strong>强大的生成能力
+                <br/>
+                <strong>局限：</strong>训练不够稳定，易出现模式坍缩
+              </div>
+            </div>
+
+            <div class="bg-white rounded-lg p-8 shadow-lg">
+              <div class="flex items-center mb-6">
+                <div class="w-12 h-12 bg-clay rounded-full flex items-center justify-center mr-4">
+                  <i class="fas fa-compress-alt text-white"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-navy">变分自编码器 (VAEs)</h3>
+              </div>
+              <p class="text-gray-700 mb-4">
+                学习数据的低维潜在表示，通过编码器-解码器结构进行生成。
+                与Transformer结合，可用于电子密度引导的分子设计。
+                <a class="text-sage hover:underline" href="https://www.biorxiv.org/content/10.1101/2024.12.18.629081v1">[183]</a>
+              </p>
+              <div class="text-sm text-gray-600">
+                <strong>优势：</strong>有意义的潜在空间，训练稳定
+                <br/>
+                <strong>局限：</strong>生成样本可能较模糊
+              </div>
+            </div>
+
+            <div class="bg-white rounded-lg p-8 shadow-lg">
+              <div class="flex items-center mb-6">
+                <div class="w-12 h-12 bg-stone rounded-full flex items-center justify-center mr-4">
+                  <i class="fas fa-wave-square text-white"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-navy">扩散模型</h3>
+              </div>
+              <p class="text-gray-700 mb-4">
+                通过逐步去噪过程从噪声中恢复数据。在3D分子生成中表现出色，
+                如PMDM、DiffLinker等模型。
+                <a class="text-sage hover:underline" href="https://www.nature.com/articles/s41467-024-46569-1">[103]</a>
+              </p>
+              <div class="text-sm text-gray-600">
+                <strong>优势：</strong>生成质量高，多样性好
+                <br/>
+                <strong>局限：</strong>训练计算成本较大
+              </div>
+            </div>
+
+            <div class="bg-white rounded-lg p-8 shadow-lg">
+              <div class="flex items-center mb-6">
+                <div class="w-12 h-12 bg-navy rounded-full flex items-center justify-center mr-4">
+                  <i class="fas fa-stream text-white"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-navy">自回归模型</h3>
+              </div>
+              <p class="text-gray-700 mb-4">
+                将联合分布分解为条件概率乘积，逐个元素生成。
+                Pocket2Mol、ResGen等模型在基于口袋的分子生成中表现优异。
+                <a class="text-sage hover:underline" href="https://arxiv.org/html/2205.07249v2">[39]</a>
+              </p>
+              <div class="text-sm text-gray-600">
+                <strong>优势：</strong>生成过程可控，化学有效性好
+                <br/>
+                <strong>局限：</strong>顺序生成，速度较慢
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pocket to Ligand Section -->
+      <section class="py-16 bg-white" id="pocket-to-ligand">
+        <div class="container mx-auto px-8">
+          <h2 class="font-serif text-4xl font-bold text-navy mb-12">从靶点口袋到配体分子的生成：AI方法进展</h2>
+
+          <!-- Diffusion Models -->
+          <div class="mb-16">
+            <h3 class="text-3xl font-semibold text-navy mb-8">基于扩散模型的方法</h3>
+
+            <div class="bg-sage/10 rounded-lg p-8 mb-8">
+              <h4 class="text-xl font-semibold text-navy mb-4">PMDM (Pocket-based Molecular Diffusion Model)</h4>
+              <p class="text-gray-700 leading-relaxed mb-4">
+                PMDM是一种先进的基于扩散模型的深度生成模型，将配体和蛋白口袋视为3D点云，
+                通过条件去噪扩散过程生成与口袋互补的配体分子。
+                <a class="text-sage hover:underline" href="https://www.nature.com/articles/s41467-024-46569-1">[103]</a>
+              </p>
+              <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                  <h5 class="font-semibold text-navy mb-2">核心创新</h5>
+                  <ul class="text-sm text-gray-700 space-y-1">
+                    <li>• 双等变编码器设计</li>
+                    <li>• 局部边与全局边策略</li>
+                    <li>• E(3)等变性保证</li>
+                  </ul>
+                </div>
+                <div>
+                  <h5 class="font-semibold text-navy mb-2">应用验证</h5>
+                  <ul class="text-sm text-gray-700 space-y-1">
+                    <li>• SARS-CoV-2主蛋白酶</li>
+                    <li>• CDK2先导化合物优化</li>
+                    <li>• 体外实验验证</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-clay/10 rounded-lg p-8">
+              <h4 class="text-xl font-semibold text-navy mb-4">DiffLinker：基于条件扩散模型的Linker设计</h4>
+              <p class="text-gray-700 leading-relaxed mb-4">
+                DiffLinker专注于从头设计连接分子片段的连接子，以输入片段和蛋白口袋为条件，
+                生成大小可变的连接子，并保持等变性。
+                <a class="text-sage hover:underline" href="https://www.bilibili.com/read/cv36803057">[266]</a>
+              </p>
+              <div class="flex items-center justify-center">
+                <img alt="药物分子连接子设计示意图" class="max-w-full h-48 rounded-lg shadow-md" src="https://kimi-web-img.moonshot.cn/img/pic4.zhimg.com/87a5a7efdf4e84537f6ba0473f720b3d6f55a70c.jpg" size="medium" aspect="wide" style="linedrawing" query="分子连接子设计" referrerpolicy="no-referrer" data-modified="1" data-score="11599.00"/>
+              </div>
+            </div>
+          </div>
+
+          <!-- Autoregressive Models -->
+          <div class="mb-16">
+            <h3 class="text-3xl font-semibold text-navy mb-8">基于自回归模型的方法</h3>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+              <div class="bg-white border border-gray-200 rounded-lg p-6">
+                <h4 class="text-lg font-semibold text-navy mb-4">Pocket2Mol：E(3)-等变自回归模型</h4>
+                <p class="text-gray-700 text-sm leading-relaxed mb-4">
+                  通过E(3)-等变生成网络，以自回归方式逐个原子地生成与口袋结合的分子，
+                  考虑几何和化学相互作用。
+                  <a class="text-sage hover:underline" href="https://arxiv.org/html/2205.07249v2">[39]</a>
+                </p>
+                <div class="text-xs text-gray-600">
+                  <strong>特点：</strong>前沿原子预测、高效采样算法、化学键类型预测
+                </div>
+              </div>
+
+              <div class="bg-white border border-gray-200 rounded-lg p-6">
+                <h4 class="text-lg font-semibold text-navy mb-4">ResGen：分层自回归模型</h4>
+                <p class="text-gray-700 text-sm leading-relaxed mb-4">
+                  将分子生成表述为分层自回归问题，包括全局自回归和原子组件自回归，
+                  结合并行多尺度建模技术。
+                  <a class="text-sage hover:underline" href="https://cloud.kepuchina.cn/h5/detail?id=7147324538416463872">[262]</a>
+                </p>
+                <div class="text-xs text-gray-600">
+                  <strong>特点：</strong>多层次相互作用建模、生成速度快、多样性好
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ED Methods Section -->
+      <section class="py-16 bg-gray-50" id="ed-methods">
+        <div class="container mx-auto px-8">
+          <h2 class="font-serif text-4xl font-bold text-navy mb-12">电子密度作为中间表示的创新方法</h2>
+
+          <!-- GAN with ED Interpretation -->
+          <div class="mb-16">
+            <h3 class="text-3xl font-semibold text-navy mb-8">GAN与电子密度解释模块的结合</h3>
+
+            <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+              <div class="flex items-start mb-6">
+                <div class="w-16 h-16 bg-sage rounded-full flex items-center justify-center mr-6 flex-shrink-0">
+                  <i class="fas fa-microscope text-white text-xl"></i>
+                </div>
+                <div>
+                  <h4 class="text-2xl font-semibold text-navy mb-3">&#34;Thinking like a structural biologist&#34;</h4>
+                  <p class="text-gray-700 leading-relaxed mb-4">
+                    这一开创性研究首次提出利用实验电子密度作为训练数据，模仿结构生物学家的思考过程：
+                    先根据电子密度图确定分子形状，再应用立体化学约束优化构象。
+                    <a class="text-sage hover:underline" href="https://www.biorxiv.org/content/10.1101/2022.06.11.495756.full">[69]</a>
+                  </p>
+                </div>
+              </div>
+
+              <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                  <h5 class="font-semibold text-navy mb-3">模型架构</h5>
+                  <div class="space-y-3">
+                    <div class="flex items-center">
+                      <div class="w-3 h-3 bg-sage rounded-full mr-3"></div>
+                      <span class="text-sm">GAN生成配体电子密度</span>
+                    </div>
+                    <div class="flex items-center">
+                      <div class="w-3 h-3 bg-clay rounded-full mr-3"></div>
+                      <span class="text-sm">VQ-VAE2编码化学约束</span>
+                    </div>
+                    <div class="flex items-center">
+                      <div class="w-3 h-3 bg-stone rounded-full mr-3"></div>
+                      <span class="text-sm">PixelCNN和V-Net处理</span>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <h5 class="font-semibold text-navy mb-3">应用验证</h5>
+                  <div class="text-sm text-gray-700 space-y-2">
+                    <p><strong>激酶HPK1：</strong>重现经典活性化合物结构</p>
+                    <p><strong>蛋白酶Covid19-3CL：</strong>生成新颖结构分子</p>
+                    <p><strong>核受体VDR：</strong>展现泛化能力</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- VAE with Transformer -->
+          <div class="mb-16">
+            <h3 class="text-3xl font-semibold text-navy mb-8">VAE与Transformer的结合</h3>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+              <div class="bg-white rounded-lg shadow-lg p-8">
+                <h4 class="text-xl font-semibold text-navy mb-4">ED2Mol框架</h4>
+                <p class="text-gray-700 leading-relaxed mb-4">
+                  利用电子密度指导从头分子设计与优化，在生成成功率和物理可靠性方面
+                  （超过97%）优于现有方法，支持基于片段的先导化合物优化。
+                  <a class="text-sage hover:underline" href="https://www.biorxiv.org/content/10.1101/2024.12.18.629081v1">[183]</a>
+                </p>
+                <div class="bg-sage/10 rounded p-4">
+                  <h5 class="font-semibold text-navy mb-2">真实应用案例</h5>
+                  <ul class="text-sm text-gray-700 space-y-1">
+                    <li>• FGFR3正构抑制剂</li>
+                    <li>• CDC42别构抑制剂</li>
+                    <li>• GCK别构激活剂</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="bg-white rounded-lg shadow-lg p-8">
+                <h4 class="text-xl font-semibold text-navy mb-4">电子密度GPT</h4>
+                <p class="text-gray-700 leading-relaxed mb-4">
+                  结合VAE和Transformer，利用电子密度信息进行主客体结合分子优化。
+                  通过QM9数据集训练VAE，再使用Transformer将电子密度转换为SMILES。
+                  <a class="text-sage hover:underline" href="https://www.nature.com/articles/s43588-024-00602-x">[256]</a>
+                </p>
+                <div class="bg-clay/10 rounded p-4">
+                  <h5 class="font-semibold text-navy mb-2">验证体系</h5>
+                  <ul class="text-sm text-gray-700 space-y-1">
+                    <li>• 葫芦脲CB[6]主客体体系</li>
+                    <li>• 金属有机笼[Pd2L4]4+</li>
+                    <li>• X射线共晶结构验证</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Other ED Methods -->
+          <div class="mb-16">
+            <h3 class="text-3xl font-semibold text-navy mb-8">其他创新方法</h3>
+
+            <div class="grid md:grid-cols-3 gap-6">
+              <div class="bg-white rounded-lg p-6 shadow-lg">
+                <h4 class="font-semibold text-navy mb-3">ECloudGen</h4>
+                <p class="text-sm text-gray-700 mb-3">
+                  将电子云作为潜在变量，通过ECloud Latent Diffusion和
+                  ECloud Decipher模块生成分子。
+                  <a class="text-sage hover:underline" href="https://www.biorxiv.org/content/10.1101/2024.06.03.597263v2.full.pdf">[80]</a>
+                </p>
+                <div class="text-xs text-gray-600">
+                  解决&#34;稀疏化学空间生成悖论&#34;
+                </div>
+              </div>
+
+              <div class="bg-white rounded-lg p-6 shadow-lg">
+                <h4 class="font-semibold text-navy mb-3">机器学习ED表示</h4>
+                <p class="text-sm text-gray-700 mb-3">
+                  利用3D CNN、CGCNN、DeepDFT等模型从分子坐标预测电子密度，
+                  快速准确计算分子性质。
+                  <a class="text-sage hover:underline" href="https://oa.upm.es/68071/1/BRUNO_EMILIO_CUEVAS_ZUVIRIA.pdf">[284]</a>
+                </p>
+                <div class="text-xs text-gray-600">
+                  DeepDFT相对误差仅0.003
+                </div>
+              </div>
+
+              <div class="bg-white rounded-lg p-6 shadow-lg">
+                <h4 class="font-semibold text-navy mb-3">GENiPPI</h4>
+                <p class="text-sm text-gray-700 mb-3">
+                  PPI界面感知的分子生成框架，结合体素与电子密度信息，
+                  生成靶向蛋白质-蛋白质相互作用的小分子。
+                  <a class="text-sage hover:underline" href="https://hub.baai.ac.cn/view/42082">[293]</a>
+                </p>
+                <div class="text-xs text-gray-600">
+                  处理PPI界面大而平坦的挑战
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Comparison Section -->
+      <section class="py-16 bg-white" id="comparison">
+        <div class="container mx-auto px-8">
+          <h2 class="font-serif text-4xl font-bold text-navy mb-12">不同生成模型的比较与分析</h2>
+
+          <!-- Model Comparison Table -->
+          <div class="bg-gray-50 rounded-lg p-8 mb-12">
+            <h3 class="text-2xl font-semibold text-navy mb-6">扩散模型 vs. 自回归模型</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="border-b border-gray-300">
+                    <th class="text-left py-3 px-4 font-semibold text-navy">特性</th>
+                    <th class="text-left py-3 px-4 font-semibold text-sage">扩散模型</th>
+                    <th class="text-left py-3 px-4 font-semibold text-clay">自回归模型</th>
+                  </tr>
+                </thead>
+                <tbody class="text-gray-700">
+                  <tr class="border-b border-gray-200">
+                    <td class="py-3 px-4 font-medium">核心原理</td>
+                    <td class="py-3 px-4">学习逆向去噪过程</td>
+                    <td class="py-3 px-4">条件概率链式乘积</td>
+                  </tr>
+                  <tr class="border-b border-gray-200">
+                    <td class="py-3 px-4 font-medium">训练目标</td>
+                    <td class="py-3 px-4">最小化噪声预测误差</td>
+                    <td class="py-3 px-4">最大化下一个token概率</td>
+                  </tr>
+                  <tr class="border-b border-gray-200">
+                    <td class="py-3 px-4 font-medium">生成方式</td>
+                    <td class="py-3 px-4">并行优化，迭代去噪</td>
+                    <td class="py-3 px-4">序列化，依赖上文生成</td>
+                  </tr>
+                  <tr class="border-b border-gray-200">
+                    <td class="py-3 px-4 font-medium">优势</td>
+                    <td class="py-3 px-4">生成速度快，连贯性好</td>
+                    <td class="py-3 px-4">密度估计好，过程可控</td>
+                  </tr>
+                  <tr class="border-b border-gray-200">
+                    <td class="py-3 px-4 font-medium">局限性</td>
+                    <td class="py-3 px-4">质量可能不稳定</td>
+                    <td class="py-3 px-4">生成速度慢，误差累积</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="text-sm text-gray-600 mt-4">
+              数据来源：<a class="text-sage hover:underline" href="https://www.cnblogs.com/JJBox/p/18907632">[271]</a>
+              <a class="text-sage hover:underline" href="https://www.51cto.com/aigc/4821.html">[270]</a>
+            </p>
+          </div>
+
+          <!-- Representation Comparison -->
+          <div class="mb-12">
+            <h3 class="text-2xl font-semibold text-navy mb-8">3D分子表示方法比较</h3>
+            <div class="grid md:grid-cols-3 gap-6">
+              <div class="bg-sage/10 rounded-lg p-6">
+                <h4 class="font-semibold text-navy mb-3 flex items-center">
+                  <i class="fas fa-dot-circle text-sage mr-2"></i>
+                  点云 (Point Cloud)
+                </h4>
+                <div class="text-sm text-gray-700 space-y-2">
+                  <p><strong>优势：</strong>精确空间坐标，易于等变性</p>
+                  <p><strong>局限：</strong>不显式包含化学键</p>
+                  <p><strong>应用：</strong>PMDM, DiffLinker, EDM</p>
+                </div>
+              </div>
+
+              <div class="bg-clay/10 rounded-lg p-6">
+                <h4 class="font-semibold text-navy mb-3 flex items-center">
+                  <i class="fas fa-cubes text-clay mr-2"></i>
+                  体素 (Voxel Grid)
+                </h4>
+                <div class="text-sm text-gray-700 space-y-2">
+                  <p><strong>优势：</strong>结构规整，适合3D CNN</p>
+                  <p><strong>局限：</strong>分辨率限制，量化误差</p>
+                  <p><strong>应用：</strong>VoxMol, GENiPPI</p>
+                </div>
+              </div>
+
+              <div class="bg-stone/10 rounded-lg p-6">
+                <h4 class="font-semibold text-navy mb-3 flex items-center">
+                  <i class="fas fa-project-diagram text-stone mr-2"></i>
+                  图 (Graph)
+                </h4>
+                <div class="text-sm text-gray-700 space-y-2">
+                  <p><strong>优势：</strong>明确编码化学键和拓扑</p>
+                  <p><strong>局限：</strong>3D坐标生成复杂</p>
+                  <p><strong>应用：</strong>EDM-SyCo, MolGAN</p>
+                </div>
+              </div>
+            </div>
+            <p class="text-sm text-gray-600 mt-4">
+              数据来源：<a class="text-sage hover:underline" href="https://hub.baai.ac.cn/view/38069">[292]</a>
+            </p>
+          </div>
+
+          <!-- ED Advantages and Challenges -->
+          <div class="grid lg:grid-cols-2 gap-8">
+            <div class="bg-white border border-gray-200 rounded-lg p-8">
+              <h3 class="text-xl font-semibold text-navy mb-6">电子密度作为中间表示的优势</h3>
+              <div class="space-y-4">
+                <div class="flex items-start">
+                  <div class="w-6 h-6 bg-sage rounded-full flex items-center justify-center mr-3 mt-1 flex-shrink-0">
+                    <i class="fas fa-check text-white text-xs"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold text-navy">提升物理可解释性</h4>
+                    <p class="text-sm text-gray-700">直接与实验观测数据联系，增强模型可解释性</p>
+                  </div>
+                </div>
+                <div class="flex items-start">
+                  <div class="w-6 h-6 bg-clay rounded-full flex items-center justify-center mr-3 mt-1 flex-shrink-0">
+                    <i class="fas fa-check text-white text-xs"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold text-navy">促进知识迁移</h4>
+                    <p class="text-sm text-gray-700">普适性物理量，便于跨生物大分子类型迁移</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white border border-gray-200 rounded-lg p-8">
+              <h3 class="text-xl font-semibold text-navy mb-6">面临的挑战</h3>
+              <div class="space-y-4">
+                <div class="flex items-start">
+                  <div class="w-6 h-6 bg-stone rounded-full flex items-center justify-center mr-3 mt-1 flex-shrink-0">
+                    <i class="fas fa-exclamation text-white text-xs"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold text-navy">数据获取与质量</h4>
+                    <p class="text-sm text-gray-700">实验数据质量参差不齐，计算成本较高</p>
+                  </div>
+                </div>
+                <div class="flex items-start">
+                  <div class="w-6 h-6 bg-navy rounded-full flex items-center justify-center mr-3 mt-1 flex-shrink-0">
+                    <i class="fas fa-exclamation text-white text-xs"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold text-navy">表示与模型复杂性</h4>
+                    <p class="text-sm text-gray-700">3D表示选择，多任务学习复杂性</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Challenges Section -->
+      <section class="py-16 bg-gray-50" id="challenges">
+        <div class="container mx-auto px-8">
+          <h2 class="font-serif text-4xl font-bold text-navy mb-12">挑战与未来方向</h2>
+
+          <div class="grid lg:grid-cols-2 gap-8 mb-12">
+            <div class="space-y-8">
+              <div class="bg-white rounded-lg p-8 shadow-lg">
+                <div class="flex items-center mb-4">
+                  <div class="w-12 h-12 bg-sage rounded-full flex items-center justify-center mr-4">
+                    <i class="fas fa-database text-white"></i>
+                  </div>
+                  <h3 class="text-xl font-semibold text-navy">数据质量与标准化</h3>
+                </div>
+                <p class="text-gray-700 leading-relaxed">
+                  构建大规模、标准化、高质量的电子密度数据集是关键挑战。
+                  需要统一不同来源、分辨率、格式的数据，建立评估基准。
+                </p>
+              </div>
+
+              <div class="bg-white rounded-lg p-8 shadow-lg">
+                <div class="flex items-center mb-4">
+                  <div class="w-12 h-12 bg-clay rounded-full flex items-center justify-center mr-4">
+                    <i class="fas fa-flask text-white"></i>
+                  </div>
+                  <h3 class="text-xl font-semibold text-navy">化学合理性与可合成性</h3>
+                </div>
+                <p class="text-gray-700 leading-relaxed">
+                  确保生成分子不仅理论合理，还要可合成并具有良好药物相似性。
+                  需整合化学知识、合成规则及ADMET预测。
+                </p>
+              </div>
+            </div>
+
+            <div class="space-y-8">
+              <div class="bg-white rounded-lg p-8 shadow-lg">
+                <div class="flex items-center mb-4">
+                  <div class="w-12 h-12 bg-stone rounded-full flex items-center justify-center mr-4">
+                    <i class="fas fa-brain text-white"></i>
+                  </div>
+                  <h3 class="text-xl font-semibold text-navy">模型可解释性与可靠性</h3>
+                </div>
+                <p class="text-gray-700 leading-relaxed">
+                  提升模型物理化学可解释性，理解决策过程。
+                  提高鲁棒性，减少无效分子生成，量化不确定性。
+                </p>
+              </div>
+
+              <div class="bg-white rounded-lg p-8 shadow-lg">
+                <div class="flex items-center mb-4">
+                  <div class="w-12 h-12 bg-navy rounded-full flex items-center justify-center mr-4">
+                    <i class="fas fa-exchange-alt text-white"></i>
+                  </div>
+                  <h3 class="text-xl font-semibold text-navy">跨靶点知识迁移</h3>
+                </div>
+                <p class="text-gray-700 leading-relaxed">
+                  开发适应蛋白质、核酸、PPI等不同靶点的通用模型，
+                  提升在数据稀疏或全新靶点上的泛化能力。
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Future Directions -->
+          <div class="bg-white rounded-lg p-8 shadow-lg">
+            <h3 class="text-2xl font-semibold text-navy mb-6">未来研究方向</h3>
+            <div class="grid md:grid-cols-2 gap-8">
+              <div>
+                <h4 class="font-semibold text-navy mb-4 flex items-center">
+                  <i class="fas fa-chart-line text-sage mr-2"></i>
+                  技术发展路径
+                </h4>
+                <ul class="space-y-2 text-gray-700">
+                  <li class="flex items-start">
+                    <span class="text-sage mr-2">•</span>
+                    开发高效准确的计算电子密度方法
+                  </li>
+                  <li class="flex items-start">
+                    <span class="text-sage mr-2">•</span>
+                    构建标准化电子密度-分子结构数据库
+                  </li>
+                  <li class="flex items-start">
+                    <span class="text-sage mr-2">•</span>
+                    设计混合模型结合扩散与自回归优势
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <h4 class="font-semibold text-navy mb-4 flex items-center">
+                  <i class="fas fa-cogs text-clay mr-2"></i>
+                  应用拓展方向
+                </h4>
+                <ul class="space-y-2 text-gray-700">
+                  <li class="flex items-start">
+                    <span class="text-clay mr-2">•</span>
+                    拓展至RNA、PPI等挑战性靶点
+                  </li>
+                  <li class="flex items-start">
+                    <span class="text-clay mr-2">•</span>
+                    发展跨靶点知识迁移技术
+                  </li>
+                  <li class="flex items-start">
+                    <span class="text-clay mr-2">•</span>
+                    建立计算-实验验证闭环系统
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Conclusion Section -->
+      <section class="py-16 bg-white" id="conclusion">
+        <div class="container mx-auto px-8">
+          <h2 class="font-serif text-4xl font-bold text-navy mb-12">结论</h2>
+
+          <div class="max-w-4xl mx-auto">
+            <div class="bg-sage/10 rounded-lg p-8 mb-12">
+              <h3 class="text-2xl font-semibold text-navy mb-6">研究进展总结</h3>
+              <p class="text-gray-700 leading-relaxed mb-6">
+                基于电子密度的AI药物设计代表了药物发现领域极具潜力的新兴方向。
+                通过将电子密度作为AI模型的中间表示，研究者们旨在克服传统分子表征方法的局限性，
+                提升模型的可解释性、物理合理性以及生成分子质量。
+              </p>
+              <p class="text-gray-700 leading-relaxed">
+                本综述系统梳理了该领域的最新进展，从电子密度的基础物理化学意义，
+                到各类AI生成模型的应用原理，重点讨论了将电子密度作为关键信息融入分子生成流程的创新方法。
+                这些方法试图模拟结构生物学家的思维过程，从更本质的物理层面理解和设计药物分子与靶点的相互作用。
+              </p>
+            </div>
+
+            <div class="bg-clay/10 rounded-lg p-8">
+              <h3 class="text-2xl font-semibold text-navy mb-6">应用前景展望</h3>
+              <div class="prose prose-gray max-w-none">
+                <p class="text-gray-700 leading-relaxed mb-4">
+                  展望未来，基于电子密度的AI药物设计有望在多个方面取得突破。
+                  在数据层面，开发更高效准确的计算方法，整合更多高质量实验数据；
+                  在模型层面，探索更先进的生成模型，深度整合化学知识与约束条件；
+                  在应用层面，拓展至更广泛的靶点类型，发展跨靶点知识迁移技术。
+                </p>
+                <p class="text-gray-700 leading-relaxed">
+                  <strong>最重要的是，加强AI预测与湿实验验证的紧密结合</strong>，
+                  建立高效的反馈循环，加速从虚拟筛选到苗头化合物发现乃至先导化合物优化的全过程。
+                  随着技术成熟和应用深入，这一领域有望为攻克复杂疾病、加速创新药物研发贡献重要力量。
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="bg-navy text-white py-12">
+        <div class="container mx-auto px-8">
+          <div class="text-center">
+            <p class="text-gray-300 mb-4">
+              本综述基于最新文献资料，旨在为AI药物设计领域的研究者提供系统性参考
+            </p>
+            <div class="text-sm text-gray-400">
+              <p>文献综述与选题报告 2025</p>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </main>
+    </div>
+    <script>
+        // Initialize Mermaid
+        document.addEventListener('DOMContentLoaded', function() {
+            mermaid.initialize({ 
+                startOnLoad: true,
+                theme: 'base',
+                themeVariables: {
+                    primaryColor: '#1E293B',
+                    primaryTextColor: '#FFFFFF',
+                    primaryBorderColor: '#334155',
+                    lineColor: '#64748B',
+                    secondaryColor: '#8FA68E',
+                    tertiaryColor: '#D4A574',
+                    background: '#FFFFFF',
+                    mainBkg: '#F8FAFC',
+                    secondBkg: '#8FA68E',
+                    tertiaryBkg: '#D4A574',
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '13px'
+                },
+                flowchart: {
+                    useMaxWidth: true,
+                    htmlLabels: true,
+                    curve: 'basis'
+                },
+                sequence: {
+                    useMaxWidth: true
+                },
+                gantt: {
+                    useMaxWidth: true
+                }
+            });
+
+            // Initialize Mermaid Controls for zoom and pan
+            initializeMermaidControls();
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Highlight active section in TOC
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('section[id]');
+            const tocLinks = document.querySelectorAll('.toc-fixed a');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollY >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            tocLinks.forEach(link => {
+                link.classList.remove('text-white');
+                link.classList.add('text-sage');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.remove('text-sage');
+                    link.classList.add('text-white');
+                }
+            });
+        });
+
+        // Initialize Mermaid Controls for zoom and pan
+        function initializeMermaidControls() {
+            const containers = document.querySelectorAll('.mermaid-container');
+
+            containers.forEach(container => {
+            const mermaidElement = container.querySelector('.mermaid');
+            let scale = 1;
+            let isDragging = false;
+            let startX, startY, translateX = 0, translateY = 0;
+
+            // 触摸相关状态
+            let isTouch = false;
+            let touchStartTime = 0;
+            let initialDistance = 0;
+            let initialScale = 1;
+            let isPinching = false;
+
+            // Zoom controls
+            const zoomInBtn = container.querySelector('.zoom-in');
+            const zoomOutBtn = container.querySelector('.zoom-out');
+            const resetBtn = container.querySelector('.reset-zoom');
+            const fullscreenBtn = container.querySelector('.fullscreen');
+
+            function updateTransform() {
+                mermaidElement.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+
+                if (scale > 1) {
+                container.classList.add('zoomed');
+                } else {
+                container.classList.remove('zoomed');
+                }
+
+                mermaidElement.style.cursor = isDragging ? 'grabbing' : 'grab';
+            }
+
+            if (zoomInBtn) {
+                zoomInBtn.addEventListener('click', () => {
+                scale = Math.min(scale * 1.25, 4);
+                updateTransform();
+                });
+            }
+
+            if (zoomOutBtn) {
+                zoomOutBtn.addEventListener('click', () => {
+                scale = Math.max(scale / 1.25, 0.3);
+                if (scale <= 1) {
+                    translateX = 0;
+                    translateY = 0;
+                }
+                updateTransform();
+                });
+            }
+
+            if (resetBtn) {
+                resetBtn.addEventListener('click', () => {
+                scale = 1;
+                translateX = 0;
+                translateY = 0;
+                updateTransform();
+                });
+            }
+
+            if (fullscreenBtn) {
+                fullscreenBtn.addEventListener('click', () => {
+                if (container.requestFullscreen) {
+                    container.requestFullscreen();
+                } else if (container.webkitRequestFullscreen) {
+                    container.webkitRequestFullscreen();
+                } else if (container.msRequestFullscreen) {
+                    container.msRequestFullscreen();
+                }
+                });
+            }
+
+            // Mouse Events
+            mermaidElement.addEventListener('mousedown', (e) => {
+                if (isTouch) return; // 如果是触摸设备，忽略鼠标事件
+
+                isDragging = true;
+                startX = e.clientX - translateX;
+                startY = e.clientY - translateY;
+                mermaidElement.style.cursor = 'grabbing';
+                updateTransform();
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (isDragging && !isTouch) {
+                translateX = e.clientX - startX;
+                translateY = e.clientY - startY;
+                updateTransform();
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (isDragging && !isTouch) {
+                isDragging = false;
+                mermaidElement.style.cursor = 'grab';
+                updateTransform();
+                }
+            });
+
+            document.addEventListener('mouseleave', () => {
+                if (isDragging && !isTouch) {
+                isDragging = false;
+                mermaidElement.style.cursor = 'grab';
+                updateTransform();
+                }
+            });
+
+            // 获取两点之间的距离
+            function getTouchDistance(touch1, touch2) {
+                return Math.hypot(
+                touch2.clientX - touch1.clientX,
+                touch2.clientY - touch1.clientY
+                );
+            }
+
+            // Touch Events - 触摸事件处理
+            mermaidElement.addEventListener('touchstart', (e) => {
+                isTouch = true;
+                touchStartTime = Date.now();
+
+                if (e.touches.length === 1) {
+                // 单指拖动
+                isPinching = false;
+                isDragging = true;
+
+                const touch = e.touches[0];
+                startX = touch.clientX - translateX;
+                startY = touch.clientY - translateY;
+
+                } else if (e.touches.length === 2) {
+                // 双指缩放
+                isPinching = true;
+                isDragging = false;
+
+                const touch1 = e.touches[0];
+                const touch2 = e.touches[1];
+                initialDistance = getTouchDistance(touch1, touch2);
+                initialScale = scale;
+                }
+
+                e.preventDefault();
+            }, { passive: false });
+
+            mermaidElement.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 1 && isDragging && !isPinching) {
+                // 单指拖动
+                const touch = e.touches[0];
+                translateX = touch.clientX - startX;
+                translateY = touch.clientY - startY;
+                updateTransform();
+
+                } else if (e.touches.length === 2 && isPinching) {
+                // 双指缩放
+                const touch1 = e.touches[0];
+                const touch2 = e.touches[1];
+                const currentDistance = getTouchDistance(touch1, touch2);
+
+                if (initialDistance > 0) {
+                    const newScale = Math.min(Math.max(
+                    initialScale * (currentDistance / initialDistance),
+                    0.3
+                    ), 4);
+                    scale = newScale;
+                    updateTransform();
+                }
+                }
+
+                e.preventDefault();
+            }, { passive: false });
+
+            mermaidElement.addEventListener('touchend', (e) => {
+                // 重置状态
+                if (e.touches.length === 0) {
+                isDragging = false;
+                isPinching = false;
+                initialDistance = 0;
+
+                // 延迟重置isTouch，避免鼠标事件立即触发
+                setTimeout(() => {
+                    isTouch = false;
+                }, 100);
+                } else if (e.touches.length === 1 && isPinching) {
+                // 从双指变为单指，切换为拖动模式
+                isPinching = false;
+                isDragging = true;
+
+                const touch = e.touches[0];
+                startX = touch.clientX - translateX;
+                startY = touch.clientY - translateY;
+                }
+
+                updateTransform();
+            });
+
+            mermaidElement.addEventListener('touchcancel', (e) => {
+                isDragging = false;
+                isPinching = false;
+                initialDistance = 0;
+
+                setTimeout(() => {
+                isTouch = false;
+                }, 100);
+
+                updateTransform();
+            });
+
+            // Enhanced wheel zoom with better center point handling
+            container.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const rect = container.getBoundingClientRect();
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+
+                const delta = e.deltaY > 0 ? 0.9 : 1.1;
+                const newScale = Math.min(Math.max(scale * delta, 0.3), 4);
+
+                // Adjust translation to zoom towards center
+                if (newScale !== scale) {
+                const scaleDiff = newScale / scale;
+                translateX = translateX * scaleDiff;
+                translateY = translateY * scaleDiff;
+                scale = newScale;
+
+                if (scale <= 1) {
+                    translateX = 0;
+                    translateY = 0;
+                }
+
+                updateTransform();
+                }
+            });
+
+            // Initialize display
+            updateTransform();
+            });
+        }
+    </script>
+
+  
+
+</body></html>
