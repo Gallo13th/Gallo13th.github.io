@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>Lotte</title><link rel="manifest" href="/manifest.json"><meta name="application-name" content="Lotte"><meta name="msapplication-TileImage" content="https://raw.githubusercontent.com/Gallo13th/BlogImages/main/pics/head_icon.jpg"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Lotte"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="icml2026_rebuttal.pdf 翻译 审稿人 1 我们衷心感谢您的 thoughtful 反馈。以下，我们将逐点回应您的问题。我们承诺将所有内容添加到原始论文中。 药效团依赖性： 该模型依赖于根据填充物中最近的原子为点云分配药效团标签。这在严格的新药物设计中会产生高度依赖性，因为在新药物设计场景中，可能缺乏高质量的参考结合剂。 回应： 关于药效团依赖性，我们 respectfully"><meta property="og:type" content="blog"><meta property="og:title" content="Lotte Gallo"><meta property="og:url" content="https://gallo13th.github.io/"><meta property="og:site_name" content="Lotte Gallo"><meta property="og:description" content="icml2026_rebuttal.pdf 翻译 审稿人 1 我们衷心感谢您的 thoughtful 反馈。以下，我们将逐点回应您的问题。我们承诺将所有内容添加到原始论文中。 药效团依赖性： 该模型依赖于根据填充物中最近的原子为点云分配药效团标签。这在严格的新药物设计中会产生高度依赖性，因为在新药物设计场景中，可能缺乏高质量的参考结合剂。 回应： 关于药效团依赖性，我们 respectfully"><meta property="og:locale" content="zh_CN"><meta property="og:image" content="https://raw.githubusercontent.com/Gallo13th/BlogImages/main/pics/head_icon.jpg"><meta property="article:published_time" content="2026-05-10T03:02:39.762Z"><meta property="article:modified_time" content="2026-03-29T14:11:00.960Z"><meta property="twitter:card" content="summary"><meta property="twitter:image:src" content="https://raw.githubusercontent.com/Gallo13th/BlogImages/main/pics/head_icon.jpg"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://gallo13th.github.io/draft/rebuttal.html"},"headline":"Lotte","image":["http://gallo13th.github.io/img/og_image.png"],"datePublished":"2026-05-10T03:02:39.762Z","dateModified":"2026-03-29T14:11:00.960Z","author":{"@type":"Person","name":null},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject"}},"description":"icml2026_rebuttal.pdf 翻译 审稿人 1 我们衷心感谢您的 thoughtful 反馈。以下，我们将逐点回应您的问题。我们承诺将所有内容添加到原始论文中。 药效团依赖性： 该模型依赖于根据填充物中最近的原子为点云分配药效团标签。这在严格的新药物设计中会产生高度依赖性，因为在新药物设计场景中，可能缺乏高质量的参考结合剂。 回应： 关于药效团依赖性，我们 respectfully"}</script><link rel="canonical" href="http://gallo13th.github.io/draft/rebuttal.html"><link rel="icon" href="https://raw.githubusercontent.com/Gallo13th/BlogImages/main/pics/head_icon.jpg"><meta name="referrer" content="no-referrer-when-downgrade"><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/font-awesome/6.0.0/css/all.min.css"><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/highlight.js/11.7.0/styles/atom-one-light.min.css"><link rel="stylesheet" href="https://fonts.loli.net/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link rel="stylesheet" href="/css/default.css"><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/font-awesome/5.12.0/css/all.min.css"><link rel="stylesheet" href="https://fonts.loli.net/css?family=Ubuntu:400,600|Source+Code+Pro|Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Microsoft YaHei:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&amp;amp;subset=latin,latin-ext|Inconsolata|Itim|Lobster.css"><script src="https://cdnjs.loli.net/ajax/libs/jquery/3.3.1/jquery.min.js"></script><script src="/js/globalUtils.js"></script><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" defer></script><!--!--><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/lightgallery/1.10.0/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/justifiedGallery/3.8.1/css/justifiedGallery.min.css"><!--!--><!--!--><!--!--><!--!--><style>.pace{-webkit-pointer-events:none;pointer-events:none;-webkit-user-select:none;-moz-user-select:none;user-select:none}.pace-inactive{display:none}.pace .pace-progress{background:#3273dc;position:fixed;z-index:2000;top:0;right:100%;width:100%;height:2px}</style><script src="https://cdnjs.loli.net/ajax/libs/pace/1.2.4/pace.min.js"></script><!-- hexo injector head_end start --><script>
+  (function () {
+      function switchTab() {
+          if (!location.hash) {
+            return;
+          }
+
+          const id = '#' + CSS.escape(location.hash.substring(1));
+          const $tabMenu = document.querySelector(`.tabs a[href="${id}"]`);
+          if (!$tabMenu) {
+            return;
+          }
+
+          const $tabMenuContainer = $tabMenu.parentElement.parentElement;
+          Array.from($tabMenuContainer.children).forEach($menu => $menu.classList.remove('is-active'));
+          Array.from($tabMenuContainer.querySelectorAll('a'))
+              .map($menu => document.getElementById($menu.getAttribute("href").substring(1)))
+              .forEach($content => $content.classList.add('is-hidden'));
+
+          if ($tabMenu) {
+              $tabMenu.parentElement.classList.add('is-active');
+          }
+          const $activeTab = document.querySelector(id);
+          if ($activeTab) {
+              $activeTab.classList.remove('is-hidden');
+          }
+      }
+      switchTab();
+      window.addEventListener('hashchange', switchTab, false);
+  })();
+  </script><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head><body class="is-3-column has-navbar-fixed-top"><nav class="navbar navbar-main is-fixed-top"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="https://raw.githubusercontent.com/Gallo13th/BlogImages/main/pics/head_icon.jpg" alt="Lotte" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">Home</a><a class="navbar-item" href="/archives">Archives</a><a class="navbar-item" href="/categories">Categories</a><a class="navbar-item" href="/tags">Tags</a><a class="navbar-item" href="/about">About</a><a class="navbar-item" href="/album">Album</a><a class="navbar-item" href="/friend">Friend</a><a class="navbar-item" href="/message">Message</a><a class="navbar-item" href="/self-talking">Self-talking</a><a class="navbar-item" href="/music">Music</a><a class="navbar-item" href="/media">Media</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Join Gitter" href="https://gitter.im/hexo-theme-amazing/community"><i class="fab fa-gitter"></i></a><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/removeif/hexo-theme-amazing"><i class="fab fa-github"></i></a><a class="navbar-item" target="_blank" rel="noopener" title="GitHub" href="https://github.com/gallo13th"><i class="fab fa-github"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a><a class="navbar-item" id="night-nav" title="Night Mode" href="javascript:;"><i class="fas fa-moon" id="night-icon"></i></a></div></div></div></nav><script type="text/javascript" src="/js/theme-setting.js"></script><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main"><!--!--><div class="card"><article class="card-content article" role="article"><h1 class="title is-3 is-size-4-mobile"> </h1><div class="content"><h1>icml2026_rebuttal.pdf 翻译</h1>
+<h2 id="审稿人-1">审稿人 1</h2>
+<p>我们衷心感谢您的 thoughtful 反馈。以下，我们将逐点回应您的问题。我们承诺将所有内容添加到原始论文中。</p>
+<p><strong>药效团依赖性：</strong> 该模型依赖于根据填充物中最近的原子为点云分配药效团标签。这在严格的新药物设计中会产生高度依赖性，因为在新药物设计场景中，可能缺乏高质量的参考结合剂。</p>
+<p><strong>回应：</strong> 关于药效团依赖性，我们 respectfully 澄清，新药物设计并不严格等同于使用无配体的“Apo”结构。实际上，大多数成功的 de novo 设计案例都是从全息结构（例如，与内源性配体如 ADP 或 NADPH 一起结晶的蛋白质，随后去除这些配体）衍生的“空”口袋开始的[ref 3]。这种工作流程是首选，因为 Apo 和 Holo 口袋在体积、表面积和疏水性方面存在显著的构象差异[ref 1, 2]。我们的方法利用这些类似 Holo 的空腔，其中天然的内源性底物本身就提供了必要的药效团信息。即使内源性底物的结构相对简单，我们仍然可以提取口袋衍生的药效团特征，并将其映射到填充物密度网格上[ref 5]，从而确保即使在缺乏高质量参考结合剂的情况下也能提供 robust 的指导。</p>
+<p>对于只有 Apo 结构可用的场景，当前最先进的策略通常遵循在设计分子之前重建 Holo 状态的逻辑[ref 4]。例如，可以利用同源模板从 Apo 结构推断 Holo 构象，并放置填充物来代表结合环境。经过分子动力学弛豫后，我们的框架可以无缝地利用由此产生的计算电子密度 (calED) 和相应的药效团先验来指导生成过程。因此，我们对填充物信息密度的依赖并没有限制适用性；相反，它反映了在实际药物设计流程中，成功的计算先导化合物发现所需的严格生物物理准备——例如识别保守的相互作用热点。</p>
+<p><strong>分辨率和稀疏性的权衡：</strong> 虽然消融研究表明点的数量 (N_p=199) 至关重要，但这个选择看起来有些经验主义。进一步讨论这种稀疏性如何影响显著不同口袋体积的性能将是有益的。</p>
+<p><strong>回应：</strong> 如表 6 所示，我们对 (N_{p}) 进行了消融研究。增加 (N_{p}) 可以更精细地表示密度模式，提高 Min-in-place 分数，但会略微降低多样性，同时也会增加输入 token 的数量，从而增加计算成本。相比之下，使用更少的点可以减少 token 数量和相关资源消耗，但会导致一定的性能下降。因此，(N_{p} = 199) 代表了资源效率和性能之间的实际平衡。</p>
+<p><strong>强度的领域差异：</strong> 由于实验噪声和柔性，CalED 和 ExpED 之间的强度分布存在显著差异。论文将受益于更深入的理论分析，说明微调阶段如何缓解这种分布偏移。</p>
+<p><strong>回应：</strong> 我们基于泛化界限提供了一个初步的理论视角。令 (\mathcal{D}<em>{cal}) 和 (\mathcal{D}</em>{exp}) 分别表示计算和实验电子密度的分布。对于在 (\mathcal{D}<em>{cal}) 上预训练的模型 (G</em>{\theta})，其在实验领域上的风险 (\epsilon_{exp}(G_{\theta})) 可以如下界定 [ref5]：</p>
+<p>[\epsilon_{exp}(G_{\theta})\leq \epsilon_{cal}(G_{\theta}) + \frac{1}{2} d_{\mathcal{H}\Delta \mathcal{H}}(\mathcal{D}<em>{cal},\mathcal{D}</em>{exp}) + \lambda ,]</p>
+<p>其中 (d_{\mathcal{H}\Delta \mathcal{H}}) 衡量两个强度分布之间的差异，(\lambda) 是与假设类复杂度相关的常数。由于实验噪声和分子柔性，初始差异 (d_{\mathcal{H}\Delta \mathcal{H}}(\mathcal{D}<em>{cal},\mathcal{D}</em>{exp})) 是不可忽略的，这可能导致 (\epsilon_{exp}(G_{\theta})) 的上界相对宽松。</p>
+<p>在 (\mathcal{D}<em>{exp}) 上进行微调可以看作是将模型适应目标分布，这有助于在一定程度上减少有效的分布差异。在理想情况下，这个过程对应于将差异项替换为 (d</em>{\mathcal{H}\Delta \mathcal{H}}(\mathcal{D}<em>{exp},\mathcal{D}</em>{exp}) = 0)。在实践中，虽然无法完全消除这种差异，但可以通过微调显著减轻它，从而收紧泛化界限并提高在实验数据上的性能。</p>
+<p>[ref 1] Guo, Zuojun, et al. “Identification of protein-ligand binding sites by the level-set variational implicit-solvent approach.” Journal of Chemical Theory and Computation 11.2 (2015): 753-765.<br>
+[ref 2] Clark, Jordan J., et al. “Inherent versus induced protein flexibility: Comparisons within and between apo and holo structures.” PLoS computational biology 15.1 (2019): e1006705.<br>
+[ref 3] Lam, Jordy Homing, and Vsevolod Katritch. “Navigating structure-based drug discovery with emerging innovations in physics- and knowledge-based approaches.” npj Drug Discovery 2.1 (2025): 29.<br>
+[ref 4] Zhang, Jinze, et al. “Holo protein conformation generation from apo structures by ligand binding site refinement.” Journal of Chemical Information and Modeling 62.22 (2022): 5806-5820.<br>
+[ref 5] Flynn, Emma L., et al. “PharmacoForge: pharmacophore generation with diffusion models.” Frontiers in Bioinformatics 5 (2025): 1628800.<br>
+[ref 6] Ben-David, Shai, et al. “Analysis of representations for domain adaptation.” Advances in neural information processing systems 19 (2006).</p>
+<h2 id="审稿人-2">审稿人 2</h2>
+<p>我们衷心感谢您 valuable 和 insightful 的评论。以下，我们将逐点回应您的问题。我们承诺将所有内容添加到原始论文中。</p>
+<p>作者强调了方法的弱点，并对模型表现不如基线的情况提供了大多令人满意的解释。不过，关于构象稳定性，我认为 EDMolGPT 的应变能比 Lingo3DMol 更差（而不是相当）。然后，对于 min-in-place 结合亲和力，这个指标在 CalED 设置中 EDMolGPT 表现最佳时被重视，但在 ExpED 设置中却被轻视了。</p>
+<p><strong>回应：</strong> 我们同意 EDMolGPT 的 SE 高于 Lingo3DMol，尽管它仍处于可比较的范围内，表明构象稳定性合理但尚未达到最优。关于 CalED 和 ExpED 之间 Min-in-place 的不同趋势，我们总结这源于两个因素：(1) 高质量实验性全息结构的有限可用性限制了 ExpED 训练数据的规模，尽管 CalED 预训练部分缓解了这个问题，但差距仍然存在；(2) 实验电子密度具有更高的柔性和噪声，这使得评估更具挑战性，并可能导致不稳定的评分结果。总体而言，我们的工作代表了利用电子密度进行分子生成的初步探索，我们承认某些指标可能尚未超越强大的基线。我们将在未来的工作中继续完善框架并提高稳定性和鲁棒性。</p>
+<p>作为一个小问题，EDMolGPT 中可能不需要位置嵌入，因为 token 嵌入捕获了原子之间的离散距离。在这种情况下，用一行解释是否需要（以及为什么需要）位置编码可能会有所帮助。</p>
+<p><strong>回应：</strong> 尽管 token 嵌入编码了离散的原子间距离，但位置编码对于保持顺序和为自回归生成提供全局空间参考仍然是必要的。此外，我们的模型包含不同类型的电子密度 token 和分子 token，位置编码有助于区分这些模态，同时使分子解码过程能够更好地感知空间结构。</p>
+<p>在 3.4 节中，您提到使用线性分类器“since all items are converted into discrete space”。您能详细说明一下这是什么意思吗？例如，特征是否需要处于离散空间才能使用线性分类器？以及为什么需要它们来预测 a, v, l, theta 等？</p>
+<p><strong>回应：</strong> 感谢您指出这一点。我们原本的意图是区分连续空间和离散空间中的预测范式。对于在连续空间中定义的变量，单个线性层通常足以执行回归。相比之下，在离散化之后，预测问题被重新表述为对离散区间的分类任务，为此我们采用线性分类器（即线性层后接 softmax）。因此，使用“线性分类器”并不意味着特征必须是离散的才能应用线性模型；相反，它反映了离散化后预测目标的表述。我们对此描述中的模糊性表示歉意，并将修改稿件以澄清这一区别。</p>
+<p>DUD-E 对于评估生物活性分子恢复率（这是您首先提出的指标）来说相当小。它是否代表了足够广泛的生物活性分子集合，以至于可以得出结论，与其分子的相似性等同于所有已知活性化合物的相似性？请考虑使用如此小的参考集的局限性。</p>
+<p><strong>回应：</strong> 关于测试数据集的选择，我们主要使用 DUD-E 数据集评估我们的模型，因为它仍然是基于结构的药物设计中的既定基准。DUD-E 涵盖了超过 100 个不同的蛋白质靶点，包括激酶、蛋白酶、GPCR 和离子通道等关键治疗类别，每个靶点平均有超过 200 个活性配体。此外，DUD-E 中的每个活性化合物都有实验测量的亲和力支持，为在广泛的化学空间中将生成的分子与经过验证的生物活性配体进行比较提供了可靠的基础。</p>
+<p>虽然我们承认没有一个单一数据集能够完全囊括针对某个靶点的所有已知活性化合物的整个化学空间，但我们遵循了生成建模中的既定协议。这确保了在一致的基准测试框架下，与最先进的基线进行公平比较。</p>
+<p>为了验证基线可能因为生成更小、更简单的分子而获得有利的 QED/SAS 分数这一假设，我建议按重量对样本进行分箱，并计算每个分箱的药物相似性属性。</p>
+<p><strong>回应：</strong> 我们在下表中总结了 ED2Mol 和 EdMolGPT 的结果：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">分子量 (bin)</th>
+<th style="text-align:left">SAS (Ed2Mol / Ours)</th>
+<th style="text-align:left">QED (Ed2Mol / Ours)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">&lt; 180</td>
+<td style="text-align:left">3.18 / 3.29</td>
+<td style="text-align:left">0.66 / 0.52</td>
+</tr>
+<tr>
+<td style="text-align:left">180 - 300</td>
+<td style="text-align:left">3.93 / 3.80</td>
+<td style="text-align:left">0.75 / 0.63</td>
+</tr>
+<tr>
+<td style="text-align:left">300 - 420</td>
+<td style="text-align:left">4.68 / 3.73</td>
+<td style="text-align:left">0.74 / 0.63</td>
+</tr>
+<tr>
+<td style="text-align:left">&gt; 420</td>
+<td style="text-align:left">5.27 / 3.88</td>
+<td style="text-align:left">0.52 / 0.46</td>
+</tr>
+</tbody>
+</table>
+<p>分箱分析显示，虽然 Ed2Mol 在 QED 上表现出局部优势，但随着分子量的增加，其 SAS 分数显著升高，表明对于较大的分子，其合成可及性下降。相比之下，EdMolGPT 在所有重量类别中都保持更一致和有利的 SAS 分布。</p>
+<p>此外，考虑到其他指标如恢复率和结合亲和力，EdMolGPT 在生成生物学相关结构方面表现出优越的整体性能。我们承认 ED2Mol 在优化特定药物相似性属性方面具有独特优势，我们认为这是一个 valuable 的基准。在未来的工作中，我们旨在将这些优势整合到我们的框架中，以进一步缩小差距并增强我们生成分子的化学合理性。</p>
+<p>正文中的讨论（第 5 节）没有明确的目的或读者。也不清楚您是想突出 EDMolGPT 的方法论差异，还是担心其他人不认为您的方法与使用全息结构的其他 SBDD 方法一致。您是在施加约束还是确保与其他 SBDD 方法的一致性？我考虑完全删除这一节。如果修订后还有空间，我建议将当前在附录中的讨论移到正文中，替换当前的讨论。附录中的讨论更全面，并且在更高层次上更好地比较了 EDMolGPT 与其他 SBDD 方法。</p>
+<p><strong>回应：</strong> 我们衷心感谢审稿人关于我们讨论部分结构的这一 insightful 建议。我们第 5 节的初衷是为可能没有药物发现专业背景的读者提供关于我们方法应用的实际广度和深度的宏观视角。然而，我们认识到这可能无意中模糊了叙述的重点和 EDMolGPT 的方法论区别。根据您的建议，为了提高稿件的清晰度和流畅性，我们将删除当前的第五部分。</p>
+<p>我建议将图 3、5 和 6 各自放在单独的面板中，而不是挤在一起，因为您可能正打算为相机就绪版本这样做。</p>
+<p><strong>回应：</strong> 在相机就绪版本中，我们将把图 3、5 和 6 重新组织成单独的面板，以确保更好的可读性和更少拥挤的呈现。</p>
+<p>考虑在 3.3 节中引用 C.1 节，当您描述改进 FSMILES 时。</p>
+<p><strong>回应：</strong> 我们将在 3.3 节中添加对 C.1 节的引用，为 FSMILES 的改进提供更详细的背景。</p>
+<p>其他人可能会因为需要离散化坐标并人为地对 token 进行自回归排序而对直接使用 EdMolGPT 犹豫不决。这一点，加上低分辨率的填充物 ED，理论上可能会消除太多连续信息并阻碍更广泛的应用。</p>
+<p><strong>回应：</strong> 在这项工作中，我们采用了自回归公式，因为先前的研究表明，这种方法通常能产生具有更优药物相似性和化学有效性的分子。受大型语言模型成功应用的启发，我们旨在探索这种序列建模范式是否能够有效地对以电子密度为条件的分子结构进行建模。虽然我们承认离散化涉及与连续信息的内在权衡，但我们认为这是利用 robust 的 Transformer 架构进行基于 ED 的药物设计的基础性尝试。我们同意基于扩散的方法提供了一个引人注目的替代方案，研究更精细的表示方案以最小化信息损失仍然是我们未来研究的高度优先事项。</p>
+<p>作为一个小问题，您可以明确指出，尽管 3D 坐标被离散化，但您的特征化和 EDMolGPT 对旋转和平移都是不变的。</p>
+<p><strong>回应：</strong> 我们将在修订后的稿件中解释我们的离散化和编码方案如何处理空间坐标及其对模型空间感知能力的影响。</p>
+<p>您能否澄清您正文中当前讨论的受众和目的？请考虑用附录中提到的当前讨论替换它。</p>
+<p><strong>回应：</strong> 正文中的讨论旨在阐明我们方法的范围和适用性，这与现有的基于口袋的药物设计方法基本一致。由于我们提出了一个新的范式，我们加入这个讨论是为了帮助读者，特别是没有药物发现背景的计算研究人员，更好地理解我们工作的背景和意义。我们感谢这个建议，并将在未来的修订中合并正文和附录，以提高简洁性和可读性。</p>
+<p>您能否更详细地解释为什么选择自回归模型？在引言中，您强调了它的简单性、灵活性和高效率，但没有提到它“离散化信息”的潜在缺点。很明显，您选择填充物 ED 是为了克服刚性口袋的局限性，但为什么自回归模型在这种设置下是正确的建模选择？</p>
+<p><strong>回应：</strong> 在分子生成建模中，两种主要的范式是自回归和基于扩散的方法。在这项工作中，我们采用了自回归公式，因为先前的研究表明，这些方法往往能产生具有更强药物相似性和更稳定化学有效性的分子。此外，大型语言模型在广泛领域的近期成功激励我们研究类似的序列建模范式是否可以有效地应用于此设置，特别是用于生成以电子密度为条件的分子结构。同时，我们承认基于扩散的方法也为这个问题提供了一个可行的解决方案和有效的替代方案。</p>
+<p>总的来说，自回归和扩散范式之间的选择仍然是一个悬而未决的问题。开发更有效的建模框架和改进的算法是未来研究的一个重要方向。</p>
+<h2 id="审稿人-3">审稿人 3</h2>
+<p>我们衷心感谢您的 thoughtful 反馈。以下，我们将逐点回应您的问题。我们承诺将所有内容添加到原始论文中。</p>
+<p>该方法严重依赖全息结构来提取填充物 ED，这极大地限制了其在现实 de novo 药物设计中的适用性，因为现实场景中没有已知的配体。</p>
+<p><strong>回应：</strong> 关于 de novo 药物设计中的适用性，我们 respectfully 澄清，de novo 设计并不严格等同于使用无配体的“Apo”结构。实际上，大多数成功的 de novo 设计案例都是从全息结构（例如，与内源性配体如 ADP 或 NADPH 一起结晶的蛋白质，随后去除这些配体）衍生的“空”口袋开始的[ref 3]。从一个全息状态到一个新的配体结合状态的转变是标准的工作流程，因为 Apo 和 Holo 口袋在体积、表面积和疏水性方面存在显著的构象差异[ref 1, 2]。因此，在预先配置的类似 Holo 的空腔内设计分子是药物发现中更现实、成功率更高的场景，这与我们的方法对填充物电子密度 (ED) 的需求完美契合，该密度用于定义结合位点的药效团环境。</p>
+<p>对于只有 Apo 结构可用的场景，当前最先进的策略通常遵循“在设计分子之前重建 Holo 状态”的逻辑，而不是直接设计到 collapsed 的 Apo 口袋中。例如，最近的方法利用同源模板从 Apo 结构推断 Holo 状态[ref 4]。在这种情况下，可以将同源填充物放入预测的口袋中，并进行分子动力学 (MD) 弛豫以稳定类似 Holo 的构象。然后，我们的框架可以无缝地利用来自这些稳定结构的计算 ED (calED) 来指导 de novo 生成过程。因此，我们对填充物信息 ED 的依赖并没有限制适用性，而是反映了成功的计算先导化合物发现所需的严格生物物理准备。</p>
+<p>整体叙述和实验设计需要更好的组织，以明确定义和区分其实际任务设置。</p>
+<p><strong>回应：</strong> 我们将仔细重组论文，以更好地定义问题设置，更清楚地区分训练和推理场景，并进一步强调与先前 SBDD 范式的差异。我们还将改进实验部分的结构，确保其与任务定义和评估目标更加一致。</p>
+<p>与 SBDD 基线相比，所采用的基准测试上的优势并不持续强劲。此外，应明确阐明 DUD-E 和 CrossDock 评估之间的关键差异，尤其是因为 SBDD 模型在 DUD-E 上的排名与典型结果显著不同。</p>
+<p><strong>回应：</strong> 我们想澄清，CrossDock 数据集是由人工对接的蛋白质-配体对构建的，其中配体基于几何或形状互补性放置，不一定表现出真实的结合活性。相比之下，DUD-E 涵盖了超过 100 个不同的蛋白质靶点，包括激酶、蛋白酶、GPCR 和离子通道等关键治疗类别，每个靶点平均有超过 200 个活性配体。此外，DUD-E 中的每个活性化合物都有实验测量的亲和力支持，为在广泛的化学空间中将生成的分子与经过验证的生物活性配体进行比较提供了可靠的基础。这种根本性差异可能导致两个基准测试中的模型排名不一致。</p>
+<p>原始训练数据集的描述不足以阐明其构成，并且需要更详细地记录数据预处理步骤，以提高透明度和可重复性。</p>
+<p><strong>回应：</strong> 在第 3.2 节中，我们描述了关于电子密度数据准备的几个细节。为了确保完全的可重复性，我们将发布处理后的电子密度文件、用于通过密度生成分子的代码以及训练好的检查点。</p>
+<p>生成电子密度的过程有些复杂。在修订后的稿件中，我们将提供伪代码描述以清楚说明预处理步骤。由于本 rebuttal 的空间限制，我们无法在此提供所有细节，但这些将包含在更新版本中，以确保透明度和可重复性。</p>
+<p>虽然作者将他们的工作定位为超越传统 SBDD 的进步，但所有基准测试仍然是针对标准 SBDD 基线进行的。由于条件信号（填充物 ED）直接来源于参考配体，信息泄露是不可避免的。该方法更像是一个高性能的配体优化或重建工具，而不是一个真正的 de novo 设计引擎，这使得其真正的贡献在当前 SBDD 评估框架下难以评估。</p>
+<p><strong>回应：</strong> 关于信息泄露和任务定位的担忧，我们 respectfully 指出，我们的方法被设计为一个真正的 de novo 引擎，而不仅仅是一个重建工具。如表 3 所示，生成的分子与参考配体之间的结构相似性始终较低，这表明该模型有潜力探索远超参考结合剂的化学空间。此外，我们在附录 F.1 中对信息泄露的风险进行了广泛讨论。一个关键区别是，在 ExpED 的推理阶段，模型整合了源自溶剂的电子密度，这是一种在训练期间被排除的模态。这确保了模型在测试时必须泛化到未见过的密度分布，而不是简单地记忆训练参考。</p>
+<p>此外，正如我们在对弱点 1 的回应中所述，我们方法的操作范围和适用性与当前基于口袋的 SBDD 框架完全一致。因此，针对标准 SBDD 基线评估我们的模型是合适的。作为利用电子密度进行基于结构的分子生成的先驱工作，我们的方法为基于结构的设计提供了一个新的视角，并为未来在密度引导生成建模方面的研究奠定了坚实的基础。</p>
+<p>核心动机是克服“刚性口袋假设”。然而，主要的结合亲和力指标依赖于 GlideSP，通过“min-in-place”和“redocking”协议进行评估。标准对接算法将受体视为刚性的（或仅允许高度受限的侧链柔性）。使用刚性评分函数评估“柔性感知”生成方法在逻辑上是不一致且矛盾的。</p>
+<p><strong>回应：</strong> 感谢您提出这个 insightful 的观察。您说得对，使用刚性对接分数（如 GlideSP）评估“柔性感知”方法会产生逻辑上的张力。在论文中，我们也使用恢复率作为主要指标，该指标独立于“刚性口袋假设”运行。然而，我们认为仅评估序列生成是不够的。虽然我们承认使用刚性评分函数评估柔性结合存在固有偏差，但亲和力预测作为一种必要但不完美的代理，可以以高通量的方式衡量潜在的生物活性。</p>
+<p>理想情况下，最严格的验证将涉及湿实验室合成和 X 射线晶体学检查每个生成的分子。鉴于这对于大规模生成建模是不可行的，我们使用现有的对接协议作为比较参考的“白银标准”。我们将在论文中添加讨论。</p>
+<p>为什么改变分辨率 (d_{min}) 会导致表 3 中的性能差异可以忽略不计？这是否意味着模型仅仅学习了空间占据模式，而不是物理上有意义的细粒度特征？</p>
+<p><strong>回应：</strong> 感谢您的 insightful 评论。我们主要将此观察归因于我们当前的表示方案，该方案使用固定数量的 199 个采样点来描述“填充物”电子密度。考虑到用如此有限数量的点表示复杂 3D 体积所带来的固有噪声，这种相对粗糙的表示成为我们当前模型中的主导因素（或瓶颈），有效地降低了对 (d_{min}) 变化的敏感性。然而，这并不意味着模型仅仅学习了简单的空间占据模式。我们在附录 F.4 中进行了额外的消融研究，其中改变了采样点的数量并取消了氢键供体和受体的特定标签。这些结果显示性能变化，证实了当表示能力增加时，模型确实能够捕捉物理上有意义的细粒度特征。</p>
+<p>[ref1] Guo, Zuojun, et al. “Identification of protein-ligand binding sites by the level-set variational implicit-solvent approach.” Journal of Chemical Theory and Computation 11.2 (2015): 753-765.<br>
+[ref2] Clark, Jordan J., et al. “Inherent versus induced protein flexibility: Comparisons within and between apo and holo structures.” PLoS computational biology 15.1 (2019): e1006705.<br>
+[ref3] Lam, Jordy Homing, and Vsevolod Katritch. “Navigating structure-based drug discovery with emerging innovations in physics- and knowledge-based approaches.” npj Drug Discovery 2.1 (2025): 29.<br>
+[ref4] Zhang, Jinze, et al. “Holo protein conformation generation from apo structures by ligand binding site refinement.” Journal of Chemical Information and Modeling 62.22 (2022): 5806-5820.</p>
+<h2 id="审稿人-4">审稿人 4</h2>
+<p>我们衷心感谢您的 thoughtful 反馈。以下，我们将逐点回应您的问题。我们承诺将所有内容添加到原始论文中。</p>
+<p>由于填充物 ED 包含配体本身，模型正在以参考结合剂的形状和位置信息为条件。这就提出了一个问题：模型在多大程度上学习了一般结合原理，而不是依赖于参考配体的几何形状。更详细的分析将有助于更好地理解该方法，并有助于解释结果。此外，我想知道这是否可以被视为一种信息泄露，或者也许是一种以牺牲多样性为代价来换取提高稳定性的权衡。我愿意与作者讨论这个问题，以更好地理解他们的观点。</p>
+<p><strong>回应：</strong> 如表 3 所示，生成的分子与参考配体之间的结构相似性始终较低，这表明模型有潜力探索参考结合剂之外的化学空间。我们还在附录 F.1 中对信息泄露的风险进行了广泛讨论。此外，在 ExpED 的推理阶段，模型整合了源自溶剂的电子密度，这是一种在训练阶段不存在的模态。测试时输入分布的这种差异要求模型进行泛化，而不是简单地依赖记忆的训练模式。</p>
+<p>关于模型是否主要学习空间占据，我们将观察到的性能一致性归因于我们当前的表示方案，该方案使用固定数量的 199 个采样点。这种相对粗糙的表示可能作为一个限制因素（或瓶颈），降低了模型对细粒度坐标变化的敏感性，这可能有助于无意中防止对参考几何形状的过拟合。然而，这并不一定意味着缺乏物理理解。如附录 F.4 中的消融研究所示，采样密度的变化和特定标签（例如氢键供体/受体）的移除会导致性能的显著变化。这些结果表明模型可能正在捕捉物理相关的特征，而不仅仅是填充空间体积。我们将这种离散化视为一种权衡，其中较粗糙的表示可能提供改进的建模稳定性和一定程度的对实验噪声的鲁棒性。</p>
+<p>ExpED 的结果显示与 CalED 相比有显著下降。论文将其归因于构象柔性使刚性对接不太可靠，这可能是真的，但表 2 中没有基线比较来 contextualize 这是否是预期的或是方法的局限性。</p>
+<p><strong>回应：</strong> 我们感谢审稿人对 ExpED 和 CalED 之间性能差距的 insightful 观察。这种下降符合我们的预期，并突显了该方法当前的一个局限性。主要挑战在于实验确定的全息结构的稀缺性，这严重限制了实验密度图的高质量训练数据的数量。虽然我们的 CalED 预训练策略有助于缓解这个问题，但不能完全弥补此类复杂任务固有的数据渴求。此外，实验电子密度更高的柔性和噪声使得评估更具挑战性，并可能导致不太稳定的评分结果。</p>
+<p>作为将原始实验密度与生成建模整合的开创性探索，我们承认某些指标目前未达到理想的基线。我们将这些结果视为揭示从合成数据过渡到真实世界实验数据的实际障碍的基础性步骤。在未来的工作中，我们致力于改进模型架构并探索更 robust 的评分函数，以更好地处理这些复杂性。</p>
+<p>对于结合亲和力评估，为什么不包括标准的 Vina 对接分数？表 1 显示了 min-in-place 和恢复指标，但使用 Vina 进行直接比较将更容易评估相对于报告这些数字的其他 SBDD 方法的性能。</p>
+<p><strong>回应：</strong> 我们采用 Glide 进行结合亲和力评估，因为它通常被认为是一种更准确、更符合行业标准的对接/评分工具。与依赖于相对简化的评分函数（主要基于经验能量项，例如空间相互作用和对溶剂化及熵的有限处理）的 Vina 相比，Glide 采用了更复杂的评分方案（例如 GlideScore），改进了对疏水包埋、氢键和去溶剂化效应的建模。因此，Glide 通常被认为与实验结合亲和力具有更好的相关性，并且更适合评估细粒度的分子质量。</p>
+<p>此外，基于 Glide 的评估已被先前的文献广泛采用，包括最近的工作如 [ref 1, 2]，支持其作为可靠基准测试协议的有效性。另外，为了确保可重复性，我们将在发表后发布处理后的电子密度数据以及评估脚本。</p>
+<p>所有评估都在 DUD-E 上进行。虽然这是一个标准基准，但对单一数据集的依赖使得评估方法的泛化能力变得更加困难。此外，由于 DUD-E 最初是作为虚拟筛选的诱饵数据集设计的，我有点担心它是否是评估 de novo 生成方法的最合适选择。</p>
+<p><strong>回应：</strong> 感谢您的 valuable 评论。我们想指出，DUD-E 包含近 100 个不同的靶点。在我们的设置中，我们为每个靶点生成大约 1,000 个分子，导致一个相对大规模的评估，有助于提供更稳定和全面的性能度量。此外，一些先前的研究（例如 [ref 3, 4]）也曾在 DUD-E 上进行生成实验，这使得与现有方法进行更直接的比较成为可能。</p>
+<p>我们也承认 DUD-E 最初是为虚拟筛选设计的。尽管如此，它仍然可以作为生成评估的合理测试平台。特别是，DUD-E 涵盖了超过 100 个不同的蛋白质靶点，包括激酶、蛋白酶、GPCR 和离子通道等关键治疗类别，每个靶点平均有超过 200 个活性配体。此外，DUD-E 中的每个活性化合物都有实验测量的亲和力支持，为在广泛的化学空间中将生成的分子与经过验证的生物活性配体进行比较提供了可靠的基础。</p>
+<p>我更广泛的担忧是，该方法在某种程度上是从条件化的填充物状态执行模板驱动的生成，而不是学习更可泛化的结合原理。在表 3 中，关于点云大小的消融显示，(\mathrm{Np} = 10000) 给出 (41%) 的恢复率，而 (\mathrm{Np} = 5000) 给出 (38%)，而多样性分数几乎保持不变（0.186 对 0.184）。这是否表明额外的点主要有助于保留或利用参考填充物状态，从而提高已知活性化合物的恢复率，而不是能够更广泛地探索新的化学空间？</p>
+<p><strong>回应：</strong> 在表 3 中，我们报告了不同采样温度和分辨率 ((d_{min})) 的影响。在那里观察到的可忽略的性能差异主要归因于我们当前的表示方案，该方案使用固定的 199 个采样点的瓶颈。这种相对粗糙的表示作为一个主导因素，限制了模型对细粒度坐标变化的敏感性，这可能有助于无意中防止对精确参考几何形状的过拟合。此外，我们在附录 F.4 中的消融研究也表明，移除特定标签（例如氢键供体/受体）会导致性能显著下降。增加 (N_{p}) 的数量可以提高结合亲和力。这表明额外的点不仅仅有助于“保留”空间模板，而且为模型提供了必要的分辨率，以捕捉物理上有意义的特征和化学环境。虽然我们承认填充物状态提供了一个强大的先验，但与参考配体的低结构相似性以及对化学标签的敏感性表明，模型正在尝试学习潜在结合原理，而不是执行简单的模板重建。</p>
+<p>图 5 显示了 KITH 的一些生成分子。我很好奇失败案例：当模型生成具有低结合分数或低恢复率的分子时，是否存在某种模式？例如，当参考配体具有不寻常的特征，或者当电子密度嘈杂时，这种情况是否更常发生？</p>
+<p><strong>回应：</strong> 为了更好地理解失败案例中的潜在模式，我们对各种靶点生成的分子进行了初步分析。在这个分析中，我们将“失败”定义为对接分数为正或者 Glide 无法执行必要的配体准备的实例。</p>
+<p>我们对各个靶点的统计评估显示，某些蛋白质，如 1s3b、2znp 和 3ln1，其成功率明显低于其他蛋白质。经过进一步研究，我们观察到与分子大小的潜在相关性：1s3b 和 2znp 的参考配体具有相对较高的分子量（分别约为 969 和 468）。由于我们当前的表示使用固定数量的 199 个采样点来描述“填充物”电子密度，这种固定容量的表示可能难以提供对具有大量原子的较大配体足够详细的描述。这表明结合位点的复杂性相对于表示密度可能是导致观察到失败的一个因素。</p>
+<p>我们承认失败的原因是多方面的，不仅涉及分子量，还涉及点云的具体形状和电子密度标签的质量。我们当前的分析是理解这些根本原因的初步步骤。我们相信您关于调查不寻常特征或嘈杂密度是否影响性能的建议非常有价值。在未来的工作中，我们打算对这些模式进行更精细的研究，以进一步提高 EDMolGPT 的鲁棒性。</p>
+<p>两阶段训练使用 CalED 进行预训练，使用 ExpED 进行微调。您是否尝试过相反的方式：在 ExpED 上预训练（即使数据较少），然后适应 CalED？这可能会揭示 CalED 和 ExpED 之间的性能差异是来自密度质量本身还是来自训练数据量。</p>
+<p><strong>回应：</strong> 我们进行了反向训练实验（ExpED 预训练，然后 CalED 微调），以解耦密度质量和数据量的影响。比较结果总结如下（由于 rebuttal 期限有限且 CalED 数据集规模巨大，反向训练模型尚未完全收敛）：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left">Bio. Mol. Recov.</th>
+<th style="text-align:left">Min-in-place</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">CalED</td>
+<td style="text-align:left">41%</td>
+<td style="text-align:left">-6.92</td>
+</tr>
+<tr>
+<td style="text-align:left">ExpED → CalED</td>
+<td style="text-align:left">38%</td>
+<td style="text-align:left">-6.45</td>
+</tr>
+</tbody>
+</table>
+<p>结果表明，两种策略的恢复率保持相对一致，这可能是因为底层的序列建模范式是 robust 且学习快速的。然而，反向策略的 Min-in-place 分数明显较低，我们将其归因于在庞大的 CalED 数据集上训练时间不足。</p>
+<p>关于性能差距来源的问题，我们总结这是综合效应：首先，如附录 B.2 中所讨论和可视化的，实验密度和计算密度强度之间存在显著的分布偏移。其次，ExpED 固有的构象柔性使其成为模型一个更“困难”的起点，相比之下 CalED 更 rigid 和理想化。我们感谢审稿人的建议，因为它强化了我们的理解：虽然数据量是一个瓶颈，但实验密度的内在复杂性仍然是一个主要挑战。</p>
+<p>与 ECloudGen 的比较显示您的方法表现更好。但 ECloudGen 也使用电子密度作为输入。您认为导致改进的关键区别是什么？</p>
+<p><strong>回应：</strong> 我们首先要承认 ECloudGen 是一项非常具有启发性和设计精良的工作，它为将电子密度纳入生成建模提供了 valuable 的见解。然而，ECloudGen 专注于序列生成，而我们的方法直接建模分子结构。这使得我们的模型能够在生成过程中更有效地感知和利用电子密度诱导的空间约束，从而提高结构保真度和下游性能。</p>
+<p>[ref 1] Su, M. et al. Comparative assessment of scoring functions: the CASF-2016 update. J. Chem. Inf. Model. 59, 895-913 (2018).<br>
+[ref 2] Shen, C. et al. Beware of the generic machine learning-based scoring functions in structure-based virtual screening. Brief. Bioinform. 22, bbaa070 (2021).<br>
+[ref 3] Feng, Wei, et al. “Generation of 3D molecules in pockets via a language model.” Nature Machine Intelligence 6.1 (2024): 62-73.<br>
+[ref 4] Yoshikawa, Naruki, et al. “Population-based de novo molecule generation, using grammatical evolution.” Chemistry Letters 47.11 (2018): 1431-1434.</p>
+</div><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/social-share.js/1.0.16/css/share.min.css"><div class="social-share"></div><script src="https://cdnjs.loli.net/ajax/libs/social-share.js/1.0.16/js/social-share.min.js"></script></article></div><div class="card"><div class="card-content"><h3 class="menu-label has-text-centered">喜欢这篇文章？打赏一下作者吧</h3><div class="buttons is-centered"><a class="button donate" data-type="alipay"><span class="icon is-small"><i class="fab fa-alipay"></i></span><span>支付宝</span><span class="qrcode"><img src="/img/alipay-qrcode.png" alt="支付宝"></span></a><a class="button donate" data-type="wechat"><span class="icon is-small"><i class="fab fa-weixin"></i></span><span>微信</span><span class="qrcode"><img src="/img/wechat-qrcode.png" alt="微信"></span></a></div></div></div><!--!--><div class="card"><div class="card-content"><div class="title is-5">评论</div><div id="comment-container"></div><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/gitalk/1.6.0/gitalk.css"><script> $.getScript('/js/gitalk.min.js', function () { 
+            var gitalk = new Gitalk({
+            language:'zh-CN',
+            id: '18d02d072574cd8cab2e58f051de0c7f',
+            repo: 'BlogCommentForGallo',
+            owner: 'Gallo13th',
+            clientID: 'Ov23liEEy3v4vRgJm03V',
+            clientSecret: 'bad45f1196b965854f087f0ab4eb955ea1f28c96',
+            admin: ["Gallo13th"],
+            createIssueManually: true,
+            distractionFreeMode: false,
+            perPage: 10,
+            pagerDirection: 'last',
+            proxy: 'https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token',
+            
+            enableHotKey: true,
+            isLocked: false
+        })
+        gitalk.render('comment-container')});</script></div></div></div><div class="column column-left is-4-tablet is-4-desktop is-3-widescreen  order-1 is-sticky"><!--!--><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar is-rounded" src="https://raw.githubusercontent.com/Gallo13th/BlogImages/main/pics/head_icon.jpg" alt="Lotte Gallo"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">Lotte Gallo</p><p class="is-size-6 is-block">雪月风花，雷霆雨露，窗前赏景人如故。四时辗转客穷途，东山得望扶桑木。碎玉白瓷，残烛金釜，生平只恨歇息处。挥毫泼墨案牍间，劳形不为竹帛赋。</p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">文章</p><a href="/archives/"><p class="title">14</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">分类</p><a href="/categories/"><p class="title">3</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">标签</p><a href="/tags/"><p class="title">14</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="https://github.com/gallo13th" target="_blank" rel="noopener">关注我</a></div><div class="level is-mobile"><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Github" href="https://github.com/gallo13th"><i class="fab fa-github"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Weibo" href="/null"><i class="fab fa-weibo"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Email" href="mailto:glt23@mails.tsinghua.edu.cn"><i class="fa fa-envelope"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="RSS" href="/atom.xml"><i class="fas fa-rss"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Next" href="/null"><i class="fab fa-dribbble"></i></a></div><div><hr><p id="hitokoto">:D 一言句子获取中...</p><script type="text/javascript" defer>function getYiyan(){
+                                $.getJSON("https://v1.hitokoto.cn/", function (data) {
+                                if(data){
+                                    $('#hitokoto').html("");
+                                    $('#hitokoto').append("<strong style='color: #3273dc;'>"+data.hitokoto+"</strong>"+
+                                    "<p>"+"来源《"+data.from+"》</p><p>提供者-"+data.creator+"</p>");
+                                }});}
+                                $(function (){getYiyan();$('#hitokoto').click(function(){getYiyan();})});</script></div></div></div><div class="card widget" data-type="links"><div class="card-content"><div class="menu"><h3 class="menu-label">链接</h3><ul class="menu-list"><li><a class="level is-mobile" href="https://hexo.io" target="_blank" rel="noopener"><span class="level-left"><span class="level-item">Hexo</span></span><span class="level-right"><span class="level-item tag">hexo.io</span></span></a></li><li><a class="level is-mobile" href="https://bulma.io" target="_blank" rel="noopener"><span class="level-left"><span class="level-item">Bulma</span></span><span class="level-right"><span class="level-item tag">bulma.io</span></span></a></li></ul></div></div></div><div class="card widget"><div class="card-content"><h3 class="menu-label">最新评论</h3><span class="body_hot_comment">加载中，最新评论有1分钟缓存...</span></div></div><div class="card widget"><div class="card-content"><h3 class="menu-label">最新文章</h3><article class="media"><div class="media-content"><p class="date"><time dateTime="2026-05-10T04:00:00.000Z">2026-05-10</time></p><p class="title"><a href="/2026/05/10/rna-energy-landscape/">RNA 二级结构能量景观与最低自由能障碍路径</a></p><p class="categories"><a href="/categories/%E7%A7%91%E7%A0%94/">科研</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2026-03-03T10:04:01.000Z">2026-03-03</time></p><p class="title"><a href="/2026/03/03/dairy08/">元宵随记</a></p><p class="categories"><a href="/categories/%E9%97%B2%E7%AC%94/">闲笔</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2025-11-17T11:41:24.000Z">2025-11-17</time></p><p class="title"><a href="/2025/11/17/birthday20251108/">老鼠的十二年</a></p><p class="categories"><a href="/categories/%E9%97%B2%E7%AC%94/">闲笔</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2025-08-11T08:49:45.000Z">2025-08-11</time></p><p class="title"><a href="/2025/08/11/comment-Psin/">没有人类了——评《章鱼噼的原罪》</a></p><p class="categories"><a href="/categories/%E9%97%B2%E7%AC%94/">闲笔</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2025-07-02T07:45:40.000Z">2025-07-02</time></p><p class="title"><a href="/2025/07/02/huzhou05/">胡咧传·序章</a></p><p class="categories"><a href="/categories/%E5%B0%8F%E8%AF%B4/">小说</a></p></div></article></div></div><div class="card widget"><div class="card-content"><div class="menu"><h3 class="menu-label">分类</h3><ul class="menu-list"><li><a class="level is-mobile is-marginless" href="/categories/%E5%B0%8F%E8%AF%B4/"><span class="level-start"><span class="level-item">小说</span></span><span class="level-end"><span class="level-item tag">7</span></span></a></li><li><a class="level is-mobile is-marginless" href="/categories/%E7%A7%91%E7%A0%94/"><span class="level-start"><span class="level-item">科研</span></span><span class="level-end"><span class="level-item tag">4</span></span></a></li><li><a class="level is-mobile is-marginless" href="/categories/%E9%97%B2%E7%AC%94/"><span class="level-start"><span class="level-item">闲笔</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li></ul></div></div></div><div class="card widget"><div class="card-content"><div class="menu"><h3 class="menu-label">归档</h3><ul class="menu-list"><li><a class="level is-mobile is-marginless" href="/archives/2026/05/"><span class="level-start"><span class="level-item">五月 2026</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile is-marginless" href="/archives/2026/03/"><span class="level-start"><span class="level-item">三月 2026</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile is-marginless" href="/archives/2025/11/"><span class="level-start"><span class="level-item">十一月 2025</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile is-marginless" href="/archives/2025/08/"><span class="level-start"><span class="level-item">八月 2025</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile is-marginless" href="/archives/2025/07/"><span class="level-start"><span class="level-item">七月 2025</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><a class="level is-mobile is-marginless" href="/archives/"><span class="level-start"><span class="level-item">查看全部&gt;&gt;</span></span></a></ul></div></div></div><div class="card widget"><div class="card-content"><div class="menu"><h3 class="menu-label">标签</h3><div class="field is-grouped is-grouped-multiline"><div class="control"><a class="tags has-addons" href="/tags/%E5%AD%A6%E6%9C%AF%E7%94%9F%E6%B4%BB/"><span class="tag">学术生活</span><span class="tag is-grey-lightest">3</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E8%83%A1%E5%92%A7%E4%BC%A0-%E4%BA%BA%E7%89%A9%E7%89%B9%E5%85%B8/"><span class="tag">胡咧传 - 人物特典</span><span class="tag is-grey-lightest">3</span></a></div><div class="control"><a class="tags has-addons" href="/tags/RNA-sequence-design/"><span class="tag">RNA sequence design</span><span class="tag is-grey-lightest">2</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E6%88%91%E7%9A%84%E7%AB%A5%E8%AF%9D/"><span class="tag">我的童话</span><span class="tag is-grey-lightest">2</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E9%9A%8F%E7%AC%94/"><span class="tag">随笔</span><span class="tag is-grey-lightest">2</span></a></div><div class="control"><a class="tags has-addons" href="/tags/RNA-folding/"><span class="tag">RNA folding</span><span class="tag is-grey-lightest">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/RNA-inverse-folding/"><span class="tag">RNA inverse folding</span><span class="tag is-grey-lightest">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/ViennaRNA/"><span class="tag">ViennaRNA</span><span class="tag is-grey-lightest">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/energy-landscape/"><span class="tag">energy landscape</span><span class="tag is-grey-lightest">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/path-planning/"><span class="tag">path planning</span><span class="tag is-grey-lightest">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E6%B8%B8%E6%88%8F%E4%BA%BA%E7%94%9F/"><span class="tag">游戏人生</span><span class="tag is-grey-lightest">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E8%83%A1%E5%92%A7%E4%BC%A0-%E4%BA%BA%E7%89%A9%E7%89%B9%E5%85%B8-%E8%83%A1%E5%AE%89-%E8%8E%AB%E9%9D%92/"><span class="tag">胡咧传 - 人物特典 - 胡安 - 莫青</span><span class="tag is-grey-lightest">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E8%83%A1%E5%92%A7%E4%BC%A0-%E6%AD%A3%E7%AF%87/"><span class="tag">胡咧传 - 正篇</span><span class="tag is-grey-lightest">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E9%97%B2%E7%AC%94-%E6%BC%AB%E8%AF%84/"><span class="tag">闲笔 - 漫评</span><span class="tag is-grey-lightest">1</span></a></div></div></div></div></div><div class="card widget" data-type="subscribe-email"><div class="card-content"><div class="menu"><h3 class="menu-label">订阅更新</h3><form action="https://feedburner.google.com/fb/a/mailverify" method="post" target="popupwindow" onsubmit="window.open(&#039;https://feedburner.google.com/fb/a/mailverify?uri=&#039;,&#039;popupwindow&#039;,&#039;scrollbars=yes,width=550,height=520&#039;);return true"><input type="hidden" value="" name="uri"><input type="hidden" name="loc" value="en_US"><div class="field has-addons"><div class="control has-icons-left is-expanded"><input class="input" name="email" type="email" placeholder="Email"><span class="icon is-small is-left"><i class="fas fa-envelope"></i></span></div><div class="control"><input class="button" type="submit" value="订阅"></div></div></form></div></div></div><!--!--><div class="column-right-shadow is-hidden-widescreen"></div></div></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/"><img src="https://raw.githubusercontent.com/Gallo13th/BlogImages/main/pics/head_icon.jpg" alt="Lotte" height="28"></a><p class="size-small"><span>&copy; 2026 Lotte</span>  Powered by <a href="https://hexo.io/" target="_blank">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank">Icarus</a> &amp; <a href="https://github.com/removeif/hexo-theme-amazing" target="_blank">Amazing</a> <br><span>© <a href="http://www.beian.miit.gov.cn/" target="_blank">None</a><br></span><span>© 版权说明：[本网站所有内容均收集于互联网或自己创作,<br />&nbsp;&nbsp;&nbsp;&nbsp;方便于网友与自己学习交流，如有侵权，请<a href="/message" target="_blank">留言</a>，立即处理]<br /></span><div class="size-small"><span>❤️感谢 <strong><span id="busuanzi_value_site_uv">99+</span></strong> 小伙伴的 <strong><span id="busuanzi_value_site_pv">99+</span></strong> 次光临！❤️</span></div></p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/removeif/hexo-theme-amazing"><i class="fab fa-github"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="GitHub" href="https://github.com/gallo13th"><i class="fab fa-github"></i></a></p></div><div class="sideMusic"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css"><script src="/js/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script><meting-js style="width: auto;height: 2000px;" server="netease" type="playlist" id="6779591271" theme="#2980b9" loop="all" autoplay="false" order="list" storageName="aplayer-setting" lrctype="0" list-max-height="400px" fixed="true"></meting-js></div></div></div></div></footer><script src="https://cdnjs.loli.net/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script><script src="https://cdnjs.loli.net/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" async></script><script>moment.locale("zh-cn");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            }
+        };</script><script src="/js/column.js"></script><script src="/js/animation.js"></script><a id="back-to-top" title="回到顶端" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script src="/js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdnjs.loli.net/ajax/libs/lightgallery/1.10.0/js/lightgallery.min.js" defer></script><script src="https://cdnjs.loli.net/ajax/libs/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/KaTeX/0.15.1/katex.min.css"><script src="https://cdnjs.loli.net/ajax/libs/KaTeX/0.15.1/katex.min.js" defer></script><script src="https://cdnjs.loli.net/ajax/libs/KaTeX/0.15.1/contrib/auto-render.min.js" defer></script><script src="https://cdnjs.loli.net/ajax/libs/KaTeX/0.15.1/contrib/mhchem.min.js" defer></script><script>window.addEventListener("load", function() {
+            document.querySelectorAll('[role="article"] > .content').forEach(function(element) {
+                renderMathInElement(element);
+            });
+        });</script><script type="text/javascript" id="MathJax-script" async>MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      },
+      svg: {
+        fontCache: 'global'
+      },
+      chtml: {
+        matchFontHeight: false
+      }
+    };</script><script src="https://cdnjs.loli.net/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script><!--!--><script src="/js/main.js" defer></script><script>$.getScript('/js/comment-issue-data.js',function(){loadIssueData('Ov23liEEy3v4vRgJm03V','bad45f1196b965854f087f0ab4eb955ea1f28c96','Gallo13th','BlogCommentForGallo',false);})</script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="想要查找什么..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script data-pjax src="/js/insight.js" defer></script><script data-pjax>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/content.json"}, {"hint":"想要查找什么...","untitled":"(无标题)","posts":"文章","pages":"页面","categories":"分类","tags":"标签"});
+        });</script><script src="https://cdn.jsdelivr.net/npm/pjax@0.2.8/pjax.js"></script><script type="text/javascript">var pjax = new Pjax({
+            elements: "a",//代表点击链接就更新
+            selectors: [  //代表要更新的节点
+                ".section",
+                "title"
+            ],
+            cache: true,
+            cacheBust:false
+        })
+
+        function loadBusuanzi(){
+        $.getScript("//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js", function () {});
+        }
+
+        function loadMathJax() { //加载mathjax
+            $.getScript("//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML", function () {
+                MathJax.Hub.Config({ tex2jax: { inlineMath: [['$', '$'], ['\(', '\)']] } });
+                var math = document.getElementsByClassName("entry-content")[0];
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, math]);
+            });
+        };
+
+        // 开始 PJAX 执行的函数
+        document.addEventListener('pjax:send', function () {
+        });
+        
+        // PJAX 完成之后执行的函数，可以和上面的重载放在一起
+        document.addEventListener('pjax:complete', function () {
+            $(".section").css({opacity:1});
+            if(true){
+                $.getScript('/js/comment-issue-data.js',function(){loadIssueData('Ov23liEEy3v4vRgJm03V','bad45f1196b965854f087f0ab4eb955ea1f28c96','Gallo13th','BlogCommentForGallo',false);});
+            }
+            if(false){
+                loadMathJax();
+            }
+            loadMainJs(jQuery, window.moment, window.ClipboardJS, window.IcarusThemeSettings);
+            loadBackTop();
+            loadBusuanzi();
+            if(typeof loadBanner == 'function'){
+                loadBanner();
+            }
+        });</script><!-- hexo injector body_end start --><script data-pjax src="https://unpkg.com/oh-my-live2d"></script><script>const oml2d = OML2D.loadOml2d({dockedPosition:"right",mobileDisplay:false,models:[{"path":"/live2d_models/fll/fll.model3.json","position":[-30,-10],"scale":0.16,"stageStyle":{"width":500,"height":500},"mobilePosition":[0,0],"mobileScale":0.08,"mobileStageStyle":{"width":180,"height":166},"motionPreloadStrategy":"ALL"}],sayHello:false,tips:{style: {"width":230,"height":120,"left":"calc(50% - 20px)","top":"-100px"},mobileStyle: {"width":180,"height":80,"left":"calc(50% - 30px)","top":"-100px"},idleTips:{interval:3600,message:["你好呀，这里是Gallo的小站~","欢迎来到我的小站~"]}}});</script><!-- hexo injector body_end end --></body></html>
