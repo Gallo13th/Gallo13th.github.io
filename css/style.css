@@ -389,7 +389,7 @@ th:not([align]) {
 }
 html {
   background-color: #f7f7f7;
-  font-size: 14px;
+  font-size: 16px;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   min-width: 300px;
@@ -5262,7 +5262,7 @@ fieldset[disabled] .button {
 .content h5,
 .content h6 {
   color: #363636;
-  font-weight: 400;
+  font-weight: 600;
   line-height: 1.125;
 }
 .content h1 {
@@ -10813,7 +10813,8 @@ article.article .article-meta {
 }
 article.article .content {
   word-wrap: break-word;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
+  line-height: 1.8;
 }
 article.article .content h1 {
   font-size: 1.75em;
@@ -11318,6 +11319,7 @@ figure.highlight figcaption.level .level-right a {
 }
 figure.highlight .highlight-body {
   overflow: auto;
+  max-height: 500px;
 }
 figure.highlight .gutter {
   text-align: right;
@@ -11745,20 +11747,20 @@ article.article .article-meta {
   }
   .column.is-3-widescreen {
     flex: none;
-    width: 24%;
+    width: 20%;
   }
   .column.is-6-widescreen {
-    width: 52%;
+    width: 60%;
   }
   .column.is-4-widescreen {
     flex: none;
-    width: 24%;
+    width: 20%;
   }
   .column.is-8-widescreen {
-    width: 76%;
+    width: 80%;
   }
   .column.is-9-widescreen {
-    width: 76%;
+    width: 80%;
   }
   .navbar > .container .navbar-brand,
   .container > .navbar .navbar-brand {
@@ -11793,7 +11795,7 @@ article.article .article-meta {
 }
 @media screen and (max-width: 768px) {
   .section {
-    padding: 6.5rem 1.5rem;
+    padding: 5rem 1rem;
   }
   .friend-card-item {
     width: 100% !important;
@@ -12080,32 +12082,17 @@ hr {
 .night .timeline .media:last-child:after {
   background-color: #151313;
 }
-.night .level-item.tag.is-danger,
-.night .button:not(.is-white),
-.night #index_hot_div,
-.night #post-calendar canvas,
-.night .waifu canvas,
-.night .is-current,
-.night .button.is-marginless .fab,
-.night .fas,
-.night .button.is-large,
-.night .gt-btn,
-.night .gt-comment-body pre,
-.night .time-axis-main,
-.night .meplayer-control-play,
-.night .social-share,
-.night .widget .tags .tag:first-child,
-.night .g-emoji,
-.night .fa-envelope,
-.night input,
-.night img {
-  filter: brightness(0.6) !important;
+.night .content img,
+.night .article img,
+.night .card-image img {
+  filter: brightness(0.92) !important;
 }
-.night figure {
+.night #post-calendar canvas,
+.night .waifu canvas {
   filter: brightness(0.7) !important;
 }
-.night strong {
-  filter: brightness(0.8) !important;
+.night .gt-comment-body pre {
+  filter: brightness(0.85) !important;
 }
 .night .content blockquote {
   border-left: 3px solid #1e4584;
@@ -12204,12 +12191,10 @@ hr {
 }
 .night #index_hot_div {
   color: #c0c0c0;
-}
-.night #index_hot_div {
   filter: unset !important;
 }
 .night #index_hot_div .item {
-  filter: brightness(0.6) !important;
+  filter: brightness(0.8) !important;
 }
 .night .gt-container .gt-meta {
   border-bottom: 2px solid #989898;
@@ -12227,11 +12212,6 @@ hr {
 }
 .night .friend-card-item {
   color: unset;
-}
-.night .g-ads-x,
-.night .g-ads-y,
-.night .google-auto-placed {
-  filter: brightness(0.6) !important;
 }
 .night .index-category-tag .button.is-small {
   color: #c0c0c0;
@@ -12274,7 +12254,7 @@ hr {
 .night .navbar,
 .night footer.footer,
 .night .card {
-  background-color: rgba(21,19,19,0.678);
+  background-color: #1a1a1a;
 }
 .aplayer-narrow {
   -webkit-transform: translateX(-100%);
@@ -12295,7 +12275,7 @@ button,
 input,
 select,
 textarea {
-  font-family: AlimamaFangYuanTi, "PingFang SC", "Microsoft JhengHei", "Microsoft YaHei", sans-serif !important;
+  font-family: "PingFang SC", "Microsoft JhengHei", "Microsoft YaHei", sans-serif !important;
 }
 .img-x {
   position: relative;
@@ -12625,4 +12605,18 @@ hr {
 .hljs-comment,
 .hljs-quote {
   color: #42bb35 !important;
+}
+@media screen and (max-width: 768px) {
+  .navbar-item {
+    min-height: 44px;
+  }
+  .menu-list a {
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+  }
+  .tag,
+  .button.is-small {
+    min-height: 32px;
+  }
 }

@@ -150,6 +150,15 @@ function loadMathJax() { //加载mathjax
 }
 
 $(document).ready(function () {
+    // Navbar burger toggle for mobile
+    var $navbarBurgers = $('.navbar-burger');
+    $navbarBurgers.on('click', function () {
+        var target = $(this).data('target');
+        var $target = $('#' + target);
+        $(this).toggleClass('is-active');
+        $target.toggleClass('is-active');
+    });
+
     loadMainJs(jQuery, window.moment, window.ClipboardJS, window.IcarusThemeSettings);
     /* 添加背景色 */
     var navbar = $(".is-fixed-top");
