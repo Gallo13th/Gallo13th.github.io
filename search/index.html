@@ -1,0 +1,142 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><!-- 不加 maximum-scale=1：现状违规（WCAG SC 1.4.4），已修 --><meta name="viewport" content="width=device-width, initial-scale=1"><!-- 主题必须在首次绘制前决定，否则暗色用户会看到白屏闪烁（现状主题正是如此）。
+         内联且不 defer：随 head 解析立即执行。JS 失败时退回浅色，内容永不隐藏。 --><script>
+      (() => {
+        const KEY = 'lotte-theme';
+        let theme = 'light';
+        try {
+          const saved = localStorage.getItem(KEY);
+          theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        } catch (_) {}
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script><title>搜索 - Lotte</title><meta name="description" content="站内搜索：支持中文分词，无需服务端。"><link rel="canonical" href="https://gallo13th.github.io/search/"><link rel="alternate" type="application/rss+xml" title="Lotte" href="/rss.xml"><meta property="og:type" content="website"><meta property="og:site_name" content="Lotte"><meta property="og:title" content="搜索 - Lotte"><meta property="og:description" content="站内搜索：支持中文分词，无需服务端。"><meta property="og:url" content="https://gallo13th.github.io/search/"><meta property="og:locale" content="zh_CN"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="搜索 - Lotte"><meta name="twitter:description" content="站内搜索：支持中文分词，无需服务端。"><!-- 明暗两种 theme-color，浏览器 UI 配色跟随 --><meta name="theme-color" content="#fcfbf8" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#16161a" media="(prefers-color-scheme: dark)"><link rel="stylesheet" href="/_astro/Base.Bwe-e-Ff.css"></head><body><a class="skip-link" href="#main">跳到正文</a><header class="site-header"><div class="wrap site-header__inner"><a class="site-title" href="/">Lotte</a><nav aria-label="主导航"><ul class="site-nav"><li><a href="/">首页</a></li><li><a href="/categories/科研/">科研</a></li><li><a href="/categories/小说/">小说</a></li><li><a href="/categories/闲笔/">闲笔</a></li><li><a href="/self-talking/">碎碎念</a></li><li><a href="/about/">关于</a></li></ul></nav><form class="search-form" role="search" action="/search/" method="get"><label class="visually-hidden" for="header-search">站内搜索</label><input id="header-search" name="q" type="search" placeholder="搜索…" autocomplete="off" enterkeyhint="search"></form><button class="theme-toggle" type="button" data-theme-toggle><span aria-hidden="true">◐</span><span class="visually-hidden">切换深色 / 浅色主题</span></button></div></header><!-- data-pagefind-body：只索引 main 内的内容；页头页脚因此自动排除。
+         搜索页用 searchExclude 反过来排除自己。 --><main id="main" data-pagefind-ignore><div class="wrap"><h1 class="page-header__title">搜索</h1><p class="page-header__note">输入关键词后回车。中文由 Pagefind 在构建期用 charabia 分词，无需服务端、无第三方请求。</p><form class="search-form search-form--page" role="search" action="/search/" method="get"><label class="visually-hidden" for="q">搜索关键词</label><input id="q" name="q" type="search" placeholder="搜索标题与正文…" autocomplete="off" enterkeyhint="search"><button type="submit">搜索</button></form><p id="search-status" class="search-status" role="status"></p><ol id="search-results" class="search-results"></ol><script>
+    // Pagefind 的索引与 JS 是**构建后**才生成的（dist/pagefind/），因此 dev 环境下
+    // 这个模块不存在 —— 必须优雅降级，而不是抛出未捕获错误。
+    const form = document.querySelector('.search-form--page');
+    const input = document.getElementById('q');
+    const statusEl = document.getElementById('search-status');
+    const listEl = document.getElementById('search-results');
+
+    let pagefind = null;
+    let loadError = null;
+
+    const load = async () => {
+      if (pagefind || loadError) return pagefind;
+      try {
+        pagefind = await import('/pagefind/pagefind.js');
+        await pagefind.options({ excerptLength: 30 });
+      } catch (err) {
+        loadError = err;
+      }
+      return pagefind;
+    };
+
+    const escapeHtml = (s) =>
+      s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+
+    const render = (results, query) => {
+      listEl.innerHTML = '';
+      if (!results.length) {
+        statusEl.textContent = `没有找到与「${query}」相关的内容。`;
+        return;
+      }
+      statusEl.textContent = `找到 ${results.length} 条结果`;
+      for (const result of results) {
+        const data = result.data;
+        const li = document.createElement('li');
+        li.className = 'search-result';
+        li.innerHTML =
+          `<h2 class="search-result__title"><a href="${data.url}">${escapeHtml(data.meta.title || data.url)}</a></h2>` +
+          `<p class="search-result__excerpt">${data.excerpt}</p>`;
+        listEl.appendChild(li);
+      }
+    };
+
+    const run = async (query) => {
+      if (!query) {
+        statusEl.textContent = '';
+        listEl.innerHTML = '';
+        return;
+      }
+      statusEl.textContent = '搜索中…';
+      const pf = await load();
+      if (!pf) {
+        statusEl.textContent =
+          '搜索索引未生成。Pagefind 的索引只在构建后存在，请在本地运行 npm run build 后预览，或在已部署的站点上使用。';
+        return;
+      }
+      const search = await pf.search(query);
+      // 只取前 20 条，避免一次性拉取全部结果数据
+      const results = await Promise.all(search.results.slice(0, 20).map((r) => r.data()));
+      render(results, query);
+    };
+
+    const initial = new URLSearchParams(location.search).get('q') || '';
+    if (initial) input.value = initial;
+    run(initial);
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const query = input.value.trim();
+      const url = query ? `?q=${encodeURIComponent(query)}` : location.pathname;
+      history.replaceState(null, '', url);
+      run(query);
+    });
+
+    // 输入即搜（防抖 200ms）；有 JS 时表单仍可用（默认行为被阻止后由脚本接管）
+    let timer;
+    input.addEventListener('input', () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        const query = input.value.trim();
+        history.replaceState(null, '', query ? `?q=${encodeURIComponent(query)}` : location.pathname);
+        run(query);
+      }, 200);
+    });
+  </script></div></main><footer class="site-footer"><div class="wrap"><ul class="site-footer__links"><li><a href="/archives/">归档</a></li><li><a href="/categories/">分类</a></li><li><a href="/tags/">标签</a></li><li><a href="/media/">视听</a></li><li><a href="/rss.xml">RSS</a></li><li><a href="mailto:glt23@mails.tsinghua.edu.cn">邮件</a></li></ul><p>© 2026 Gallo13th · 除非另有说明，本站内容采用<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="license noopener" target="_blank">CC BY-NC-SA 4.0</a>许可。</p></div></footer><script>
+      (() => {
+        const KEY = 'lotte-theme';
+        const root = document.documentElement;
+        const isGiscusFrame = (el) => el instanceof HTMLIFrameElement && el.classList.contains('giscus-frame');
+
+        // giscus 是懒加载的，client.js 在执行时才读 data-theme；
+        // 这里在首次滚动之前把它改成我们解析出的主题（而不是让 giscus 自己猜系统偏好）。
+        const syncGiscus = () => {
+          const script = document.querySelector('script[data-giscus]');
+          if (script) script.setAttribute('data-theme', root.dataset.theme === 'dark' ? 'dark' : 'light');
+        };
+        syncGiscus();
+
+        document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+            root.dataset.theme = next;
+            try {
+              localStorage.setItem(KEY, next);
+            } catch (_) {}
+            syncGiscus();
+            // 已加载的评论框无需重载即可换肤
+            document.querySelectorAll('iframe').forEach((frame) => {
+              if (isGiscusFrame(frame)) {
+                frame.contentWindow?.postMessage(
+                  { giscus: { setConfig: { theme: next === 'dark' ? 'dark' : 'light' } } },
+                  'https://giscus.app'
+                );
+              }
+            });
+          });
+        });
+
+        // 系统偏好变化时，仅在用户未手动选择过的情况下跟随
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+          let saved = null;
+          try {
+            saved = localStorage.getItem(KEY);
+          } catch (_) {}
+          if (saved) return;
+          root.dataset.theme = e.matches ? 'dark' : 'light';
+          syncGiscus();
+        });
+      })();
+    </script></body></html>

@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# 现状的三个缺失项之一（审计：/robots.txt 返回 404）。
+# 迁移期注意：Hexo 侧仍有 source/_drafts/ 与无 frontmatter 的草稿，
+# 它们不会被 Hexo 发布；Astro 侧只渲染 source/_posts。
+Sitemap: https://gallo13th.github.io/sitemap-index.xml
