@@ -1,0 +1,2429 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EmoHealth · IPIP-NEO-300 自测陪伴</title>
+<style>
+  :root{
+    --bg:#faf8f5; --card:#fff; --ink:#2b2a28; --ink2:#6b6862; --ink3:#a19d95;
+    --line:#e8e4dd; --accent:#4a7c6f; --accent-soft:#e6efec;
+    --warm:#b5836a; --warm-soft:#f5ece7;
+    --locked:#dedad3; --shadow:0 1px 3px rgba(0,0,0,.05),0 8px 24px rgba(0,0,0,.04);
+    --tier1:#8fb8ac; --tier2:#4a7c6f; --tier3:#2f5d52;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.65 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}
+  .wrap{max-width:1440px;margin:0 auto;padding:20px 20px 80px}
+  h1{font-size:20px;font-weight:600;margin:0}
+  h2{font-size:16px;font-weight:600;margin:0 0 12px}
+  .top{display:flex;align-items:center;gap:16px;padding:16px 0 20px;flex-wrap:wrap}
+  .modes{display:flex;gap:6px;background:#efece6;padding:4px;border-radius:10px}
+  .modes button{border:0;background:transparent;padding:7px 16px;border-radius:7px;
+    cursor:pointer;font-size:14px;color:var(--ink2);font-weight:500}
+  .modes button.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.06)}
+  .spacer{flex:1}
+  .meta{font-size:13px;color:var(--ink3)}
+  .layout{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start}
+  @media(max-width:900px){.layout{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    box-shadow:var(--shadow);padding:22px}
+  /* 进度 */
+  .bar{height:6px;background:#efece6;border-radius:3px;overflow:hidden}
+  .bar i{display:block;height:100%;background:var(--accent);transition:width .35s ease}
+  /* 情景条 */
+  .scenes{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+  .scene-chip{border:1px solid var(--line);background:#fff;border-radius:10px;
+    padding:8px 12px;cursor:pointer;font-size:13px;display:flex;gap:8px;align-items:center;
+    transition:.18s}
+  .scene-chip:hover{border-color:var(--accent);transform:translateY(-1px)}
+  .scene-chip.on{border-color:var(--accent);background:var(--accent-soft);
+    box-shadow:0 0 0 3px var(--accent-soft)}
+  .scene-chip.done{background:#f4f8f6;border-color:var(--tier1)}
+  .scene-chip .n{font-size:11px;color:var(--ink3);font-variant-numeric:tabular-nums}
+  .scene-chip.done .n{color:var(--accent)}
+  /* 题卡 */
+  .qhead{font-size:12px;letter-spacing:.06em;color:var(--ink3);text-transform:uppercase;
+    margin-bottom:10px}
+  .qtext{font-size:22px;line-height:1.5;font-weight:500;margin:6px 0 22px;min-height:66px}
+  .qtext .rev{display:inline-block;font-size:12px;color:var(--warm);background:var(--warm-soft);
+    border-radius:5px;padding:1px 7px;vertical-align:middle;margin-left:8px;font-weight:500}
+  .opts{display:grid;gap:8px}
+  .opt{display:flex;align-items:center;gap:12px;border:1px solid var(--line);background:#fff;
+    border-radius:10px;padding:13px 16px;cursor:pointer;text-align:left;font-size:15px;
+    color:var(--ink);transition:.14s;width:100%}
+  .opt:hover{border-color:var(--accent);background:var(--accent-soft)}
+  .opt .k{width:26px;height:26px;border-radius:7px;background:#f2efe9;display:grid;
+    place-items:center;font-size:13px;color:var(--ink2);font-weight:600;flex:none}
+  .opt.sel{border-color:var(--accent);background:var(--accent-soft)}
+  .opt.sel .k{background:var(--accent);color:#fff}
+  .navrow{display:flex;gap:10px;margin-top:18px;align-items:center}
+  /* 「这题什么意思」——把 300 题脚手架递到用户手边 */
+  .why{margin-top:16px;border-top:1px dashed var(--line);padding-top:12px}
+  .why summary{cursor:pointer;font-size:13px;color:var(--accent);list-style:none;
+    display:inline-flex;align-items:center;gap:6px;user-select:none}
+  .why summary::-webkit-details-marker{display:none}
+  .why summary::before{content:"？";width:17px;height:17px;border-radius:50%;
+    background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;
+    font-size:11px;font-weight:700}
+  .why[open] summary::before{content:"−"}
+  .whybody{margin-top:12px;font-size:13.5px;line-height:1.75;color:var(--ink2)}
+  .whybody b{color:var(--ink)}
+  .whybody .k{background:#f6f3ee;border-radius:5px;padding:1px 6px;font-size:12.5px;
+    color:var(--ink)}
+  .whybody .mis{margin:8px 0 0;padding:0;list-style:none}
+  .whybody .mis li{padding:5px 0 5px 14px;position:relative;border-bottom:1px solid #f6f3ee}
+  .whybody .mis li:last-child{border-bottom:0}
+  .whybody .mis li::before{content:"×";position:absolute;left:0;color:var(--warm);
+    font-weight:700;font-size:12px}
+  .whybody .mis li em{font-style:normal;color:var(--accent)}
+  .whybody .cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+  .whybody .cols>div{background:#faf9f6;border-radius:8px;padding:9px 11px}
+  .whybody .cols h5{margin:0 0 5px;font-size:12px;color:var(--ink3);font-weight:600}
+  .whybody .cols ul{margin:0;padding-left:15px}
+  .whybody .loc{margin-top:10px;background:var(--warm-soft);border-radius:8px;
+    padding:9px 11px;color:#7a5a48;font-size:13px}
+  /* 结果里的面向详情 */
+  .facet{border:1px solid var(--line);border-radius:11px;padding:14px 16px;margin-bottom:10px}
+  .facet h4{margin:0 0 4px;font-size:14.5px}
+  .facet .band{font-size:12.5px;color:var(--ink3);margin-bottom:8px}
+  .facet .raw{font-variant-numeric:tabular-nums;font-weight:600;color:var(--accent)}
+  .facet .def{font-size:13.5px;color:var(--ink2);margin:8px 0}
+  .facet details{margin-top:8px;border-top:1px dashed var(--line);padding-top:8px}
+  .facet details summary{font-size:12.5px;color:var(--accent);cursor:pointer;
+    list-style:none}
+  .facet details summary::-webkit-details-marker{display:none}
+  .facet details summary::before{content:"▸ "}
+  .facet details[open] summary::before{content:"▾ "}
+  .facet details .d{font-size:13px;color:var(--ink2);line-height:1.7;margin-top:8px}
+  .facet details .d ul{margin:6px 0 0;padding-left:16px}
+  .btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:9px 18px;
+    cursor:pointer;font-size:14px;color:var(--ink);font-weight:500}
+  .btn:hover{border-color:var(--accent)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn.primary:hover{opacity:.92}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  /* 技能树 */
+  .dom{margin-bottom:14px}
+  .domname{font-size:11px;letter-spacing:.08em;color:var(--ink3);margin-bottom:6px;
+    text-transform:uppercase}
+  .sk{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:13px}
+  .skname{flex:1;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sk.locked .skname{color:var(--locked)}
+  .dots{display:flex;gap:2px;flex:none}
+  .dots i{width:5px;height:5px;border-radius:50%;background:var(--locked)}
+  .dots i.f{background:var(--accent)}
+  .dots i.f.t1{background:var(--tier1)} .dots i.f.t2{background:var(--tier2)}
+  .dots i.f.t3{background:var(--tier3)}
+  .badge{font-size:10px;padding:1px 6px;border-radius:4px;flex:none;
+    background:#f2efe9;color:var(--ink3);font-variant-numeric:tabular-nums}
+  .badge.u1{background:#eef4f2;color:#6f9c8f}
+  .badge.u2{background:#e3efeb;color:#417a6c}
+  .badge.u3{background:#d6e9e3;color:#2f5d52}
+  .legend{font-size:11.5px;color:var(--ink3);margin-top:14px;padding-top:12px;
+    border-top:1px solid var(--line);line-height:1.7}
+  /* 结果 */
+  .res h3{font-size:14px;margin:20px 0 8px;color:var(--ink)}
+  .res h3:first-child{margin-top:0}
+  .res .hint{font-size:12.5px;color:var(--ink3);margin:0 0 10px}
+  .res ul{list-style:none;padding:0;margin:0}
+  .res li{display:flex;gap:10px;padding:6px 0;border-bottom:1px solid #f4f1ec;font-size:13.5px}
+  .res li:last-child{border-bottom:0}
+  .res .fi{color:var(--ink2);flex:none;width:104px;overflow:hidden;text-overflow:ellipsis;
+    white-space:nowrap}
+  .res .pct{flex:none;width:58px;text-align:right;font-variant-numeric:tabular-nums;
+    color:var(--accent);font-weight:600}
+  .res .pct.neg{color:var(--warm)}
+  .res .tx{color:var(--ink);flex:1}
+  .res .rv{color:var(--warm);font-size:11px;margin-right:3px}
+  .warn{background:var(--warm-soft);border-left:3px solid var(--warm);border-radius:0 8px 8px 0;
+    padding:11px 14px;font-size:13px;color:#7a5a48;margin-top:16px;line-height:1.6}
+  .note{font-size:12.5px;color:var(--ink3);margin-top:10px}
+  .empty{color:var(--ink3);font-size:14px;padding:40px 0;text-align:center}
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);
+    background:#2f5d52;color:#fff;padding:11px 20px;border-radius:11px;font-size:14px;
+    opacity:0;pointer-events:none;transition:.3s;box-shadow:0 8px 28px rgba(0,0,0,.2);z-index:9}
+  .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+  /* 保存与导出 */
+  .io{display:flex;gap:8px;align-items:center;position:relative}
+  .io button{border:1px solid var(--line);background:#fff;border-radius:9px;
+    padding:7px 13px;cursor:pointer;font-size:13px;color:var(--ink);font-weight:500}
+  .io button:hover{border-color:var(--accent)}
+  .io button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .menu{position:absolute;top:110%;right:0;background:#fff;border:1px solid var(--line);
+    border-radius:11px;box-shadow:var(--shadow);padding:6px;min-width:240px;display:none;z-index:20}
+  .menu.on{display:block}
+  .menu button{display:block;width:100%;text-align:left;border:0;padding:9px 12px;
+    border-radius:7px;font-size:13.5px;background:transparent}
+  .menu button:hover{background:var(--accent-soft)}
+  .menu .sub{font-size:11.5px;color:var(--ink3);display:block;margin-top:2px;
+    font-weight:400;line-height:1.5}
+  .menu hr{border:0;border-top:1px solid var(--line);margin:5px 0}
+  .saved{font-size:12px;color:var(--ink3);white-space:nowrap}
+  /* ── 天赋树 ───────────────────────────────────────── */
+  /* 图是主角：给它尽可能宽的一列。原先面板列 400px 把 viewBox 1060 压成
+     ~665px 显示（缩放 0.63），节点半径与字号按比例一起缩水——
+     「看不看得清」直接取决于这一行的比例，而不是 font-size 写多少。 */
+  .tree{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,420px);gap:20px;align-items:start}
+  @media(max-width:1180px){.tree{grid-template-columns:1fr}}
+  /* 分级模式下天赋树是主角：主区通栏，右侧技能条收起 */
+  .layout.tier{grid-template-columns:1fr}
+  .layout.tier #treecard{display:none}
+  .graphbox{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    box-shadow:var(--shadow);padding:10px;position:sticky;top:16px}
+  .graphbox svg{display:block;width:100%;height:auto}
+  .nd{cursor:pointer;transition:.15s}
+  .nd circle{transition:.2s}
+  .nd.locked{cursor:not-allowed}
+  .nd:not(.locked):hover circle{r:11}
+  .nd.rec circle{filter:drop-shadow(0 0 5px rgba(181,131,106,.45))}
+  .nd.sel circle{stroke-width:2.5}
+  .nd.ans circle{stroke:#fff;stroke-width:1.5}
+  .ringlbl{font-size:13px;fill:var(--ink3);font-variant-numeric:tabular-nums}
+  .ringlbl.cur{fill:var(--accent);font-weight:600}
+  .facetlbl{font-size:12px;fill:var(--ink3);pointer-events:none}
+  .facetlbl.on{fill:var(--ink2)}
+  .domlbl{font-size:15px;fill:var(--ink2);font-weight:600;letter-spacing:.04em}
+  .centerlbl{font-size:11px;fill:var(--ink3)}
+  .treelegend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--ink3);
+    padding:8px 6px 4px}
+  .treelegend i{display:inline-block;width:9px;height:9px;border-radius:50%;
+    margin-right:4px;vertical-align:-1px}
+  /* ── 窄屏 / 移动端 ────────────────────────────────────────────
+     SVG 的半径与字号随「viewBox→显示宽度」整体缩放，所以光靠 CSS 缩图会把
+     节点压到 4px、手指点不准。这里的做法是：**窄屏下把几何与字号放大**
+     （见 NR_OF()），同时减掉容不下的文字（支线名、图例的长说明），
+     只留「点节点作答」这一句提示。 */
+  .hhint{display:none;font-size:12.5px;color:var(--ink3);text-align:center;
+    padding:2px 6px 8px}
+  @media(max-width:700px){
+    .hhint{display:block}
+    .wrap{padding:14px 12px 60px}
+    .card{padding:14px}
+    .panel{padding:14px;min-height:0}
+    .graphbox{padding:4px}
+    /* 手机上让图**占满一屏**：面板折起后，图几乎就是整屏 */
+    .panelwrap{margin-top:8px}
+    .ptoggle{margin-bottom:8px;position:sticky;bottom:0;z-index:3}
+    .nextq{padding:12px}
+    .nextq .qtext.nq{font-size:19px}
+    .treelegend{font-size:11px;gap:10px}
+    .treelegend .long{display:none}          /* 长说明留宽屏 */
+    /* 图形的字号也必须放大：SVG 会整体缩放，420px 宽的卡片把 900 单位的图
+       压到 0.43 倍，13px 的字只剩 5.6px。这里是按缩放比例反向补偿。 */
+    .facetlbl{font-size:20px}
+    .domlbl{font-size:24px}
+    .confrow{font-size:12px;padding:6px 8px}
+    .confrow .cr{width:48px}
+    .conf{max-height:none}                   /* 手机上不嵌套滚动条 */
+    .qtext{font-size:19px}
+    .layout{overflow-x:hidden}
+  }
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    box-shadow:var(--shadow);padding:22px;min-height:280px}
+  .panel .ph{font-size:12px;letter-spacing:.06em;color:var(--ink3);margin-bottom:10px}
+  /* 面板可折起：窄屏上面板在图下方，图占满一屏更实用（D103） */
+  .panelwrap{min-width:0}
+  .ptoggle{display:block;width:100%;text-align:left;border:1px solid var(--line);
+    background:#fff;border-radius:12px;padding:11px 14px;font:inherit;font-size:13.5px;
+    color:var(--ink2);cursor:pointer;box-shadow:var(--shadow);margin-bottom:12px}
+  .ptoggle:hover{border-color:var(--accent)}
+  .ptoggle b{color:var(--accent)}
+  .ptoggle.on{border-color:var(--tier1);background:#f7fbf9}
+  /* ── 「下一题」常驻区 ───────────────────────────────────────────
+     用户要的是「不想在图上点圆圈时也能顺着答」，所以它放面板最上面，
+     而且不是折叠区——永远可见。 */
+  .nextq{border:1px solid var(--line);border-radius:12px;padding:14px;
+    background:linear-gradient(#fbfdfc,#fff);margin-bottom:16px}
+  .nextq .nqhead{display:flex;justify-content:space-between;align-items:baseline;
+    gap:10px;font-size:13.5px;margin-bottom:8px}
+  .nextq .nqhead b{font-weight:600}
+  .nextq .qtext.nq{font-size:20px;line-height:1.5;font-weight:500;margin:4px 0 14px;
+    min-height:0}
+  .nqlist{display:grid;gap:8px}
+  .nqpick{display:grid;gap:3px;text-align:left;border:1px solid var(--line);
+    background:#fff;border-radius:10px;padding:10px 12px;cursor:pointer;font:inherit;
+    transition:.15s}
+  .nqpick:hover{border-color:var(--accent);background:var(--accent-soft)}
+  .nqpick.first{border-color:#d9b79f;box-shadow:0 0 0 3px #f7efe9}
+  .nqpick .nqtxt{font-size:14px;color:var(--ink);line-height:1.45}
+  .nqpick .nqmeta{font-size:11.5px;color:var(--ink3)}
+  /* 结果折叠区 */
+  .peek{border:1px solid var(--line);border-radius:10px;margin-bottom:16px;overflow:hidden}
+  .peek.open{border-color:#b5836a}
+  .peekhead{width:100%;display:flex;justify-content:space-between;align-items:center;
+    padding:11px 14px;background:#faf8f4;border:0;font:inherit;font-size:13.5px;
+    color:var(--ink);cursor:pointer;text-align:left}
+  .peek.open .peekhead{background:#f6f1ea;color:#8a6247}
+  .peekchev{font-size:12px;color:var(--ink3)}
+  .peekbody{padding:12px 14px;border-top:1px solid var(--line)}
+  .peekrow{display:flex;justify-content:space-between;align-items:baseline;
+    padding:7px 0;border-bottom:1px solid #f2efe9;font-size:13px}
+  .peekrow:last-of-type{border-bottom:0}
+  .peeknm{font-weight:600}
+  .peekbd{color:var(--ink2);font-size:12.5px}
+  .coolbar{padding:9px 14px;background:#fdf6ef;border-top:1px solid #f0e4d5;
+    font-size:12.5px;color:#8a6247}
+  .coolbar.big{border-radius:10px;border:1px solid #f0e4d5;margin-bottom:14px;
+    text-align:center;font-size:13px}
+  /* 逐面向的可信度清单（取代旧的「环进度条」） */
+  .conf{max-height:298px;overflow:auto;border:1px solid var(--line);border-radius:10px}
+  .confrow{display:flex;align-items:baseline;gap:8px;padding:6px 10px;font-size:12.5px;
+    border-bottom:1px solid #f4f1ec}
+  .confrow:last-child{border-bottom:0}
+  .confrow .cn{flex:1;color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .confrow .ck{flex:none;width:34px;text-align:right;color:var(--ink3);
+    font-variant-numeric:tabular-nums}
+  .confrow .cr{flex:none;width:54px;text-align:right;color:var(--ink3);
+    font-variant-numeric:tabular-nums}
+  .confrow .cb{flex:none;width:52px;text-align:right;font-size:11.5px}
+  .confrow.l0 .cb{color:var(--ink3)}
+  .confrow.l1 .cb{color:var(--tier1)}
+  .confrow.l2 .cb{color:var(--tier2)}
+  .confrow.l3 .cb{color:var(--tier3)}
+  .confrow.l2 .cn,.confrow.l3 .cn{color:var(--ink)}
+  .rowline{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+  .rowline b{font-size:13.5px;font-weight:600}
+  .rowline span{font-size:12px;color:var(--ink3);font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <h1>EmoHealth · 自测陪伴</h1>
+    <div class="modes" id="modes">
+      <button data-m="tier" class="on">分级模式</button>
+      <button data-m="scene">情景模式</button>
+      <button data-m="classic">经典模式</button>
+    </div>
+    <div class="spacer"></div>
+    <div class="io">
+      <span class="saved" id="saved"></span>
+      <button id="btn-clear" title="清空本机保存的作答">重来</button>
+      <div style="position:relative">
+        <button class="primary" id="btn-export">导出 ▾</button>
+        <div class="menu" id="menu">
+          <button data-x="md">报告（Markdown）
+            <span class="sub">给人看的：分数、落带、区间、精度、以及「这不意味着什么」</span></button>
+          <button data-x="copy">复制报告到剪贴板</button>
+          <hr>
+          <button data-x="json">存档（JSON）
+            <span class="sub">可续做：换设备或清空浏览器后导入，从断点继续</span></button>
+          <button data-x="import">导入存档…</button>
+          <hr>
+          <button data-x="csv">逐题作答（CSV）
+            <span class="sub">原始数据，供你自己分析或带给专业人士</span></button>
+        </div>
+      </div>
+    </div>
+    <input type="file" id="file" accept=".json" style="display:none">
+  </div>
+  <div class="meta" id="topmeta" style="padding-bottom:12px"></div>
+
+  <div class="layout" id="layout">
+    <div>
+      <div class="card" id="stage"></div>
+      <div class="card" id="resultcard" style="margin-top:20px;display:none"></div>
+    </div>
+    <div class="card" id="treecard"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="emohealth-data.js"></script>
+<script src="tier-data.js"></script>
+<script src="unlock-data.js"></script>
+<script src="adaptive-data.js"></script>
+<script src="net-layout.js"></script>
+<script>
+"use strict";
+const D = window.EMOHEALTH;
+const TR = window.EMOHEALTH_TIER;      // 分级解锁数据
+const UN = window.EMOHEALTH_UNLOCK;    // 网络感知的解锁规则
+const AD = window.EMOHEALTH_ADAPT;     // 自适应选题（题-题相关矩阵）
+const NET = window.EMOHEALTH_NET;      // 网状布局：坐标 + 支撑边 + 角序（离线算好，界面不做物理模拟）
+/* 精度档位：**用户看的是「这个面向的结果可不可信」，不是「答了几层」**。
+   这与 `unlockOf()` 用的 TIERS 同源，只多了一个「够不够给结果」的分界（UNLOCK_R）。 */
+const CONF = [
+  [0.95, "很稳", 3], [0.90, "稳", 2], [0.85, "可信", 2],
+  [0.80, "初步", 1], [0.70, "仅供参考", 1],
+];
+function confOf(r) {
+  for (const [th, name, lvl] of CONF) if (r >= th) return {name, lvl};
+  return {name: "还不行", lvl: 0};
+}
+const TIERS = [
+  [0.95,"完整",3],[0.90,"较可靠",2],[0.80,"初步倾向",1],[0.70,"仅供参考",1]
+];
+const OPTLABEL = ["很不符合","比较不符合","一般","比较符合","很符合"];
+
+/* ── 状态 ───────────────────────────────────────────── */
+const S = {
+  mode: "tier",
+  resp: {},            // order -> 1..5
+  scene: null,
+  qi: 0,               // 当前情景内的题序
+  result: null,        // {type:'scene'|'classic'|'tier', ...}
+  tierSel: null,       // 天赋树里选中的节点 {f, t, o}
+  peekOpen: false,     // 「可解读的结果」折叠区是否展开
+  panelOpen: null,     // 面板是否展开（null = 未定，按窄屏/宽屏取默认；D103）
+  coolUntil: 0,        // 作答冷却截止时间戳（看完结果后 10s 内不许继续答）
+};
+
+/* ── 最小 markdown 渲染 ───────────────────────────────────────
+   脚手架与 facet 档案的正文是按 markdown 写的，里面大量使用 **加粗**。
+   直接塞进 innerHTML 会把星号原样显示出来（实测踩过）。
+   只支持 **粗体** 一种——够用，且不会引入 XSS 面。            */
+function esc(t) {
+  return String(t == null ? "" : t)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+function md(t) {
+  return esc(t).replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
+}
+
+/* ── 数据访问 ───────────────────────────────────────── */
+const itemByOrder = {};
+D.items.forEach(it => itemByOrder[it[0]] = it);
+const facetOrders = Array.from({length: D.facets.length}, () => []);
+D.items.forEach(it => facetOrders[it[1]].push(it[0]));
+facetOrders.forEach(a => a.sort((x, y) => x - y));
+const sceneItems = Array.from({length: D.scenes.length}, () => []);
+D.items.forEach(it => sceneItems[it[2]].push(it[0]));
+sceneItems.forEach(a => a.sort((x, y) => x - y));
+
+const answeredIn = (f) => facetOrders[f].filter(o => o in S.resp);
+function maskOf(f) {
+  const orders = facetOrders[f];
+  let m = 0;
+  orders.forEach((o, i) => { if (o in S.resp) m |= (1 << i); });
+  return m;
+}
+function precisionOf(f) {
+  const m = maskOf(f);
+  if (m === 0) return null;
+  return D.fullPrec[f][m];
+}
+function unlockOf(f) {
+  const k = answeredIn(f).length, r = precisionOf(f);
+  if (k <= 2) return {k, r, tier:"未解锁", lvl:0, why:"题量不足"};
+  if (r == null) return {k, r, tier:"未解锁", lvl:0, why:"无法计算"};
+  for (const [th, name, lvl] of TIERS)
+    if (r >= th) return {k, r, tier:name, lvl};
+  return {k, r, tier:"仅供参考", lvl:1};
+}
+const sceneDone = (s) => sceneItems[s].every(o => o in S.resp);
+const sceneCount = (s) => sceneItems[s].filter(o => o in S.resp).length;
+const totalAnswered = () => Object.keys(S.resp).length;
+
+/* ── 渲染：顶部与技能树 ─────────────────────────────── */
+function renderTop() {
+  const n = totalAnswered();
+  let extra = "";
+  if (S.mode === "tier") {
+    // **不再说「第几层」**（D99）。环数只是「答了多少」的代理，而用户真正在追的是
+    // 「这个结果可不可信」——两者不重合时会误导（实测 90 题时 29 个面向已 r≥0.85，
+    // 但按完整环算只「完成」了 3 层）。
+    const nOk = D.facets.filter((_, i) => Math.sqrt(netR2(i)) >= UNLOCK_R
+                                        && ownCount(i) >= MIN_OWN).length;
+    extra = `已可信 ${nOk}/30 个面向`;
+  } else if (S.mode === "scene") {
+    extra = `已完成情景 ${sceneItems.filter((_, i) => sceneDone(i)).length}/${D.scenes.length}`;
+  } else {
+    const rounds = Math.floor(n / 30);
+    extra = `第 ${Math.min(rounds + 1, 10)} 轮 / 共 10 轮`;
+  }
+  document.getElementById("topmeta").textContent =
+    `已答 ${n}/${D.items.length} 题（${(n / D.items.length * 100).toFixed(1)}%） · ${extra}`;
+}
+
+function renderTree() {
+  const unlocked = D.facets.map((_, i) => unlockOf(i));
+  const nU = unlocked.filter(u => u.lvl > 0).length;
+  let html = `<div class="rowline"><b>技能条</b>
+      <span>已解锁 ${nU}/30</span></div>
+    <div class="bar" style="margin-bottom:14px"><i style="width:${nU / 30 * 100}%"></i></div>`;
+
+  for (let d = 0; d < 5; d++) {
+    html += `<div class="dom"><div class="domname">${D.domains[d]}</div>`;
+    for (let f = d * 6; f < d * 6 + 6; f++) {
+      const u = unlocked[f], rec = D.recs[f];
+      const dots = Array.from({length: 10}, (_, i) =>
+        `<i class="${i < u.k ? "f" + (u.lvl ? " t" + u.lvl : "") : ""}"></i>`).join("");
+      const badge = u.lvl === 0
+        ? `<span class="badge">${u.k}/10</span>`
+        : `<span class="badge u${u.lvl}">${u.tier}</span>`;
+      html += `<div class="sk ${u.lvl ? "" : "locked"}" title="${rec.does_not_measure.join("；")}">
+          <span class="skname">${u.lvl ? rec.zh : "？？？"}</span>
+          <span class="dots">${dots}</span>${badge}</div>`;
+    }
+    html += `</div>`;
+  }
+  html += `<div class="legend">
+      <b>为什么有的技能条是「？？？」</b><br>
+      一个面向需要至少 3 道题才能给出可信结果——单题与完整测量的相关最差只有
+      <b>0.51</b>，那时给数字等于用噪音冒充测量。<br><br>
+      <b>答题过程中不显示任何分值。</b>看数字涨跌会让人反复琢磨自己的答案，
+      而这正是本工具想帮你避免的事。完成一个情景或一整轮后才会出结果。
+    </div>`;
+  document.getElementById("treecard").innerHTML = html;
+}
+
+/* ── 渲染：作答区 ───────────────────────────────────── */
+function renderStage() {
+  const layout = document.getElementById("layout");
+  if (S.mode === "tier") {
+    layout.classList.add("tier");
+    refreshAdapt();
+    renderTierTree();
+    return;
+  }
+  layout.classList.remove("tier");
+  const el = document.getElementById("stage");
+  el.className = "card";
+  el.style.display = "";
+  document.getElementById("resultcard").style.display = "none";
+  const panel = document.getElementById("tierpanel");
+  if (panel) panel.remove();
+  if (S.mode === "scene") renderSceneStage(el);
+  else renderClassicStage(el);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   天赋图：支撑驱动的网络（D99）
+
+   **「环」退场了。** 旧图让节点半径＝层数（阶梯里第几题），于是图形宣称
+   「可答是因为你在第几环」。但解锁口径早已改成「别的已答内容把它的估计顶到门槛」，
+   而用户真正追的也不是「答了几层」而是「这个结果可不可信」——实测 90 题时
+   29 个面向已 r≥0.85，按完整环算却只「完成」了 3 层。**两者不重合时，层数在误导。**
+
+   现在的位置离线算好（`tools/build_tier_layout.py` → `ui/net-layout.js`）：
+   每题挂到「层数更浅的已放置邻居」里最相关的那道旁边，所以**强相关的题聚在一起
+   是算出来的**；深度仍是梯度，仍保留从中心往外长的方向感。
+   界面只按**状态**决定画什么颜色，不做物理模拟。
+
+   **解锁仍按支线各自推进**（D95）：硬性只有「第一环 30 题必须答完」，
+   之后每条支线有自己的滑动窗口 `facetWindowEnd(f)`。图上按支线各自亮着，
+   不表示「第几环」。
+   ══════════════════════════════════════════════════════════════ */
+const DOM_HUE = ["#4a7c6f", "#b5836a", "#6b7fa3", "#8a7ba8", "#7f9455"];
+
+function tierNodeState(fi, t) {
+  const o = TR.tierRingNodes[t - 1][fi];      // 第 t 环（阶梯深度）、面向 fi 的题号
+  if (o == null) return "locked";
+  if (o in S.resp) return "ans";
+
+  // ⓪ **第一环强制**：没答完第一环时，只开放第一环。
+  //    理由：实测若允许提前，8 个面向会靠**一道题**达标
+  //    （消融：8 个里 0 个能仅靠跨面向达标）。30 题换 5 个大类是诚实的交换。
+  if (!ring1Done()) return t === 1 ? "open" : "locked";
+
+  // ① 窗口内可答（窗口＝该面向的下一个待答环，相关性先到就前进一环，见 facetWindowEnd）。
+  //    不再有「全树逐级硬边界」——只有**这条支线**自己的窗口。
+  if (t <= facetWindowEnd(fi)) {
+    // ② 推荐态：窗口内信息增益最高的几道（推荐集本身也只从窗口内选）
+    if (S.adaptSet && S.adaptSet.has(o)) return "rec";
+    return "open";
+  }
+  return "locked";
+}
+/* ══ 自适应选题 ══════════════════════════════════════════════════
+
+   流程分两阶段：
+
+   **第一阶段（强制）**：第一环 30 题，每面向 1 题。**必须全部答完**，
+   期间不给任何面向结果。答完给 5 个大类的分带。
+
+   为什么强制：实测「一道题就出面向结果」会毁掉信任——
+   第 1 环若允许提前解锁，8 个面向会靠**一道题**达标
+   （消融：8 个里 0 个能仅靠跨面向达标）。30 题换 5 个大类是诚实的交换。
+
+   **第二阶段（自适应）**：接下来答哪题由**信息增益**决定，但候选池**只在已解锁环之内**
+   （＝`maxWindowEnd()`，逐面向窗口的最深处）。不设边界时，实测刚答完 30 题
+   就会推荐第 8/9/10 环——而那时那些环还没解锁，**推荐了却点不动**。
+
+       gain_f(i) = (1 − R²_f) · pcorr(i, f | 已答)²
+                 = (r_if − cᵢᵀA⁻¹b_f)² / (1 − cᵢᵀA⁻¹cᵢ)      ← (1−R²_f) 约掉了
+
+   这个式子自动处理**互补性**：与已答高度相关的题，偏相关小，增益天然低。
+   ══════════════════════════════════════════════════════════════ */
+const RING1 = 30;                    // 第一环题数，强制做完
+
+let _PAIR = null;
+function _pairArr() {
+  if (_PAIR) return _PAIR;
+  const bin = atob(AD.pairB64);
+  const buf = new ArrayBuffer(bin.length);
+  const u8 = new Uint8Array(buf);
+  for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+  // float32 直存。曾用 int16×1000/×10000，舍入破坏了正定性，
+  // 导致负的残差方差与 NaN——见 data/adaptive-network.json 的 note。
+  _PAIR = new Float32Array(buf);
+  return _PAIR;
+}
+/* 题号（1-based）之间的相关。
+   ⚠️ 行偏移是 **(a−1)(a−2)/2**，不是 a(a−1)/2。
+   三角形按行存：行 a（1-based）前面有 sum_{r=1}^{a-2} r = (a−1)(a−2)/2 个元素。
+   写成 a(a−1)/2 会整体错位——最大下标会越界（45148 > 44850），
+   而**越界前的读数全是错的**，偏偏不报错。
+   实测就是它让偏相关算出 −0.20 的残差方差和 NaN。 */
+function pairR(i, j) {
+  if (i === j) return 1;
+  const a = Math.max(i, j), b = Math.min(i, j);
+  const off = (a - 1) * (a - 2) / 2;
+  return _pairArr()[off + (b - 1)];
+}
+function _inv(M) {                    // 高斯-约当求逆
+  const m = M.length, A = M.map((r, i) =>
+    r.concat(Array.from({length: m}, (_, j) => i === j ? 1 : 0)));
+  for (let c = 0; c < m; c++) {
+    let p = c;
+    for (let r = c + 1; r < m; r++) if (Math.abs(A[r][c]) > Math.abs(A[p][c])) p = r;
+    if (Math.abs(A[p][c]) < 1e-10) return null;
+    [A[c], A[p]] = [A[p], A[c]];
+    const d = A[c][c];
+    for (let k = 0; k < 2 * m; k++) A[c][k] /= d;
+    for (let r = 0; r < m; r++) {
+      if (r === c) continue;
+      const f = A[r][c];
+      if (!f) continue;
+      for (let k = 0; k < 2 * m; k++) A[r][k] -= f * A[c][k];
+    }
+  }
+  return A.map(r => r.slice(m));
+}
+function _mv(M, v) { return M.map(r => r.reduce((s, x, k) => s + x * v[k], 0)); }
+
+/* 岭正则化强度。
+   为什么需要：30 道题的题-题相关矩阵里有大量接近 1 的组合（同一面向的题），
+   直接求逆会因舍入误差**破坏正定性**——实测出现负的残差方差（-0.1653）
+   甚至 NaN，进而 R²_f 算出 -0.2129、偏相关飙到 211035。
+   加 λI 等价于承认「每题都有独特方差」（这本来就更真实），
+   而且方向是**保守**的：宁可低估「已经知道多少」，不可高估。 */
+const RIDGE = 0.02;
+function adaptCtx() {
+  const S = [];
+  for (const o of D.items.map(i => i[0])) if (o in S_resp()) S.push(o);
+  const m = S.length;
+  if (!m) return null;
+  const A = S.map((a, i) => S.map((b, j) => i === j ? 1 + RIDGE : pairR(a, b)));
+  const Ainv = _inv(A);
+  if (!Ainv) return null;
+  const b = AD.facets.map((_, j) => S.map(o => AD.itemFacetR[o - 1][j]));
+  const xf = b.map(v => _mv(Ainv, v));
+  return {S, m, Ainv, xf, b};
+}
+function S_resp() { return S.resp; }
+
+/* 候选题 i 对面向 j 的增益
+   = (1 − R²_f) · 偏相关(i, f | 已答)²
+
+   展开后是 num²/denom。但**必须封顶**：
+     · denom = 1 − cᵀA⁻¹c 是候选题在已答条件下的残差方差。
+       候选题与已答几乎共线时 denom → 0，比值会炸成几百
+       （实测未封顶时增益出现 278.5 这种值）。
+     · 增益的物理上限是 (1 − R²_f)：偏相关² ≤ 1，所以增益不可能超过剩余方差。 */
+const MIN_RESID = 0.10;              // 残差方差下限：低于此视为与已答共线
+function gainOf(i, ctx, j) {
+  const {S, Ainv, xf} = ctx;
+  const c = S.map(o => pairR(i, o));
+  const Ac = _mv(Ainv, c);
+  const denom = 1 - c.reduce((s, x, k) => s + x * Ac[k], 0);
+  if (denom < MIN_RESID) return 0;               // 共线，不提供可靠新信息
+  const num = AD.itemFacetR[i - 1][j] - c.reduce((s, x, k) => s + x * xf[j][k], 0);
+  // R²_f = bᵀ A⁻¹ b
+  const r2f = Math.max(0, Math.min(1,
+    AD.itemFacetR[i - 1].length && ctx.b[j]
+      ? ctx.b[j].reduce((s, x, k) => s + x * xf[j][k], 0) : 0));
+  return Math.min(num * num / denom, Math.max(0, 1 - r2f));
+}
+/* 总增益：按「还没答满」加权，已经很好的面向少花力气 */
+function totalGain(i, ctx) {
+  let g = 0;
+  for (let j = 0; j < AD.facets.length; j++) {
+    // ⚠️ 这里原先写 `facetOrders[j].filter(o => o in S.resp).length`——
+    //    与 `ownCount(j)` 是同一件事，但 `ownCount` 带越界断言（D78 那一类错
+    //    是静默的），两处口径也不该分开维护。
+    if (ownCount(j) >= 10) continue;
+    const w = Math.sqrt(netR2(j)) >= 0.95 ? 0.15 : 1;
+    g += w * gainOf(i, ctx, j);
+  }
+  return g;
+}
+/* 候选题 i 与面向 j 在已答条件下的**偏相关绝对值**。
+   与 gainOf 的区别：这里不乘 (1−R²_f)、也不封顶，所以天然落在 [0,1] 且有区分度。 */
+function pcorrOf(i, ctx, j) {
+  const {S, Ainv, xf, b} = ctx;
+  const c = S.map(o => pairR(i, o));
+  const Ac = _mv(Ainv, c);
+  const di = 1 - c.reduce((s, x, k) => s + x * Ac[k], 0);
+  const r2f = Math.max(0, Math.min(1, b[j].reduce((s, x, k) => s + x * xf[j][k], 0)));
+  const dj = Math.max(1e-9, 1 - r2f);
+  if (di < MIN_RESID) return 0;
+  const num = AD.itemFacetR[i - 1][j] - c.reduce((s, x, k) => s + x * xf[j][k], 0);
+  return Math.min(1, Math.abs(num) / Math.sqrt(di * dj));
+}
+
+/* 增益的理论上限：Σ_f (1 − R²_f)。步进量纲上「还能捞回多少不确定性」。
+   显示时用相对值，避免把「13.2」误读成相关系数。 */
+function gainCeiling(ctx) {
+  let t = 0;
+  for (let j = 0; j < AD.facets.length; j++) {
+    const own = facetOrders[j].filter(o => o in S.resp).length;
+    if (own >= 10) continue;
+    const r2f = ctx.b[j].reduce((s, x, k) => s + x * ctx.xf[j][k], 0);
+    t += Math.max(0, 1 - Math.max(0, Math.min(1, r2f)));
+  }
+  return t;
+}
+/* 推荐接下来最该答的 k 题
+
+   ⚠️ 候选池按**该题自己所属面向的窗口**过滤，不是按「全树最深窗口」。
+   写错这一处的症状很隐蔽：池子按全局窗口取（更宽），节点态按本面向窗口判，
+   于是会出现**推荐了却点不动**的节点——橙色脉冲是假的。
+   （实测已答 45 题时，emotionality 的窗口只到第 2 环，却推荐出它的第 4 环。）
+   `tierNodeState` 与这里必须同源：都用 `facetWindowEnd(fi)`。 */
+function recommend(k = 5) {
+  const ctx = adaptCtx();
+  if (!ctx) return [];
+  const out = [];
+  for (const it of D.items) {
+    const o = it[0], fi = it[1];
+    if (o in S.resp) continue;
+    if (tierRingOfOrder(o) > facetWindowEnd(fi)) continue;   // 本面向窗口外 → 点不动
+    out.push({o, gain: totalGain(o, ctx)});
+  }
+  out.sort((a, b) => b.gain - a.gain);
+  const ceil = gainCeiling(ctx) || 1;
+  return out.slice(0, k).map(x => ({...x, pct: x.gain / ceil, ceiling: ceil}));
+}
+/* 第一环答完了吗 */
+function ring1Done() {
+  return TR.tierRingNodes[0].every(o => o in S.resp);
+}
+
+/* ══ 逐面向的滑动窗口：节点「何时变得可答」 ═══════════════════════════
+
+   硬性只有一条：**第一环 30 题必须答完**（D79）。
+
+   之后解锁由**两个来源共同**决定，而不是「环答满才开下一环」：
+
+     ① 相关性（网络解锁）：已在别处答过的题，把某面向的完整分估计顶到
+        门槛 r≥0.85、且该面向自己已答 ≥MIN_OWN 题 → 该面向可以往前走一环。
+     ② 预设的逐级（阶梯）：该面向的下一题本来就在它的下一环。
+
+   于是每个面向有一个**窗口末端** `end(f) = 首个空档环(+1)`，窗口只进不退：
+   相关性先到就前进一环，不然就等阶梯。**逐面向推进**是关键——一个面向
+   被相关性推着走，不会连带把别的 29 个面向也拽进深环。
+
+   实测为什么必须两者并用：只看相关性时，第 1 环答完**解锁 0 个**
+   （每个面向只有 1 题，`MIN_OWN=2` 挡着；而 26/30 个面向此时 r 已在 0.75–0.88），
+   只靠阶梯又完全用不上相关性。 */
+function facetWindowEnd(fi) {
+  let firstGap = 1;
+  for (; firstGap <= 10; firstGap++)
+    if (!(TR.tierRingNodes[firstGap - 1][fi] in S.resp)) break;
+  if (firstGap > 10) return 10;                       // 该面向 10 题已答满
+  return Math.min(10, netUnlocked(fi) ? firstGap + 1 : firstGap);
+}
+/* 全树当前可作答的最深环。它只是**可作答集合的上界**（节点态与推荐池仍按各自的
+   `facetWindowEnd(fi)` 判），界面不再拿它当「进度」显示——进度看可信度（D99）。 */
+function maxWindowEnd() {
+  let m = 0;
+  for (let fi = 0; fi < 30; fi++) m = Math.max(m, facetWindowEnd(fi));
+  return m;
+}
+
+/* ══ 网络感知的解锁 ══════════════════════════════════════════════
+   一个细类解锁的条件**不是**「它的题答够了」，而是
+   「以目前已答的**全部**题目（含别的面向的）为预测变量，
+     对该面向完整分的回归 R² 达到门槛」。
+
+   实测（门槛 r≥0.85）：第 1 环 30 题时，只看本面向解锁 0 个，
+   网络感知解锁 **8** 个；第 2 环 60 题时是 0 → **26**。
+
+   而且**答哪些题决定解锁哪些细类**：同样答 12 题，六种不同组合解锁 0–3 个，
+   没有一个是共同解锁的。
+
+   R² = bᵀ A⁻¹ b，其中 A 是已答题之间的相关矩阵、b 是它们与目标面向的相关。
+   相关清单每个面向只有 34 题，矩阵最多 34×34，浏览器里算得动。
+   ══════════════════════════════════════════════════════════════ */
+const UNLOCK_R = UN.threshold_r;
+
+function _pair(rel, a, b) {              // rel.pair 是下三角
+  return a > b ? rel.pair[a][b] : rel.pair[b][a];
+}
+function _solve(A, b) {                  // 高斯消元（部分主元）
+  const m = b.length, M = A.map((r, i) => r.concat([b[i]]));
+  for (let c = 0; c < m; c++) {
+    let piv = c;
+    for (let r = c + 1; r < m; r++) if (Math.abs(M[r][c]) > Math.abs(M[piv][c])) piv = r;
+    if (Math.abs(M[piv][c]) < 1e-9) return null;
+    [M[c], M[piv]] = [M[piv], M[c]];
+    for (let r = 0; r < m; r++) {
+      if (r === c) continue;
+      const f = M[r][c] / M[c][c];
+      if (!f) continue;
+      for (let k = c; k <= m; k++) M[r][k] -= f * M[c][k];
+    }
+  }
+  // 高斯-约当消元后：x[i] = M[i][m] / M[i][i]
+  return M.map((r, i) => (Math.abs(r[i]) < 1e-12 ? 0 : r[m] / r[i]));
+}
+function netR2(fi) {
+  const rel = UN.rel[UN.facets[fi]];
+  if (!rel) return 0;
+  const sel = [];
+  for (let k = 0; k < rel.items.length; k++)
+    if (rel.items[k] in S.resp) sel.push(k);
+  if (!sel.length) return 0;
+  const m = sel.length;
+  const A = [], b = [];
+  for (let i = 0; i < m; i++) {
+    const row = [];
+    for (let j = 0; j < m; j++)
+      row.push(i === j ? 1 : _pair(rel, sel[i], sel[j]));
+    A.push(row); b.push(rel.r[sel[i]]);
+  }
+  const x = _solve(A, b);
+  if (!x) return 0;
+  let s = 0;
+  for (let i = 0; i < m; i++) s += b[i] * x[i];
+  return Math.max(0, Math.min(1, s));
+}
+function ownCount(fi) {
+  if (!Number.isInteger(fi) || fi < 0 || fi >= facetOrders.length)
+    throw new Error(`ownCount: 面向索引越界 ${fi}`
+      + `（注意 itemByOrder[o][1] 已经是索引，不要再 indexOf）`);
+  let c = 0;
+  for (const o of facetOrders[fi]) if (o in S.resp) c++;
+  return c;
+}
+/* 该面向靠网络提前解锁了吗（即：本面向的题还不够，但别的题补上了）
+
+   ⚠️ 必须有 **至少 2 道本面向的题**，这是我加的硬约束，理由是实测的：
+     · M=1 时第 1 环（30 题）就能"解锁" 8 个——但那是**一道题**撑起来的
+       （消融：8 个里 0 个能仅靠跨面向达标），一道题出面向结果太薄
+     · M=2 时第 1 环 0 个、第 2 环（60 题）**26 个**
+   所以 M=2 是「早解锁」与「不虚报」之间的那个点：把等待从 90 题缩到 60 题。 */
+const MIN_OWN = 2;
+function netUnlocked(fi) {
+  if (!ring1Done()) return false;                // ← 第一环必须答完，硬性
+  const own = ownCount(fi);
+  if (own >= 10) return false;                   // 已经答满
+  if (own < MIN_OWN) return false;               // 本面向的题太少，不给
+  return Math.sqrt(netR2(fi)) >= UNLOCK_R;
+}
+/* 面向结果能不能给。
+
+   ⚠️ 门槛必须与 `netUnlocked` **一致**（同为 MIN_OWN=2）。
+   初版这里写的是 ≥3，而 netUnlocked 用 2——结果是
+   **解锁了节点却不给看结果**，自相矛盾。
+   实测差异很大：45 题时网络达标 15 个，用 ≥3 则一个都不给。 */
+function facetReady(fi) {
+  return ring1Done() && ownCount(fi) >= MIN_OWN
+    && Math.sqrt(netR2(fi)) >= UNLOCK_R;
+}
+/* 为某面向的解锁做出最大贡献的已答题目（用于向用户解释「为什么解锁了」） */
+function unlockContributors(fi, k = 4) {
+  const rel = UN.rel[UN.facets[fi]];
+  if (!rel) return [];
+  const mine = new Set(UN.rel[UN.facets[fi]].own);
+  const out = [];
+  for (let i = 0; i < rel.items.length; i++) {
+    const o = rel.items[i];
+    if (!(o in S.resp) || mine.has(o)) continue;
+    out.push({o, r: rel.r[i]});
+  }
+  out.sort((a, b) => Math.abs(b.r) - Math.abs(a.r));
+  return out.slice(0, k);
+}
+
+function tierRingProgress(t) {
+  // 第 t 环是否已解锁：第 1 环始终解锁；否则要求第 t-1 环全部答完
+  const idx = TR.tierRingNodes[t - 1];         // 该环的 30 个题号
+  const done = idx.filter(o => o in S.resp).length;
+  const prev = t === 1 ? null : TR.tierRingNodes[t - 2];
+  const prevDone = prev ? prev.every(o => o in S.resp) : true;
+  return {unlocked: t === 1 || prevDone, done, total: idx.length};
+}
+function tierRingOfOrder(o) {
+  for (let t = 0; t < 10; t++) if (TR.tierRingNodes[t].includes(o)) return t + 1;
+  return 1;
+}
+
+function renderTierTree() {
+  const narrow = isNarrow();
+  if (S.panelOpen == null) S.panelOpen = !narrow;
+  // 首次进入时把 stage 换成「图 + 面板」的两栏结构
+  let wrap = document.getElementById("tierwrap");
+  if (!wrap) {
+    const stage = document.getElementById("stage");
+    stage.className = "tree";
+    stage.innerHTML = `<div class="graphbox" id="graphbox"></div>
+      <div class="panelwrap" id="panelwrap">
+        <div class="nextq" id="nextq"></div>
+        <button class="ptoggle" id="ptoggle"></button>
+        <div id="panelbody"><div class="panel" id="tierpanel"></div></div>
+      </div>`;
+    document.getElementById("resultcard").style.display = "none";
+    wrap = stage;
+  }
+  // 先画图再画面板：图里要用 `S.adaptSet`（refreshAdapt 已在 renderStage 里跑过）
+  renderTierGraph();
+  renderTierPanel();
+  // 折起状态：**只折起下面的结果/可信度**，顶部「下一题」常驻区永远可见
+  //（否则窄屏一折就把「能直接作答」的路也折没了，那不叫省空间）
+  const body = document.getElementById("panelbody");
+  const tg = document.getElementById("ptoggle");
+  const nq = document.getElementById("nextq");
+  if (nq) nq.innerHTML = nextQuestionHtml();
+  if (body) body.style.display = S.panelOpen ? "" : "none";
+  if (tg) {
+    const rdy = readyFacets().length;
+    tg.innerHTML = `${S.panelOpen ? "收起结果与可信度" : "展开结果与可信度"}`
+      + (rdy ? ` · <b>${rdy}</b> 个面向可解读` : "");
+    tg.classList.toggle("on", !!S.panelOpen);
+  }
+}
+
+/* ══ 支撑驱动的网状布局 ═══════════════════════════════════════════════
+
+   **环退场了（D99）。** 旧图把节点半径＝层数（阶梯里第几题），于是图形宣称
+   「可答是因为你在第几环」。但解锁口径早已改成「别的已答内容把它的估计顶到门槛」，
+   而用户真正追的也不是「答了几层」而是「这个结果可不可信」——实测 90 题时
+   29 个面向已 r≥0.85，按完整环算却只「完成」了 3 层。**两者不重合时，层数在误导。**
+
+   现在的位置由**支撑关系**决定，离线算好（tools/build_tier_layout.py → net-layout.js）：
+
+     · 每题挑一个「层数更浅、已放置」的邻居里**最相关**的那道，挂在它旁边；
+     · 于是「强相关的聚在一起」是算出来的，不是画的；
+     · 深度仍是梯度（离中心越远＝阶梯越深），所以还有从中心往外长的方向感；
+     · 界面**不做物理模拟**——只按状态决定画什么、什么颜色。图不会随作答乱跳。
+
+   渲染分层（按状态，不按层数）：
+     已答 —— 实心、略大；它的**支撑边**画出来（细线连到它挂靠的那道题）
+     可答 —— 空心彩边；它若由某道已答题支撑，也把那根边淡淡画出来（「从这儿长出来」）
+     推荐 —— 空心彩边 + 橙圈脉冲
+     未解锁 —— 淡显骨架（保留结构感与「还有多深」，但不抢注意力）
+   ═══════════════════════════════════════════════════════════════════════ */
+const NR = 8.4;                       // 节点半径（宽屏）
+const NETV = NET.meta.viewBox;        // 900
+const cx0 = NET.meta.cx, cy0 = NET.meta.cy;   // 圆心（标注向外逃离时用）
+const P_XY = o => NET.xy[String(o)];
+const P_DEPTH = o => NET.depth[String(o)];
+
+/* 窄屏/移动端：图形与标注尺寸都要**放大**。
+   为什么不能只靠 CSS 缩放：SVG 的半径与字号随 viewBox→显示宽度整体缩放，
+   420px 宽的卡片把 900 单位的图压到 0.47 倍，节点只剩 4px、手指根本点不准。
+   所以窄屏下把半径与字号**按倍数放大**，等效于「在手机上看一张放大的图」。 */
+const isNarrow = () =>
+  typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+  && window.matchMedia('(max-width: 700px)').matches;
+const NR_OF = () => (isNarrow() ? 15 : NR);
+
+/* 标注防重叠。
+
+   踩过的坑：早先只判「同一个 y 是否够远」，于是**两个名字一左一右、角度相邻时，
+   各自向中间伸展的文字盒会叠在一起**（检查器实测：已答 0 题时「自律×同情」就重叠）。
+   名字的盒子是「锚点 + 向一侧伸出的字宽」，必须按盒子判。
+
+   做法：先按理想位置摆放，再迭代地把相交的一对**沿 y 拉开**；拉不动就丢低优先级的那个
+   （支线名可以丢，维度名尽量留）。纯几何、无随机性，状态之间可复现。 */
+const CHW = 11.5, MIN_GAP = 15, LH = 13;
+function labelBox(d) {
+  const w = d.len * CHW;
+  return d.right ? {x0: d.x, x1: d.x + w, y0: d.y - LH / 2, y1: d.y + LH / 2}
+                 : {x0: d.x - w, x1: d.x, y0: d.y - LH / 2, y1: d.y + LH / 2};
+}
+const boxHit = (a, b) => a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;
+
+function placeLabels(items, obstacles) {
+  const obs = obstacles || [];
+  const list = items.map(d => ({...d, x: d.x0, y: d.y}))
+                   .map(d => ({...d, box: labelBox(d)}))
+                   .sort((p, q) => (q.pri - p.pri) || (p.y - q.y));
+  for (let round = 0; round < 30; round++) {
+    let moved = 0;
+    // 与节点/障碍相撞的：沿该点主张的方向（右/左）往外推，并略微离中心远一点
+    for (const d of list) {
+      if (!obs.some(o => boxHit(d.box, o))) continue;
+      // 只往一个方向推会卡住（节点正好在外侧时越推越撞），所以按优先级试几个方向
+      const away = Math.atan2(d.y - cy0, d.x - cx0);
+      const tries = [[d.push, 0], [d.push, -LH], [d.push, LH],
+                     [4 * Math.cos(away), 4 * Math.sin(away)], [-d.push, 0], [0, -2 * LH]];
+      for (const [dx, dy] of tries) {
+        const cand = {...d, x: d.x + dx, y: d.y + dy};
+        const box = labelBox(cand);
+        if (!obs.some(o => boxHit(box, o))) { d.x = cand.x; d.y = cand.y; break; }
+      }
+      d.box = labelBox(d); moved++;
+    }
+    // 两两相交：沿 y 分开（各让一半）
+    for (let i = 0; i < list.length; i++) {
+      for (let j = i + 1; j < list.length; j++) {
+        if (!boxHit(list[i].box, list[j].box)) continue;
+        const a = list[i], b = list[j];
+        const need = Math.max(a.box.y1 - b.box.y0, b.box.y1 - a.box.y0) - LH;
+        const dir = a.y <= b.y ? -1 : 1;
+        a.y += dir * (need / 2 + 1); b.y -= dir * (need / 2 + 1);
+        a.box = labelBox(a); b.box = labelBox(b); moved++;
+      }
+    }
+    if (!moved) break;
+  }
+  // 仍相交的：**先尽量都摆上**（丢标注太可惜——支线名是「这是哪个面向」，
+  // 缺几个会让人以为那几个不存在），再统一消解冲突。
+  const placed = list.filter(d => d.x >= 14 && d.x <= NETV - 14
+                               && d.y >= 12 && d.y <= NETV - 12);
+  const freeOf = (box, skip) => !obs.some(o => boxHit(box, o))
+    && !placed.some(p => p !== skip && boxHit(p.box, box));
+  /* 螺旋搜索一个空位。
+     为什么不用「沿一个方向推」：标注夹在相邻节点之间时，往哪个方向推都还在
+     下一个节点的盒子里，推 5 步就放弃了（实测「活跃度」「外向性」反复压节点）。
+     螺旋**同时变方向与距离**，只要画布上真有空位就一定能找到，且没有随机性。 */
+  const spiral = (d, step = 5) => {
+    for (let r = 0; r <= 22; r++) {
+      const rr = r * step;
+      const n = r === 0 ? 1 : Math.max(8, Math.round(2 * Math.PI * r));
+      for (let k = 0; k < n; k++) {
+        const a = (d.baseAng || 0) + k * 2 * Math.PI / n;
+        const x = d.x + rr * Math.cos(a), y = d.y + rr * Math.sin(a);
+        if (x < 14 || x > NETV - 14 || y < 12 || y > NETV - 12) continue;
+        const box = labelBox({...d, x, y});
+        if (freeOf(box, d)) return {x, y, box};
+      }
+    }
+    return null;
+  };
+  placed.forEach(d => { d.baseAng = Math.atan2(d.y - cy0, d.x - cx0); });
+  // 先把压节点的挪开，再两两分 y；交替几轮（分 y 可能又压回节点）
+  for (let pass = 0; pass < 8; pass++) {
+    let moved = 0;
+    for (const d of placed) {
+      if (freeOf(d.box, d)) continue;
+      const hitNode = obs.some(o => boxHit(d.box, o));
+      const spot = spiral(d, hitNode ? 6 : 9);
+      if (spot) { d.x = spot.x; d.y = spot.y; d.box = spot.box; moved++; }
+    }
+    for (let i = 0; i < placed.length; i++) {
+      for (let j = i + 1; j < placed.length; j++) {
+        const a = placed[i], b = placed[j];
+        if (!boxHit(a.box, b.box)) continue;
+        const need = Math.max(a.box.y1 - b.box.y0, b.box.y1 - a.box.y0) - LH;
+        const dir = a.y <= b.y ? -1 : 1;
+        const sa = spiral({...a, y: a.y + dir * need / 2, baseAng: Math.PI / 2 * dir}, 7);
+        if (sa) { a.x = sa.x; a.y = sa.y; a.box = sa.box; moved++; }
+        else {                                  // 挪不动就把优先级低的丢掉
+          const low = a.pri <= b.pri ? a : b;
+          low.dead = true;
+        }
+      }
+    }
+    if (!moved) break;
+  }
+  return placed.filter(d => !d.dead && d.x >= 14 && d.x <= NETV - 14
+                         && d.y >= 12 && d.y <= NETV - 12);
+}
+
+function renderTierGraph() {
+  const cx = NET.meta.cx, cy = NET.meta.cy;
+  const nr = NR_OF();
+  const narrow = isNarrow();
+  let g = "";
+
+  // 状态先算一遍（节点态要问 20+ 次，别在图里反复算）
+  const st = {}, col = {}, fin = [];
+  for (let f = 0; f < 30; f++) {
+    for (let t = 1; t <= 10; t++) {
+      const o = TR.tierRingNodes[t - 1][f];
+      const s = tierNodeState(f, t);
+      st[o] = s;
+      col[o] = (s === "locked") ? "#dedad3" : (s === "rec") ? "#b5836a"
+             : DOM_HUE[Math.floor(f / 6)];
+      fin.push({o, f, t, s});
+    }
+  }
+
+  // ── 支撑边（题 → 它挂靠的那道题）。
+  // 这是图上唯一有语义的连线：**「这个估计是从哪些已答内容长出来的」**。
+  // 第 1 层的 30 道是根（支撑表里没有它们，它们就是「起点」），所以边由
+  // **已描述的子节点**连回父节点——父节点已作答的边画实，只是可答的画淡。
+  for (const it of fin) {
+    const sup = NET.support[String(it.o)];
+    if (!sup || it.s === "locked") continue;
+    const sf = itemByOrder[sup][1];             // ← [1] 已经是面向索引
+    const solid = st[sup] === "ans";
+    const a = P_XY(it.o), b = P_XY(sup);
+    if (!a || !b) continue;
+    g += `<line x1="${a[0].toFixed(1)}" y1="${a[1].toFixed(1)}"
+      x2="${b[0].toFixed(1)}" y2="${b[1].toFixed(1)}"
+      stroke="${solid ? DOM_HUE[Math.floor(sf / 6)] : "#c9bdb0"}"
+      stroke-width="${solid ? 1.2 : 0.9}"
+      opacity="${solid ? 0.5 : 0.55}"
+      ${it.s === "rec" ? 'stroke-dasharray="3 3"' : ""}/>`;
+  }
+
+  // ── 节点
+  for (const it of fin) {
+    const [x, y] = P_XY(it.o);
+    const s = it.s;
+    // 视觉权重按状态分层：已答略大、可答次之、未解锁最小且最淡（**淡显骨架**）
+    const rr = s === "ans" ? nr + 0.6 : s === "locked" ? nr - 2.4 : nr;
+    const op = s === "locked" ? 0.30 : 1;
+    const rec = s === "rec";
+    const sel = S.tierSel && S.tierSel.o === it.o;
+    g += `<g class="nd ${s}" data-f="${it.f}" data-t="${it.t}" data-o="${it.o}">
+      <title>${esc(D.recs[it.f].zh)} · 第 ${it.t} 题 · ${
+        s === "ans" ? "已作答" : rec ? "推荐作答"
+        : s === "open" ? "可作答" : "未解锁"}</title>
+      ${s !== "locked" ? `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}"
+        r="${(rr + 6).toFixed(1)}" fill="transparent"/>` : ""}
+      <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${rr}"
+        fill="${s === "ans" ? col[it.o] : (s === "locked" ? "#f2efe9" : "#fff")}"
+        stroke="${col[it.o]}"
+        stroke-width="${s === "ans" ? 0 : rec ? 2.4 : 1.6}"
+        opacity="${op}"/>
+      ${rec ? `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${nr + 3}"
+        fill="none" stroke="#b5836a" stroke-width="1" opacity="0.55">
+        <animate attributeName="r" values="${nr + 2};${nr + 7};${nr + 2}"
+          dur="2.2s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.6;0;0.6"
+          dur="2.2s" repeatCount="indefinite"/></circle>` : ""}
+      ${s === "ans" ? `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}"
+        r="${(nr * 0.28).toFixed(1)}" fill="#fff"/>` : ""}
+      ${sel ? `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${rr + 4.5}"
+        fill="none" stroke="#2b2a28" stroke-width="1.6" opacity="0.8"/>` : ""}</g>`;
+  }
+
+  // ── 推荐连线：从「当前选中的已答节点」（否则上一次作答）连到推荐的几道。
+  // 语义是「看这道题时，接下来答哪些题最相关」，不是「这两个面向相关」。
+  let edges = 0;
+  if (S.recFrom && S.recTo && S.recTo.length) {
+    const from = NET.xy[String(S.recFrom.o)];
+    if (from) {
+      for (const r of S.recTo) {
+        const to = NET.xy[String(r.o)];
+        if (!to) continue;
+        edges++;
+        const [x0, y0] = from, [x1, y1] = to;
+        const mx = (x0 + x1) / 2, my = (y0 + y1) / 2;
+        const k = 0.34;
+        const qx = mx + (cx - mx) * k, qy = my + (cy - my) * k;
+        const w = r.link != null ? r.link : r.pct;
+        g += `<path d="M${x0.toFixed(1)},${y0.toFixed(1)}
+          Q${qx.toFixed(1)},${qy.toFixed(1)} ${x1.toFixed(1)},${y1.toFixed(1)}"
+          fill="none" stroke="#b5836a" stroke-width="${(1.0 + w * 4.0).toFixed(2)}"
+          opacity="${(0.20 + w * 0.72).toFixed(2)}"
+          stroke-linecap="round"><animate attributeName="opacity"
+          from="0" to="${(0.20 + w * 0.72).toFixed(2)}" dur="0.45s"
+          fill="freeze"/></path>`;
+      }
+    }
+  }
+
+  // ── 支线名与维度名：**放同一个池子里**避让（分两趟各自避让＝没避让，
+  //    实测维度名会压在支线名上）。维度名优先级更高，先放它。
+  {
+    const items = [], nb = [];
+    for (let f = 0; f < 30; f++) {
+      const answered = facetOrders[f].some(o => o in S.resp);
+      let visible = null;
+      for (let t = 1; t <= 10; t++) {
+        const o = TR.tierRingNodes[t - 1][f], [x, y] = P_XY(o);
+        // 只把**看得见的**节点当障碍。把 300 个都算进去会让标注无处可放
+        // （每个标注附近总有一个淡骨架节点），于是标注要么被全丢掉、
+        // 要么硬压在节点上——实测两种都出现过。
+        if (st[o] !== "locked") {
+          nb.push({x0: x - NR - 1, x1: x + NR + 1, y0: y - NR - 1, y1: y + NR + 1});
+          visible = {x, y};
+        }
+      }
+      if (!visible) continue;                       // 整条支线都还锁着
+      // 窄屏上不放支线名：一张 380px 宽的图容不下 30 个中文名，
+      // 挤上去只会互相压。推荐的那几道仍然标（下面单独加）。
+      if (narrow) continue;
+      const right = visible.x >= cx;
+      items.push({kind: "facet", f, answered, name: D.recs[f].zh,
+                  len: D.recs[f].zh.length, right, pri: answered ? 2 : 1,
+                  x0: visible.x + (right ? 11 : -11), y: visible.y,
+                  push: right ? 9 : -9});
+    }
+    // 窄屏只标**推荐的那几道**——它们才是此刻真正要看的。
+    // 按面向去重：两道推荐题属于同一面向时只标一次，否则会出现两个同名标签。
+    if (narrow && S.recTo) {
+      const seen = new Set();
+      for (const r of S.recTo) {
+        if (seen.has(r.f)) continue;
+        seen.add(r.f);
+        const p = NET.xy[String(r.o)];
+        if (!p) continue;
+        const right = p[0] >= cx;
+        items.push({kind: "facet", f: r.f, answered: false, name: D.recs[r.f].zh,
+                    len: D.recs[r.f].zh.length, right, pri: 8,
+                    x0: p[0] + (right ? 14 : -14), y: p[1],
+                    push: right ? 12 : -12});
+      }
+    }
+    // 维度名：该维度 6 条支线的重心外侧。它压在节点上最亏（这是唯一说明
+    // 「这 6 条支线属于哪个大类」的东西），所以推得动、也让得起位置。
+    for (let d = 0; d < 5; d++) {
+      const idx = TR.domainFacetIdx[TR.domains[d]];
+      let sx = 0, sy = 0;
+      for (const fi of idx) { const p = posOfFacet(fi); sx += p[0]; sy += p[1]; }
+      sx /= idx.length; sy /= idx.length;
+      const am = Math.atan2(sy - cy, sx - cx);
+      const dist = Math.hypot(sx - cx, sy - cy) + 46;
+      const right = Math.cos(am) >= 0;
+      items.push({kind: "dom", d, answered: true, name: TR.domainNamesZh[d],
+                  len: TR.domainNamesZh[d].length, right, pri: 9,
+                  x0: cx + dist * Math.cos(am), y: cy + dist * Math.sin(am),
+                  push: right ? 16 : -16});
+    }
+    for (const d of placeLabels(items, nb)) {
+      const cls = d.kind === "dom" ? "domlbl" : ("facetlbl" + (d.answered ? " on" : ""));
+      g += `<text class="${cls}" x="${d.x.toFixed(1)}" y="${d.y.toFixed(1)}"
+        text-anchor="${d.right ? "start" : "end"}" dominant-baseline="middle">${esc(d.name)}</text>`;
+    }
+  }
+
+  document.getElementById("graphbox").innerHTML =
+    `<svg viewBox="0 0 ${NETV} ${NETV}" xmlns="http://www.w3.org/2000/svg">${g}</svg>
+     <div class="hhint">${narrow
+       ? "点节点作答 · 亮着的是可答，橙色脉冲是推荐的几道"
+       : ""}</div>
+     <div class="treelegend">
+       <span><i style="background:#fff;border:1.6px solid #4a7c6f"></i>可作答</span>
+       <span><i style="background:#4a7c6f"></i>已作答</span>
+       <span><i style="background:#fff;border:2.2px solid #b5836a"></i>推荐作答</span>
+       <span><i style="background:#f2efe9;border:1.6px solid #dedad3"></i>未解锁</span>
+       <span class="long">细线＝这个估计<b>挂在哪些已答内容上</b>；离中心越远＝阶梯越深</span>
+       ${edges ? `<span class="long">橙色连线＝从这里出发，接下来答那边最有新信息</span>` : ""}
+     </div>`;
+}
+/* ══ 「下一题」常驻区 ═══════════════════════════════════════════════
+
+   为什么要有：用户可能**不想在图上点圆圈**（尤其手机上圆圈小、还要先找），
+   那就得有一条「直接往下答」的路。这一区常驻在面板最上面：
+   选中的题给作答区，没选中就给推荐的那几道（点一下即选中）。
+
+   ⚠️ **判序有讲究**：先看「有没有选中题」，再看「第一环答完没有」。
+   反过来写会出一个真实的坑——第一环未答完时点节点，`S.tierSel` 明明设上了，
+   却因为 `!ring1Done()` 提前返回，作答区**不显示题干与选项**；
+   而第一阶段恰恰是最需要它的时候（用户要连答 30 题）。 */
+function nqAnswerHtml(sel) {
+  const it = itemByOrder[sel.o], rec = D.recs[sel.f];
+  const r = Math.sqrt(netR2(sel.f)), conf = confOf(r);
+  const done = TR.tierRingNodes[0].filter(o => o in S.resp).length;
+  const firstPhase = !ring1Done();
+  const answered = sel.o in S.resp;
+  return `<div class="nextq">
+    <div class="nqhead"><b>${answered ? "你在答" : "当前题"} · ${esc(rec.zh)}</b>
+      <span class="note">现在 r=${r.toFixed(2)}（${conf.name}）</span></div>
+    ${firstPhase ? `<div class="bar" style="margin:6px 0 10px">
+      <i style="width:${done / 30 * 100}%"></i></div>
+      <div class="note" style="margin:-4px 0 10px">第一阶段 · 第一环
+      <b>${done}/30</b> 题：每答一题换一个面向。</div>` : ""}
+    <div class="qtext nq">${esc(it[4])}${
+      it[3] < 0 ? '<span class="rev">⟲ 反向计分</span>' : ""}</div>
+    ${answered ? `<div class="note">你选了 <b>${S.resp[sel.o]}</b>。
+      <button class="btn" id="redo" style="margin-left:8px;padding:3px 10px;font-size:12px">
+      重答</button></div>` : ""}
+    <div class="opts">${[1,2,3,4,5].map(v =>
+      `<button class="opt${S.resp[sel.o] === v ? " sel" : ""}" data-v="${v}">
+        <span class="k">${v}</span>${OPTLABEL[v-1]}</button>`).join("")}</div>
+    ${whyBox(sel.o)}</div>`;
+}
+
+function nextQuestionHtml() {
+  let h = `<div class="nextq">`;
+
+  // ── ① 有选中题：它就是「当前要答的题」——**先判这个**（见上方注释）
+  if (S.tierSel) return nqAnswerHtml(S.tierSel);
+
+  // ── ② 第一环未答完：这时**不给推荐**（30 个节点地位相同，没有「最该答」的），
+  //    只说明「点任意亮起的圆圈」，并把提示交给图形
+  if (!ring1Done()) {
+    const done = TR.tierRingNodes[0].filter(o => o in S.resp).length;
+    h += `<div class="nqhead"><b>第一阶段 · 第一环</b>
+      <span class="note">${done}/30 题</span></div>
+      <div class="bar" style="margin:8px 0 10px"><i style="width:${done / 30 * 100}%"></i></div>
+      <div class="note">每答一题换一个面向——用最少的题先把 <b>5 个大类</b>立起来。
+      点图上任意<b>亮起的圆圈</b>开始；答满 30 题后，这里会出现推荐的下一题。</div>`;
+    return h + `</div>`;
+  }
+
+  const list = (S.adaptList && S.adaptList.length) ? S.adaptList : recommend(6);
+
+  // ── ③ 没有选中题：把「推荐的那几道」摆在最上面，点一下即成为当前题
+  if (!list.length) {
+    return h + `<div class="nqhead"><b>没有可推荐的题了</b></div>
+      <div class="note">所有能答的题都答完了，或者当前没有信息增益为正的题。
+      可以在下面看结果，或用「重来」从头开始。</div></div>`;
+  }
+  h += `<div class="nqhead"><b>推荐接下来答</b>
+    <span class="note">点一下即选中，或直接在图上点圆圈</span></div>
+    <div class="nqlist">`;
+  for (const x of list) {
+    const it = itemByOrder[x.o], fj = it[1];
+    const conf = confOf(Math.sqrt(netR2(fj)));
+    h += `<button class="nqpick${x === list[0] ? " first" : ""}" data-pick="${x.o}">
+      <span class="nqtxt">${esc(it[4])}</span>
+      <span class="nqmeta">${esc(D.recs[fj].zh)} · r=${Math.sqrt(netR2(fj)).toFixed(2)}（${conf.name}）
+        · 可消除 ${(x.pct * 100).toFixed(0)}%</span></button>`;
+  }
+  h += `</div>
+    <div class="note" style="margin-top:8px">增益 = (1−R²<sub>f</sub>)·偏相关²，对所有面向求和。
+    百分数看着小是正常的：分母是<b>全部 30 个面向的剩余不确定性之和</b>，
+    而一道题主要只推进 1–2 个面向。</div>`;
+  return h + `</div>`;
+}
+
+/* 一条支线的位置：取它已答/可答节点里最深的那个（支线的可见末端） */
+function posOfFacet(f) {
+  let last = null;
+  for (let t = 1; t <= 10; t++) {
+    const o = TR.tierRingNodes[t - 1][f];
+    const p = NET.xy[String(o)];
+    if (p && p[0] != null) last = p;
+  }
+  return last || [NET.meta.cx, NET.meta.cy];
+}
+
+/* 窗口宽度跨过窄屏阈值时重画一次：图形的节点半径与标注策略依赖它，
+   不重画就会出现「转屏后节点还是小圆点」。只在**跨过阈值**时重画，
+   避免拖动窗口时反复重算。 */
+let _wasNarrow = null;
+if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+  let _rt = null;
+  window.addEventListener('resize', () => {
+    if (S.mode !== 'tier') return;
+    const now = isNarrow();
+    if (now === _wasNarrow) return;
+    _wasNarrow = now;
+    clearTimeout(_rt);
+    _rt = setTimeout(() => { renderTierGraph(); }, 150);
+  });
+}
+
+function renderTierPanel() {
+  const el = document.getElementById("tierpanel");
+  const n = Object.keys(S.resp).length;
+  const narrow = isNarrow();
+  if (S.panelOpen == null) S.panelOpen = !narrow;   // 窄屏默认折起
+  let h = "";
+  // 「下一题」常驻区由 renderTierTree 单独渲染到 #nextq（**不在可折起的面板里**），
+  // 这里只渲染结果折叠区 + 可信度 + 说明。
+
+  // ── 结果折叠区（默认收齐）
+  const rdy = readyFacets();
+  if (rdy.length) {
+    const left = coolingLeft();
+    h += `<div class="peek ${S.peekOpen ? "open" : ""}">
+      <button class="peekhead" id="peektoggle">
+        <span>可解读的结果 · <b>${rdy.length}</b> 个面向</span>
+        <span class="peekchev">${S.peekOpen ? "收起" : "展开"}</span>
+      </button>`;
+    if (S.peekOpen) {
+      h += `<div class="peekbody">`;
+      for (const x of rdy) {
+        const rec = D.recs[x.fi];
+        const b = facetBand(x.fi);
+        h += `<div class="peekrow">
+          <div class="peeknm">${esc(rec.zh)}</div>
+          <div class="peekbd">${b ? `落在「<b>${b}</b>」带` : "—"}
+            <span class="note">${x.k}/10 题 · r=${x.r.toFixed(3)}</span></div>
+        </div>`;
+      }
+      h += `<div class="note" style="margin-top:10px">
+        这是<b>当前已答内容</b>能支持的结果，会随着你继续作答而变化。
+        参照人群为英国样本，非中国人群；不构成任何诊断。</div>
+      <div class="note" style="margin-top:6px;color:#b5836a">
+        收起后 <b>${(COOL_MS/1000).toFixed(0)} 秒内不能继续作答</b>——
+        先看结果再答题会影响后面的作答。</div>`;
+      h += `</div>`;
+    } else if (left > 0) {
+      h += `<div class="coolbar">冷却中 · 还需 <b>${Math.ceil(left/1000)}</b> 秒才能继续作答</div>`;
+    }
+    h += `</div>`;
+  }
+  if (isCooling()) {
+    h += `<div class="coolbar big">冷却中 · 还需 <b>${Math.ceil(coolingLeft()/1000)}</b> 秒</div>`;
+  }
+  // **不再画环条、不再报「完成几层」（D99）。** 环只是「答了多少」的代理，
+  // 而用户要看的是「这个面向的结果可不可信」——两者不重合，只报层数会误导。
+  // 这里改成逐面向的可信度清单：答了几题、估计到完整分的相关 r、档位。
+  {
+    let nOk = 0, nStart = 0;
+    const rows = [];
+    for (let f = 0; f < 30; f++) {
+      const k = ownCount(f), r = Math.sqrt(netR2(f));
+      const c = k === 0 ? {name: "还没开始", lvl: 0} : confOf(r);
+      if (r >= UNLOCK_R && k >= MIN_OWN) nOk++;
+      if (k === 0) nStart++;
+      rows.push({f, k, r, c, done: r >= UNLOCK_R && k >= MIN_OWN});
+    }
+    /* 排序按**用户下一步该关注什么**，不是按分数从高到低：
+         ① 还没开始的（先让用户看到还有哪些面向没碰）
+         ② 已开始但还不可信的，r 从低到高（最需要补的排前面）
+         ③ 已可信的，r 从高到低（已经稳的排后面，用来确认）
+       早先是「r 降序」，于是「还没开始」全沉到底部——
+       清单变成了成绩单，而不是待办。 */
+    rows.sort((a, b) => {
+      const grp = x => x.k === 0 ? 0 : (x.done ? 2 : 1);
+      const ga = grp(a), gb = grp(b);
+      if (ga !== gb) return ga - gb;
+      return ga === 1 ? (a.r - b.r) || (a.k - b.k) : (b.r - a.r) || (b.k - a.k);
+    });
+    h += `<div class="rowline" style="margin-top:16px">
+      <b>评分可信度</b>
+      <span>${nOk}/30 个面向已可信（r≥${UNLOCK_R}）${
+        nStart ? ` · ${nStart} 个还没开始` : ""}</span></div>
+      <div class="bar" style="margin:6px 0 12px"><i style="width:${nOk / 30 * 100}%"></i></div>
+      <div class="conf">`;
+    for (const x of rows) {
+      h += `<div class="confrow l${x.c.lvl}">
+        <span class="cn">${esc(D.recs[x.f].zh)}</span>
+        <span class="ck">${x.k}/10</span>
+        <span class="cr">${x.k ? `r=${x.r.toFixed(2)}` : "—"}</span>
+        <span class="cb">${x.c.name}</span></div>`;
+    }
+    h += `</div>
+      <div class="note" style="margin-top:10px">
+        <b>r 是「只答这些题估出来的分」与「答满 10 题的分」的相关</b>——
+        它就是「这个结果可不可信」的量化。r 越高，现在给的分带越稳；
+        <b>与答了几层无关</b>。右边的题数是该面向已答题数。</div>`;
+  }
+
+  /* ── 说明区（作答本身已在顶部常驻区，这里不再重复渲染一遍题目）──
+     早先这里也渲染了一份题面 + 选项，于是同一道题在面板里出现两次。
+     现在这里只讲「解锁按什么推进」，以及在被选中时补充「与别的面向怎么关联」。 */
+  if (!ring1Done()) {
+    h += `<div class="qhead" style="margin-top:18px">第一阶段 · 第一环（强制）</div>
+      <p class="note">这一环<b>不会给任何单个面向的结果</b>——每个面向只有 1 题，
+      拿一道题下结论是不诚实的。答完 30 题给出 <b>5 个大类</b>的分带
+      （与答满 300 题的一致率：相邻一档内 <b>99.0%</b>，差两档及以上 <b>1.0%</b>）。</p>`;
+  } else {
+    let pushed = 0;
+    for (let f = 0; f < 30; f++) {
+      let g = 1;
+      for (; g <= 10; g++) if (!(TR.tierRingNodes[g - 1][f] in S.resp)) break;
+      if (g <= 10 && netUnlocked(f)) pushed++;
+    }
+    h += `<div class="qhead" style="margin-top:18px">解锁按什么推进</div>
+      <p class="note">每条支线往前长一节；如果别的题已经把某个面向的估计顶到
+      r≥${UNLOCK_R}，<b>这条支线就再往前长一节</b>。所以不同支线的深浅可以不一样
+      ——图上按支线各自亮着。
+      ${pushed ? `现在有 <b>${pushed}</b> 个面向是靠相关性提前推进的。`
+              : `现在还没有面向能靠相关性提前推进（题量还少）。`}</p>`;
+  }
+  if (S.tierSel) {
+    const {o} = S.tierSel;
+    h += `<div style="margin-top:12px">${edgeNote(o)}${unlockNote(o)}</div>`;
+  }
+  el.innerHTML = h;
+}
+
+/* ── 分级模式：从粗类到细类 ─────────────────────────────────
+   第 1 层（30 题，每面向 1 题）只给 5 个大类的分带；
+   第 3 层（90 题）才解锁 30 个细类。
+
+   ⚠️ 这里原本还有一个 `renderTierStage()`（逐题推进版的分级作答区）+
+   `tierPos` / `tierOfOrder` / `tierNote`。分级模式走的是**径向天赋树**
+   （`renderTierPanel`），`renderStage` 在 `S.mode === 'tier'` 时直接 return，
+   所以那个函数**永远不可达**——它只会在改口径时留下一个不会被发现的旧口径
+   （它还在用 `TR.tierOfPos` 当层深）。已删除（D94）。 */
+
+/* 这个面向此刻解锁了吗？靠的是哪些别的题？
+
+   ⚠️ 「已经可以给结果」这句话必须与 `facetReady` **逐条同门槛**，否则又是一次 D90：
+   初版这里只看了 r，漏了 `MIN_OWN`（本面向至少 2 题），于是第一环刚答完时
+   有 4 个面向（anxiety / depression / vulnerability / self-consciousness，各只 1 题、
+   r 却已 ≥0.85）被判为「已经可以给结果了」——而 `readyFacets()` 同时给出 0 个。
+   **界面解说话术与门控真值不一致，比不给解释更坏。** */
+function unlockNote(o) {
+  const fi = itemByOrder[o][1]        /* 已经是面向索引，不要再 indexOf */;
+  const own = ownCount(fi);
+  const r = Math.sqrt(netR2(fi));
+  const contrib = unlockContributors(fi);
+  if (own >= 10 || r < 0.60) return "";
+  const reached = facetReady(fi);         // ← 唯一真值来源，不再自己拼条件
+  const li = contrib.map(c => {
+    const it = itemByOrder[c.o];
+    return `<li>${esc(D.recs[it[1]].zh)} 的第 ${TR.tierRingNodes.findIndex(
+      ring => ring[it[1]] === c.o) + 1} 题　r=${c.r > 0 ? "+" : ""}${c.r.toFixed(2)}</li>`;
+  }).join("");
+  return `<details class="why"${reached ? " open" : ""}>
+    <summary>${reached ? "这个面向已经可以给结果了" : "这个面向还差一点"}</summary>
+    <div class="whybody">
+      <div>本面向答了 <b>${own}/10</b> 题，但按<b>目前已答的全部题目</b>推算，
+        该面向的估计与完整分的相关已达 <b>r=${r.toFixed(3)}</b>
+        （门槛 ${UNLOCK_R}）。</div>
+      <div class="note" style="margin-top:8px">给结果还有一条<b>题量下限</b>：
+        本面向至少 <b>${MIN_OWN}</b> 题。理由是「一道题出面向结果」太薄——
+        实测第 1 环（每面向恰好 1 题）若允许提前解锁，会靠一道题达标。
+        ${own >= MIN_OWN
+          ? `本面向已有 ${own} 题，这条满足。`
+          : `<b>本面向目前只有 ${own} 题，所以还差这一点。</b>`}</div>
+      ${li ? `<div style="margin-top:8px">其中做出贡献的<b>别的面向</b>的题：</div>
+        <ul style="margin:6px 0 0;padding-left:16px">${li}</ul>` : ""}
+      <div class="note" style="margin-top:8px">所以解锁的不是「你答够了这个面向的题」
+        （本面向只有 ${own} 题），而是「你的作答组合已经足以推断它」。
+        <b>换一组作答会解锁不同的细类。</b></div>
+    </div></details>`;
+}
+
+/* 选中节点所属面向的连接——把「相关性网络」摆到用户面前 */
+function edgeNote(o) {
+  const fi = itemByOrder[o][1]        /* 已经是面向索引，不要再 indexOf */;
+  const mine = TR.facetPairs.filter(e => e.a === fi || e.b === fi)
+    .sort((x, y) => Math.abs(y.r) - Math.abs(x.r));
+  if (!mine.length) return "";
+  const its = mine.map(e => {
+    const other = e.a === fi ? e.b : e.a;
+    const rec = D.recs[other];
+    return `<li><b>${esc(rec.zh)}</b>（${esc(rec.domain)}）　r=${
+      e.r > 0 ? "+" : ""}${e.r.toFixed(3)}${e.same_domain ? "" : "　跨维度"}</li>`;
+  }).join("");
+  return `<details class="why"><summary>这个面向与别的面向怎么关联</summary>
+    <div class="whybody">
+      <div>面向之间不是彼此独立的。与「${esc(D.recs[fi].zh)}」关联最强的几项：</div>
+      <ul style="margin:8px 0 0;padding-left:16px">${its}</ul>
+      <div class="note" style="margin-top:8px">取自 20,993 人样本的实测相关，
+        不是示意。图上的弧线画的就是这些关系——<b>虚线表示跨越维度</b>。</div>
+    </div></details>`;
+}
+
+/* ══ 结果折叠区与「防自我强化」冷却 ══════════════════════════════
+
+   用户可以在答题过程中随时展开折叠区，看**当前已经可以解读的**结果
+   （自助、实时）。但**看完关掉之后 10 秒内不许继续作答**。
+
+   为什么：先看到「我宜人性偏低」再回去答题，会影响后面的作答
+   （自我强化 / 反应性）。冷却把「看结果」和「继续作答」在时间上隔开。
+
+   冷却时间戳存进 localStorage——否则刷新页面就能绕过。 */
+const COOL_MS = 10000;
+function coolingLeft() {
+  return Math.max(0, (S.coolUntil || 0) - Date.now());
+}
+function isCooling() { return coolingLeft() > 0; }
+function togglePeek() {
+  if (S.peekOpen) {
+    S.peekOpen = false;
+    S.coolUntil = Date.now() + COOL_MS;      // 关掉即开始冷却
+    saveLocal();
+  } else {
+    S.peekOpen = true;
+  }
+  renderTierPanel();
+  tickCool();
+}
+/* 冷却倒计时：只在冷却期间跑，结束就自动收工 */
+let _coolTimer = null;
+function tickCool() {
+  if (_coolTimer) { clearInterval(_coolTimer); _coolTimer = null; }
+  if (!isCooling()) return;
+  _coolTimer = setInterval(() => {
+    if (!isCooling()) {
+      clearInterval(_coolTimer); _coolTimer = null;
+      renderTierPanel(); renderTierGraph();
+      return;
+    }
+    renderTierPanel();
+  }, 1000);
+}
+/* 面向的落地分带（按已答题折算成 10 题当量，查 UK 表）
+   ⚠️ `normBands` 是按**常模列名**索引的（如 "Artistic Interests"），
+   不是按面向索引，必须经 `normCol` 映射，还要选年龄段——直接复用 `bandOf`。 */
+function facetBand(fi) {
+  const answered = facetOrders[fi].filter(o => o in S.resp);
+  // 与 facetReady / netUnlocked 同一门槛（MIN_OWN）——这是同一处不一致的第三处
+  if (answered.length < MIN_OWN) return null;
+  const raw = answered.reduce((s, o) => s + aligned(o, S.resp[o]), 0);
+  return bandOf(fi, Math.round(raw / answered.length * 10));
+}
+
+/* 当前已可解读的面向（第一环强制 + 网络精度门槛 + 至少 3 题） */
+function readyFacets() {
+  const out = [];
+  for (let fi = 0; fi < TR.facets.length; fi++) {
+    if (!facetReady(fi)) continue;
+    out.push({fi, r: Math.sqrt(netR2(fi)), k: ownCount(fi)});
+  }
+  out.sort((a, b) => b.r - a.r);
+  return out;
+}
+
+/* 刷新自适应推荐集（每次作答后一次，不逐帧算）
+
+   同时更新**推荐连线**的起讫点：
+     · recFrom = 上一次作答的节点
+     · recTo   = 当前推荐的几道题（含图形位置，供画边）
+
+   第一阶段（第一环未完成）**不画边**——那时 30 个节点地位相同，
+   没有「推荐」可言，画边是假的。 */
+function refreshAdapt(lastOrder) {
+  if (!ring1Done()) {
+    S.adaptSet = null; S.adaptList = null;
+    S.recSet = null; S.recTo = null; S.recFrom = null;
+    return;
+  }
+  const list = recommend(5);
+  S.adaptList = list;
+  S.adaptSet = new Set(list.map(x => x.o));
+  S.recSet = S.adaptSet;
+  S.recTo = list.map(x => {
+    const it = itemByOrder[x.o];
+    return {f: it[1], t: tierRingOfOrder(x.o), pct: x.pct, o: x.o};
+  });
+  // ── 连线起点：**优先当前选中的已答节点**，其次刚答的那道，最后最后一道已答。
+  //    这样连线语义是「看这道题时，接下来答哪些题最相关」，
+  //    而不是「随机按最后作答的题目激活外环」。
+  let fromO = null;
+  if (S.tierSel && (S.tierSel.o in S.resp)) fromO = S.tierSel.o;
+  if (fromO == null) fromO = lastOrder;
+  if (fromO == null) fromO = lastAnsweredOrder();
+  if (fromO != null) {
+    const it = itemByOrder[fromO];
+    S.recFrom = {f: it[1], t: tierRingOfOrder(fromO), o: fromO};
+    // 连线强度 = **偏相关**：答这道推荐题，对「你正看着的这个面向」
+    // 还有多少独立信息。用偏相关而不是增益，是因为增益被 (1−R²_f) 封顶，
+    // 比值会全部顶到 1 而失去区分度（实测五条线全是 1.00）。
+    const ctx = adaptCtx();
+    if (ctx) for (const r of S.recTo) r.link = pcorrOf(r.o, ctx, it[1]);
+  }
+}
+function lastAnsweredOrder() {
+  const pos = s => TR.posOf ? TR.posOf[s] : TR.order.indexOf(s) + 1;
+  let best = null, bp = -1;
+  for (const o of TR.order) {
+    if (!(o in S.resp)) continue;
+    const p = TR.order.indexOf(o);
+    if (p > bp) { bp = p; best = o; }
+  }
+  return best;
+}
+
+function sceneChips() {
+  return `<div class="scenes">` + D.scenes.map((s, i) => {
+    const done = sceneDone(i), n = sceneCount(i);
+    const cls = `scene-chip${S.scene === i ? " on" : ""}${done ? " done" : ""}`;
+    return `<button class="${cls}" data-scene="${i}">
+      ${done ? "✓ " : ""}${D.sceneNames[i]}<span class="n">${n}/${sceneItems[i].length}</span>
+    </button>`;
+  }).join("") + `</div>`;
+}
+
+function renderSceneStage(el) {
+  if (S.scene === null) {
+    const firstOpen = sceneItems.findIndex((_, i) => !sceneDone(i));
+    S.scene = firstOpen < 0 ? 0 : firstOpen;
+  }
+  const si = S.scene, orders = sceneItems[si];
+  const pending = orders.filter(o => !(o in S.resp));
+  const head = sceneChips();
+
+  if (!pending.length) {
+    el.innerHTML = head + `<div class="empty">「${D.sceneNames[si]}」已全部作答 ✓<br>
+      <span style="font-size:13px">下方是结果；也可以点上面的其他情景继续。</span></div>`;
+    return;
+  }
+  const o = pending[0], it = itemByOrder[o];
+  el.innerHTML = head + `
+    <div class="qhead">${D.sceneNames[si]} · 第 ${orders.length - pending.length + 1}/${orders.length} 题</div>
+    <div class="bar" style="margin-bottom:18px"><i style="width:${
+      (orders.length - pending.length) / orders.length * 100}%"></i></div>
+    <div class="qtext">${esc(it[4])}${it[3] < 0 ? '<span class="rev">⟲ 反向计分</span>' : ""}</div>
+    <div class="opts">${[1,2,3,4,5].map(v =>
+      `<button class="opt" data-v="${v}"><span class="k">${v}</span>${OPTLABEL[v-1]}</button>`)
+      .join("")}</div>
+    ${whyBox(o)}`;
+}
+
+/* 「这题什么意思」——300 题逐题写的脚手架，答题时随手可查。
+   这是本工具的差异化所在：多数测评只给题目，不给题目的解释。 */
+function whyBox(o) {
+  const w = D.scaf[String(o)];
+  if (!w) return "";
+  const li = a => a.map(x => `<li>${md(x)}</li>`).join("");
+  return `<details class="why"><summary>这题什么意思？</summary>
+    <div class="whybody">
+      <div><b>它在问：</b>${md(w.asks)}</div>
+      <div style="margin-top:8px"><b>承重词</b> <span class="k">${esc(w.term)}</span>
+        在这里指「${md(w.sense)}」，<b>不是</b>「${md(w.not_this)}」。</div>
+      ${w.mis.length ? `<ul class="mis">${w.mis.map(m =>
+        `<li>${md(m[0])}　<em>→ ${md(m[1])}</em></li>`).join("")}</ul>` : ""}
+      <div class="cols">
+        <div><h5>算</h5><ul>${li(w.counts)}</ul></div>
+        <div><h5>不算</h5><ul>${li(w.notcount)}</ul></div>
+      </div>
+      ${w.edge ? `<div style="margin-top:10px"><b>边界情形：</b>${md(w.edge)}</div>` : ""}
+      ${w.loc ? `<div class="loc"><b>中文语境提醒：</b>${md(w.loc)}</div>` : ""}
+    </div></details>`;
+}
+
+function renderClassicStage(el) {
+  const order = D.items.map(i => i[0]);
+  const pending = order.filter(o => !(o in S.resp));
+  if (!pending.length) {
+    el.innerHTML = `<div class="empty">全部 300 题已完成 ✓<br>
+      <span style="font-size:13px">下方是完整剖面。</span></div>`;
+    return;
+  }
+  const o = pending[0], it = itemByOrder[o];
+  const n = 300 - pending.length;
+  el.innerHTML = `
+    <div class="qhead">经典模式 · 第 ${n + 1}/300 题 · 第 ${Math.floor(n/30)+1} 轮</div>
+    <div class="bar" style="margin-bottom:18px"><i style="width:${n / 300 * 100}%"></i></div>
+    <div class="qtext">${esc(it[4])}${it[3] < 0 ? '<span class="rev">⟲ 反向计分</span>' : ""}</div>
+    <div class="opts">${[1,2,3,4,5].map(v =>
+      `<button class="opt" data-v="${v}"><span class="k">${v}</span>${OPTLABEL[v-1]}</button>`)
+      .join("")}</div>
+    ${whyBox(o)}
+    <div class="note">经典模式按 30 个面向交错呈现——相邻题目测的是不同的东西，
+      这样作答时才不容易被上一题的措辞带着走。</div>`;
+}
+
+/* ── 结果：情景面板 A / B ───────────────────────────── */
+function aligned(o, v) { return itemByOrder[o][3] > 0 ? v : 6 - v; }
+
+function sceneResult(si) {
+  const orders = sceneItems[si].filter(o => o in S.resp);
+  const rows = orders.map(o => {
+    const a = aligned(o, S.resp[o]), it = itemByOrder[o];
+    return {o, f: it[1], a, v: S.resp[o], rev: it[3] < 0,
+            pct: D.optionPct[o - 1][a - 1], tx: it[4],
+            // 分组用**相对百分位**：构念分数本就是相对人群的。
+            // 选 2 分但 84% 的人选 1，则此人相对偏高。
+            dir: null};
+  }).map(r => (r.dir = r.pct > 50 ? "high" : (r.pct < 50 ? "low" : "neutral"), r))
+    .sort((x, y) => Math.abs(y.pct - 50) - Math.abs(x.pct - 50));
+
+  // 面板 B：与自己已答全部题的平均位置比较
+  const all = Object.keys(S.resp).map(Number);
+  const doneScenes = sceneItems.filter((_, i) => sceneDone(i)).length;
+  let B = null;
+  if (doneScenes >= 3 && all.length >= 30) {
+    const own = all.reduce((s, o) => s + aligned(o, S.resp[o]), 0) / all.length;
+    const del = rows.map(r => ({...r, d: +(r.a - own).toFixed(2)}));
+    B = {own: +own.toFixed(2), n: doneScenes,
+         up: del.filter(x => x.d > 0.5).sort((a, b) => b.d - a.d).slice(0, 6),
+         dn: del.filter(x => x.d < -0.5).sort((a, b) => a.d - b.d).slice(0, 6)};
+  }
+  return {rows, B, doneScenes};
+}
+
+function li(r, val, cls) {
+  return `<li><span class="fi">${D.recs[r.f].zh}</span>
+    <span class="pct ${cls}">${val}</span>
+    <span class="tx">${r.rev ? '<span class="rv">⟲</span>' : ""}选了 ${r.v}　${r.tx}</span></li>`;
+}
+
+function renderResult() {
+  const card = document.getElementById("resultcard");
+  if (!S.result) { card.style.display = "none"; return; }
+  card.style.display = "block";
+  card.className = "card res";
+
+  if (S.result.type === "tier") {
+    const n = S.result.n;
+    // **不再说「第几层」（D99）**：用户要看的是可信度。给出「几个面向已可信」
+    // 与最可信／最不足的两端，而不是一个答了多少题的层号。
+    const conf = D.facets.map((_, i) => Math.sqrt(netR2(i)));
+    const nOk = conf.filter((r, i) => r >= UNLOCK_R && ownCount(i) >= MIN_OWN).length;
+    const best = conf.indexOf(Math.max(...conf));
+    let h = `<h2>分级结果 · ${n}/300 题（${nOk}/30 个面向已可信）</h2>
+      <p class="hint">只答 <b>${n}</b> 题就能给出的结果。
+      <b>可信度是逐面向算的</b>（r ＝ 用这些题估出的分与答满分的相关）——
+      没有「答满几层」这回事：某个面向可能只用 2 题就已可信，
+      另一个面向答了 5 题还不够。</p>`;
+    if (n >= 1) h += `<p class="hint">此刻最可信的是
+      <b>${esc(D.recs[best].zh)}</b>（r=${conf[best].toFixed(2)}）。</p>`;
+    // 5 个大类
+    h += `<div class="rowline" style="margin-top:16px"><b>5 个大类</b>
+      <span>${n >= 30 ? "已达可给门槛" : `还需 ${30 - n} 题`}</span></div>`;
+    for (let i = 0; i < TR.domains.length; i++) {
+      const d = TR.domains[i], b = domainBand(d, n);
+      const nm = TR.domainNamesZh[i];
+      if (!b) { h += `<div class="facet"><h4>${nm}</h4>
+        <div class="band">题量不足，暂不给出</div></div>`; continue; }
+      h += `<div class="facet">
+        <h4>${nm}</h4>
+        <div class="band">${b.band ? `落在「<b>${b.band}</b>」带` : "不落在任何已发布分带内"}
+          　<span class="note">（由 ${b.k} 题折算成 ${b.full} 题当量，与完整分的相关 r=${b.r.toFixed(3)}）</span></div>
+        <div class="band note">只答 ${n} 题时，这个大类的判断有
+          <b>${(b.within1 * 100).toFixed(1)}%</b> 与答满 300 题落在相邻一档以内，
+          差两档及以上的只有 <b>${(b.off2 * 100).toFixed(1)}%</b>。</div>
+        <div class="note">参照人群为英国样本，非中国人群。本结果不构成任何诊断。</div>
+      </div>`;
+    }
+    // 30 个细类
+    const fs = tierFacets(n);
+    const show = fs.filter(x => x.showable);
+    h += `<div class="rowline" style="margin-top:18px"><b>30 个细类</b>
+      <span>已解锁 ${show.length}/30</span></div>`;
+    if (!show.length) {
+      h += `<p class="note">还没有细类解锁。每个细类需要至少 3 道题
+        （即第 3 层，累计 90 题）。<b>没到门槛就不给数字，而不是猜一个「中等」。</b></p>`;
+    } else {
+      for (const x of show) {
+        const rec = D.recs[D.facets.indexOf(x.facet)];
+        h += `<div class="facet"><h4>${esc(rec.zh)} <span class="note"
+          style="font-weight:400">· ${esc(rec.domain)}</span></h4>
+          <div class="band">${x.k}/10 题　${x.tier}　r=${(x.r||0).toFixed(3)}</div>
+          ${rec.definition ? `<div class="def">${md(rec.definition)}</div>` : ""}</div>`;
+      }
+    }
+    h += `<div class="warn">分数由固定算法从你的作答算出，<b>没有经过任何 AI 改写</b>。
+      数据只存在你的设备上。</div>`;
+    card.innerHTML = h;
+    return;
+  }
+  if (S.result.type === "scene") {
+    const si = S.result.si, R = sceneResult(si);
+    const hi = R.rows.filter(r => r.dir === "high").slice(0, 10);
+    const lo = R.rows.filter(r => r.dir === "low").slice(0, 10);
+    const neu = R.rows.filter(r => r.dir === "neutral").length;
+    let h = `<h2>「${D.sceneNames[si]}」的结果</h2>
+      <h3>在这个情景里，你比多数人更靠这些面向的高端</h3>
+      <p class="hint">「位置」＝你的作答在对齐到该面向方向后，处于参照人群的百分位。
+        高于 50 表示你在这道题上比多数人更靠该面向的高端。
+        <b>⟲</b> 表示该题反向计分：选得越低，越靠高端。</p>
+      <ul>${hi.length ? hi.map(r => li(r, r.pct.toFixed(1), "")).join("")
+        : '<li style="color:#a19d95">无</li>'}</ul>
+      <h3>在这个情景里，你比多数人更靠这些面向的低端</h3>
+      <ul>${lo.length ? lo.map(r => li(r, r.pct.toFixed(1), "neg")).join("")
+        : '<li style="color:#a19d95">无</li>'}</ul>`;
+    if (neu) h += `<p class="note">另有 ${neu} 题的作答恰好落在人群中间水平，不指示方向。</p>`;
+
+    h += `<h3>在这个情景里，你和平时的自己有什么不同</h3>`;
+    if (!R.B) {
+      h += `<p class="note">还不够——需要先完成 3 个情景（当前 ${R.doneScenes} 个）。
+        要比较「情景中的你」与「平时的你」，先得有「平时的你」。</p>`;
+    } else {
+      h += `<p class="hint">你在全部已答题上的平均位置：${R.B.own}／5，基于 ${R.B.n} 个情景。</p>`;
+      h += `<ul>` + (R.B.up.length
+        ? R.B.up.map(r => li(r, "+" + r.d, "")).join("")
+        : '<li style="color:#a19d95">没有比平时更靠高端的</li>') + `</ul>`;
+      if (R.B.dn.length)
+        h += `<ul>` + R.B.dn.map(r => li(r, r.d, "neg")).join("") + `</ul>`;
+    }
+    h += `<div class="warn"><b>每一项仅基于 1 道题。</b>
+      这是<b>作答位置的描述</b>，不是该面向的测量结果——单题与完整测量的相关最差只有 0.51。
+      想看某个面向的真正分数，请在右侧技能条解锁后查看完整剖面。</div>`;
+    card.innerHTML = h;
+  } else {
+    const rows = S.result.rows;
+    const done = totalAnswered(), all = D.items.length;
+    let h = `<h2>结果</h2>
+      <p class="hint">已答 ${done}/${all} 题。**只有跨过精度门的面向才会出现**——
+      没到门槛的，我们不说，而不是猜一个「中等」。每一项都标了它基于几道题。</p>`;
+
+    if (!rows.length) {
+      h += `<p class="note">还没有面向跨过精度门。每个面向需要至少 3 道题
+        （经典模式下即 90 题）才能给出可信结果。</p>`;
+    } else {
+      h += `<div class="rowline"><b>已可解读的面向</b>
+        <span>${rows.length} / 30</span></div>`;
+      for (const r of rows) {
+        const rec = D.recs[r.f];
+        h += `<div class="facet">
+          <h4>${esc(rec.zh)} <span class="note" style="font-weight:400">
+            · ${rec.domain}</span></h4>
+          <div class="band">原始分 <span class="raw">${r.est}</span>
+            ${r.full ? "" : `<span class="note">（由 ${r.k} 题折算成 10 题当量）</span>`}
+            ${r.band ? `　落在「<b>${r.band}</b>」带` : `　<span class="note">不落在任何已发布分带内</span>`}
+            ／ 范围 10–50</div>
+          ${r.ci ? `<div class="band">考虑到测量误差，真实水平有 95% 可能落在
+            <b>${r.ci[0]} – ${r.ci[1]}</b> 之间
+            <span class="note">（基于 ${r.k}/10 题，r=${r.r.toFixed(3)}，${r.tier}）</span></div>`
+            : `<div class="band">精度：${r.k}/10 题，${r.tier}。
+              <span class="note">本面向**给不出置信区间**：源常模表缺少
+              「${missingBands(r.f).join("、")}」带，标准差无法反推。
+              这是已归档的源数据缺陷，我们不另找办法绕过去。</span></div>`}
+          ${rec.definition ? `<div class="def">${md(rec.definition)}
+            ${rec.definition_provenance ? `<span class="note">（`
+              + (rec.definition_provenance === "published_definition" ? "已发表定义" : "编辑澄清")
+              + (rec.definition_basis ? "：" + esc(rec.definition_basis) : "") + `）</span>` : ""}
+          </div>` : ""}
+          <details><summary>这个分数不意味着什么，以及读的时候要注意什么</summary>
+            <div class="d">
+              <b>它不测量：</b><ul>${rec.does_not_measure.map(x => `<li>${md(x)}</li>`).join("")}</ul>
+              ${(rec.boundaries || []).length ? `<div style="margin-top:8px"><b>容易与什么混淆：</b>
+                <ul>${rec.boundaries.map(b => `<li>与「${esc(b.against)}」的区别：${md(b.distinction)}</li>`).join("")}</ul></div>` : ""}
+              ${rec.caveats.length ? `<div style="margin-top:8px"><b>内容局限：</b>
+                <ul>${rec.caveats.map(x => `<li>${md(x)}</li>`).join("")}</ul></div>` : ""}
+              <div style="margin-top:8px" class="note">参照人群为英国样本，非中国人群；
+                源文件未提供样本量、招募方式与采集年份。本结果不构成任何诊断。</div>
+            </div></details>
+        </div>`;
+      }
+    }
+    if (S.result.withheld && S.result.withheld.length)
+      h += `<p class="note">尚未解锁（题量不足，本次不作任何表述）：
+        ${S.result.withheld.map(f => D.recs[f].zh).join("、")}</p>`;
+    card.innerHTML = h;
+  }
+}
+
+/* ── 分级模式：按前缀查精度（不做线性外推）── */
+const BAND_ZH = {"Very High":"很高","High":"偏高","Average":"中等",
+                 "Low":"偏低","Very Low":"很低"};
+/* 按**维度分块**解锁：只看该维度自己答了几题，不必等整环答满。
+   实测该维度答 6 题时相关就有 0.85–0.92（见 data/network-edges.json）。 */
+function domainBlock(domain) {
+  const idx = TR.domainFacetIdx[domain];
+  const sel = [];
+  for (const fi of idx)
+    for (const o of facetOrders[fi]) if (o in S.resp) sel.push(o);
+  return sel;
+}
+function domainBand(domain, n) {
+  const sel0 = domainBlock(domain);
+  if (!sel0.length) return null;
+  // 该维度已答满几环（每环每面向 1 题 → 每环 6 题）
+  const k = Math.min(10, Math.floor(sel0.length / 6));
+  const frac = sel0.length / 6;                      // 不足一环时按比例取
+  const table = TR.blockDomainR[domain];
+  const r = table[Math.max(0, Math.min(9, Math.ceil(frac) - 1))];
+  if (r < 0.80) return null;
+  const t = TR.tierDomainR.find(x => x.items >= Math.max(30, n)) || TR.tierDomainR[9];
+  const sel = sel0;
+  const raw = sel.reduce((s, o) => s + aligned(o, S.resp[o]), 0);
+  const K = TR.domainFacetCount[domain] * 10;      // 该维度完整题数 60
+  const est = Math.round(raw / sel.length * K);    // 折算成完整当量
+  let band = null;
+  const bt = TR.domainBands[domain] || {};
+  for (const name of ["Very High","High","Average","Low","Very Low"])
+    if (bt[name] && est >= bt[name][0] && est <= bt[name][bt[name].length-1])
+      { band = BAND_ZH[name]; break; }
+  return {r, k: sel.length, est, band, full: K,
+          within1: t.within_1 / 100, off2: t.off_2plus / 100,
+          complete: sel.length % 6 === 0};
+}
+function tierFacets(n) {
+  return TR.facets.map((f, i) => {
+    const k = TR.prefixFacetK[Math.min(n, 300)][i];
+    const r = TR.prefixFacetR[Math.min(n, 300)][i];
+    let tier = "未解锁", showable = false;
+    if (k >= 3 && r != null) {
+      showable = true;
+      tier = r >= 0.95 ? "完整" : r >= 0.90 ? "较可靠" : r >= 0.85 ? "初步倾向" : "仅供参考";
+    }
+    return {facet: f, k, r, tier, showable};
+  });
+}
+
+/* ── 经典模式计分 ─────────────────────────────────────────────
+   口径问题：常模分带是针对**完整 10 题总分**（10–50）的，
+   部分作答的小分（如 5 题，5–25）与之不可比。
+
+   解法：把部分分**按题数折算**成 10 题当量，并用**该题集的实测精度 r**
+   给出区间——r 是「这个小分与完整总分的相关」，所以
+   预测完整分时的残差标准差 = SD × √(1−r²)。
+   这条链路完全建立在已算好的精度表上，不需要额外假设。          */
+function bandOf(f, raw) {
+  const col = D.normCol[f], tab = (D.normBands[col] || {})["18-29"];
+  if (!tab) return null;
+  const zh = {"Very High":"很高","High":"偏高","Average":"中等","Low":"偏低","Very Low":"很低"};
+  for (const name of ["Very High","High","Average","Low","Very Low"])
+    if (tab[name] && raw >= tab[name][0] && raw <= tab[name][tab[name].length-1])
+      return zh[name];
+  return null;
+}
+/* SD 由分带边界反推（与 engine/assess.py 的 _sd_from_bands 同法）。
+   ⚠️ 少数面向的**源常模表缺少某个分带**（已归档的源数据缺陷），
+   此时反推不出 SD，也就给不出区间。**不另找办法糊过去**——
+   如实说明「这个面向没有区间，因为源表缺带」。 */
+function sdOf(f) {
+  const col = D.normCol[f], tab = (D.normBands[col] || {})["18-29"];
+  if (!tab) return null;
+  try {
+    const A = tab["Average"], H = tab["High"], V = tab["Very High"], L = tab["Low"];
+    if (!A || !H || !V || !L) return null;        // 缺带 → 不给，而不是猜
+    const p05 = (A[A.length-1] + H[0]) / 2, p15 = (H[H.length-1] + V[0]) / 2;
+    const n05 = (A[0] + L[L.length-1]) / 2;
+    return ((p05 - n05) + (p15 - p05)) / 2;
+  } catch (e) { return null; }
+}
+function missingBands(f) {
+  const col = D.normCol[f], tab = (D.normBands[col] || {})["18-29"];
+  if (!tab) return [];
+  return ["Very High","High","Average","Low","Very Low"].filter(b => !tab[b]);
+}
+function classicRows() {
+  const rows = [];
+  for (let f = 0; f < D.facets.length; f++) {
+    const u = unlockOf(f);
+    if (!u.lvl) continue;
+    const orders = facetOrders[f].filter(o => o in S.resp);
+    const k = orders.length, full = (k === 10);
+    const sum = orders.reduce((s, o) =>
+      s + (itemByOrder[o][3] > 0 ? S.resp[o] : 6 - S.resp[o]), 0);
+    const est = full ? sum : Math.round(sum / k * 10);   // 折算成 10 题当量
+    const sd = sdOf(f);
+    /* 总不确定性的两个来源，缺一不可：
+         · 测量误差本身——来自该面向的 α（SEM = sd·√(1−α)）
+         · 部分施测误差——来自 r（sd·√(1−r²)）
+       初版只算了后者，于是**完整作答时 r=1 导致区间宽度为 0 且被 falsy 判断丢掉**。
+       现在把两个方差相加，两端点都正确：
+         k=10 时 r=1 → 退化为 SEM；α→1 时退化为 sd·√(1−r²)。            */
+    const alpha = (D.recs[f].alpha != null) ? D.recs[f].alpha : 1;
+    const err = sd ? sd * Math.sqrt(Math.max(0, (1 - alpha) + (1 - (u.r || 0) ** 2)))
+                   : null;
+    const ci = (err != null) ? [Math.round(est - 1.96 * err), Math.round(est + 1.96 * err)]
+                             : null;
+    rows.push({f, k, full, sum, est, band: bandOf(f, est), ci, r: u.r, tier: u.tier,
+               sd, err});
+  }
+  rows.sort((a, b) => (b.r || 0) - (a.r || 0));
+  return rows;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   保存与导出
+
+   两条原则：
+
+   1. **数据不出本机。** 只写 localStorage 与用户主动触发的下载。
+      没有任何上传路径——这是心理健康数据，不该有默认外发。
+
+   2. **导出的报告必须带上和界面一样的诚实。**
+      常模适用性、不构成诊断、每个面向的精度与其内容局限，
+      一条都不能因为「报告要好看」而丢。这与契约里 must_survive
+      是同一个道理：**把「我们对自己工具的批评」藏起来是不可接受的。**
+   ══════════════════════════════════════════════════════════════ */
+const STORE = "emohealth.session.v1";
+
+let lastAnswered = null;      // 最近一次作答的题号（供推荐连线起点）
+function saveLocal() {
+  try {
+    localStorage.setItem(STORE, JSON.stringify({
+      v: 1, mode: S.mode, resp: S.resp, scene: S.scene, at: Date.now(),
+      // 冷却时间戳必须一起存——否则刷新页面就能绕过冷却
+      coolUntil: S.coolUntil || 0,
+    }));
+    const d = new Date();
+    document.getElementById("saved").textContent =
+      `已存在本机 ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+  } catch (e) {
+    document.getElementById("saved").textContent = "本机保存不可用";
+  }
+}
+function loadLocal() {
+  try {
+    const raw = localStorage.getItem(STORE);
+    if (!raw) return null;
+    const o = JSON.parse(raw);
+    if (o.v !== 1 || !o.resp) return null;
+    return o;
+  } catch (e) { return null; }
+}
+function clearLocal() { try { localStorage.removeItem(STORE); } catch (e) {} }
+
+/* ── 必须随任何导出一起走的声明 ───────────────────────────── */
+function disclosures() {
+  const out = [
+    "参照人群为**英国**样本，非中国人群；源文件未提供样本量、招募方式与采集年份，"
+      + "且分带边界来自对源常模表的反推。",
+    "本结果**不构成任何诊断**，也不能替代专业评估。"
+      + "若你长期情绪低落、失去兴趣，或出现伤害自己的念头，请直接寻求专业帮助。",
+    "分数是**描述**，不是评价，也不是关于你的证明。",
+  ];
+  const w = D.facets.map((_, i) => i).filter(i => !unlockOf(i).lvl);
+  if (w.length)
+    out.push(`有 ${w.length} 个面向因题量不足**尚未解锁**，本报告不对它们作任何表述"
+      + "——不是它们「中等」，是我们还不知道。`);
+  return out;
+}
+
+/* ── 生成报告（Markdown）───────────────────────────────────── */
+function buildReport() {
+  const n = totalAnswered(), rows = classicRows();
+  const L = [];
+  const pad = x => String(x).padStart(2, "0");
+  const d = new Date();
+  const when = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} `
+             + `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
+  L.push("# EmoHealth 自测结果", "");
+  const tp = TR.order.filter(o => o in S.resp).length;
+  // 报告与界面一致（D99）：给**可信度**，不给层号。
+  const netOk = D.facets.filter((_, i) => Math.sqrt(netR2(i)) >= UNLOCK_R
+                                      && ownCount(i) >= MIN_OWN).length;
+  L.push(`导出时间：${when}　｜　施测模式：`
+    + `${S.mode === "tier" ? `分级模式（${netOk}/30 个面向已可信）`
+        : S.mode === "scene" ? "情景模式" : "经典模式"}　｜　`
+    + `完成度：${n}/${D.items.length} 题（${(n / D.items.length * 100).toFixed(1)}%）`, "");
+  L.push("> 量表：IPIP-NEO-300（公共领域，Goldberg 1999）　"
+    + "评分与精度基于 Johnson (2005) 网络样本 N=20,993", "");
+
+  L.push("## 先说清楚这是什么", "");
+  for (const x of disclosures()) L.push(`- ${x}`);
+  L.push("");
+
+  if (!rows.length) {
+    L.push("## 结果", "");
+    L.push(`**目前还没有面向跨过精度门槛，因此本报告不给出任何面向分数。**`, "");
+    L.push(`每个面向需要至少 3 道题才能给出可信结果`
+      + `（当前完成 ${n} 题）。单题与完整测量的相关最差只有 0.51，`
+      + `那时给数字等于用噪音冒充测量。`, "");
+  } else {
+    L.push("## 已可解读的面向", "");
+    L.push(`共 ${rows.length} / 30 个。每项都标明了它基于几道题、以及当前的精度层级。`, "");
+    for (const r of rows) {
+      const rec = D.recs[r.f];
+      L.push(`### ${rec.zh}（${rec.domain}）`, "");
+      L.push(`- **原始分**：${r.est} ／ 范围 10–50`
+        + (r.full ? "" : `（由 ${r.k} 题折算成 10 题当量）`));
+      L.push(`- **落带**：`
+        + (r.band ? r.band : "不落在任何已发布分带内（源常模表存在覆盖空洞）"));
+      if (r.ci) L.push(`- **95% 区间**：${r.ci[0]} – ${r.ci[1]}`
+        + `　（基于 ${r.k}/10 题，r=${r.r.toFixed(3)}，${r.tier}）`);
+      else L.push(`- **精度**：${r.k}/10 题，${r.tier}。**本面向给不出置信区间**——`
+        + `源常模表缺少「${missingBands(r.f).join("、")}」带，标准差无法反推。`
+        + `这是已归档的源数据缺陷，我们不以其他方式绕过去。`);
+      if (rec.definition) L.push(`- **这个面向是什么**：${rec.definition}`
+        + (rec.definition_provenance ? `（${rec.definition_provenance === "published_definition"
+            ? "已发表定义" : "编辑澄清"}）` : ""));
+      L.push("");
+      if (rec.does_not_measure.length) {
+        L.push("**这个分数不意味着：**", "");
+        for (const x of rec.does_not_measure) L.push(`- ${x}`);
+        L.push("");
+      }
+      if ((rec.boundaries || []).length) {
+        L.push("**容易与什么混淆：**", "");
+        for (const b of rec.boundaries)
+          L.push(`- 与「${b.against}」的区别：${b.distinction}`);
+        L.push("");
+      }
+      if (rec.caveats.length) {
+        L.push("**读这个分数时需要注意（内容局限，不可删减）：**", "");
+        for (const x of rec.caveats) L.push(`- ${x}`);
+        L.push("");
+      }
+    }
+    const w = D.facets.map((_, i) => i).filter(i => !unlockOf(i).lvl);
+    if (w.length) {
+      L.push("## 尚未解锁的面向", "");
+      L.push(w.map(i => D.recs[i].zh).join("、") + "。", "");
+      L.push("这些面向的题量还不够。**本报告不对它们作任何表述**——"
+        + "包括不说它们「大概是中等」。", "");
+    }
+  }
+
+  if (S.mode === "scene") {
+    const done = sceneItems.filter((_, i) => sceneDone(i)).length;
+    L.push("## 情景完成情况", "");
+    for (let i = 0; i < D.scenes.length; i++) {
+      const c = sceneCount(i), t = sceneItems[i].length;
+      L.push(`- ${sceneDone(i) ? "✅" : "　"} ${D.sceneNames[i]}　${c}/${t}`);
+    }
+    L.push("");
+    const R = done ? sceneResult(0) : null;
+    if (R && R.B) {
+      L.push("### 情景中的你 与 平时的你", "");
+      L.push(`（基于 ${R.B.n} 个情景；你在全部已答题上的平均位置 ${R.B.own}／5）`, "");
+      if (R.B.up.length) {
+        L.push("比平时更靠高端的：", "");
+        for (const x of R.B.up)
+          L.push(`- +${x.d}　${D.recs[x.f].zh}　「${x.tx}」选了 ${x.v}`);
+        L.push("");
+      }
+      if (R.B.dn.length) {
+        L.push("比平时更靠低端的：", "");
+        for (const x of R.B.dn)
+          L.push(`- ${x.d}　${D.recs[x.f].zh}　「${x.tx}」选了 ${x.v}`);
+        L.push("");
+      }
+    }
+    if (done) {
+      L.push("> ⚠️ 情景面板里的每一项都**仅基于 1 道题**，是**作答位置的描述**，"
+        + "不是该面向的测量结果。", "");
+    }
+  }
+
+  L.push("## 关于这份报告的说明", "");
+  L.push("- 分数由固定算法从你的作答算出，没有经过任何 AI 改写。");
+  L.push("- 数据只存在你的设备上；本工具没有上传路径。");
+  L.push(`- 报告生成于 ${when}。内容随作答进度变化，完成更多题目后重新导出即可。`);
+  L.push("");
+  return L.join("\n");
+}
+
+/* ── 导出 ───────────────────────────────────────────────────── */
+function download(name, text, mime) {
+  const b = new Blob([text], {type: mime + ";charset=utf-8"});
+  const u = URL.createObjectURL(b);
+  const a = document.createElement("a");
+  a.href = u; a.download = name; document.body.appendChild(a); a.click();
+  a.remove(); setTimeout(() => URL.revokeObjectURL(u), 2000);
+}
+function stamp() {
+  const d = new Date(), p = x => String(x).padStart(2, "0");
+  return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}-`
+       + `${p(d.getHours())}${p(d.getMinutes())}`;
+}
+function exportJSON() {
+  const payload = {
+    format: "emohealth.session.v1",
+    exported_at: new Date().toISOString(),
+    instrument: "IPIP-NEO-300",
+    mode: S.mode,
+    responses: S.resp,
+    scene: S.scene,
+    progress: {answered: totalAnswered(), total: D.items.length},
+    unlock: Object.fromEntries(D.facets.map((_, i) => {
+      const u = unlockOf(i);
+      return [D.facets[i], {k: u.k, r: u.r, tier: u.tier, showable: u.lvl > 0}];
+    })),
+    disclosures: disclosures(),
+  };
+  download(`emohealth-存档-${stamp()}.json`,
+           JSON.stringify(payload, null, 1), "application/json");
+  toast("存档已导出——可在另一台设备导入继续");
+}
+function exportMD() {
+  download(`emohealth-结果-${stamp()}.md`, buildReport(), "text/markdown");
+  toast("报告已导出");
+}
+function exportCSV() {
+  const rows = [["题号", "面向", "情景", "计分键", "题面", "你的作答", "该选项位置%"]];
+  for (const o of D.items.map(i => i[0])) {
+    const it = itemByOrder[o], v = S.resp[o];
+    if (v == null) continue;
+    const a = aligned(o, v);
+    rows.push([o, D.recs[it[1]].zh, D.sceneNames[it[2]],
+               it[3] > 0 ? "正向" : "反向", it[4], v, D.optionPct[o-1][a-1]]);
+  }
+  const csv = "\ufeff" + rows.map(r =>
+    r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\r\n");
+  download(`emohealth-作答-${stamp()}.csv`, csv, "text/csv");
+  toast(`已导出 ${rows.length - 1} 条作答`);
+}
+function importJSON(file) {
+  const fr = new FileReader();
+  fr.onload = () => {
+    try {
+      const o = JSON.parse(fr.result);
+      if (o.format !== "emohealth.session.v1" || !o.responses)
+        throw new Error("格式不符");
+      S.resp = {}; S.result = null;
+      for (const [k, v] of Object.entries(o.responses)) S.resp[+k] = +v;
+      if (o.mode) { S.mode = o.mode;
+        document.querySelectorAll("#modes button").forEach(b =>
+          b.classList.toggle("on", b.dataset.m === o.mode)); }
+      S.scene = null;
+      saveLocal(); renderTop(); renderTree(); renderStage(); renderResult();
+      toast(`已导入 ${totalAnswered()} 题作答`);
+    } catch (e) { toast("导入失败：" + e.message); }
+  };
+  fr.readAsText(file, "utf-8");
+}
+
+/* ── 交互 ───────────────────────────────────────────── */
+function toast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("on");
+  clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("on"), 2600);
+}
+
+/* ── 天赋树的点击 ─────────────────────────────────── */
+document.addEventListener("click", (e) => {
+  if (S.mode !== "tier") return;
+  const nd = e.target.closest(".nd");
+  if (nd) {
+    if (nd.classList.contains("locked")) { toast("这一环还没解锁"); return; }
+    if (isCooling()) { toast(`冷却中，还需 ${Math.ceil(coolingLeft()/1000)} 秒`); return; }
+    S.tierSel = {f: +nd.dataset.f, t: +nd.dataset.t, o: +nd.dataset.o};
+    refreshAdapt();                       // 连线跟随选中的已答节点
+    // ⚠️ 必须调 renderTierTree()（它负责「下一题」常驻区），不是 renderTierPanel()。
+    //    常驻区从面板里搬出去之后，这里漏改过一次：点节点能选中、图上高亮也对，
+    //    但**作答区的题干与选项不出现**——因为 panel 已经不再渲染那道题了（D107）。
+    //    同类的还有 #redo 那条路，一起改。
+    renderTierGraph(); renderTierTree();
+    document.querySelectorAll(".nd.sel").forEach(x => x.classList.remove("sel"));
+    nd.classList.add("sel");
+    return;
+  }
+  if (e.target.id === "redo" && S.tierSel) {
+    delete S.resp[S.tierSel.o];
+    refreshAdapt();
+    saveLocal(); renderTop(); renderTree(); renderTierGraph(); renderTierTree();
+    return;
+  }
+  // 面板里的作答按钮
+  if (e.target.closest("#peektoggle")) { togglePeek(); return; }
+  if (e.target.closest("#ptoggle")) {
+    S.panelOpen = !S.panelOpen;
+    renderTierGraph(); renderTierTree();
+    return;
+  }
+  // 「下一题」常驻区：点推荐卡片 = 选中那道题（与点图上圆圈等价）
+  const nq = e.target.closest("[data-pick]");
+  if (nq) {
+    if (isCooling()) { toast(`冷却中，还需 ${Math.ceil(coolingLeft()/1000)} 秒`); return; }
+    const o = +nq.dataset.pick;
+    S.tierSel = {f: itemByOrder[o][1], t: tierRingOfOrder(o), o};
+    refreshAdapt();
+    renderTierGraph(); renderTierTree();
+    return;
+  }
+  if (e.target.closest(".peekbody")) return;      // 折叠区内部点击不当作答
+  // ⚠️ 作答按钮现在有**两个**可能的位置：常驻区（#nextq，D105 之后的主要入口）
+  //    与面板。只写 `#tierpanel .opt` 会让常驻区里的选项「点了不算数」——
+  //    这是 D107 那次搬迁遗留的同一类遗漏（第 4 处）。
+  const opt = e.target.closest("#nextq .opt, #tierpanel .opt");
+  if (opt && isCooling()) { toast(`冷却中，还需 ${Math.ceil(coolingLeft()/1000)} 秒`); return; }
+  if (opt && S.tierSel) {
+    const v = +opt.dataset.v, o = S.tierSel.o;
+    // 作答后这条支线可能往前长一节，所以提示要按**面向**说，不按「层」（D99）
+    const beforeReady = readyFacets().length;
+    S.resp[o] = v;
+    refreshAdapt(o);
+    lastAnswered = o;
+    refreshAdapt();
+    saveLocal(); renderTop(); renderTree(); renderTierGraph(); renderTierTree();
+    const nowReady = readyFacets().length;
+    if (nowReady > beforeReady) toast(`又有一个面向达到可信（${nowReady}/30）`);
+    document.querySelectorAll(".nd.sel").forEach(x => x.classList.remove("sel"));
+    return;
+  }
+});
+
+document.getElementById("stage").addEventListener("click", (e) => {
+  if (S.mode === "tier") return;
+  const chip = e.target.closest("[data-scene]");
+  if (chip) { S.scene = +chip.dataset.scene; renderStage(); return; }
+  const opt = e.target.closest(".opt");
+  if (!opt) return;
+  const v = +opt.dataset.v;
+  const pending = (S.mode === "tier" ? TR.order
+                 : S.mode === "scene" ? sceneItems[S.scene]
+                 : D.items.map(i => i[0]))
+    .filter(o => !(o in S.resp));
+  const o = pending[0];
+  const before = S.mode === "scene"
+    ? sceneItems[S.scene].filter(x => x in S.resp).length : totalAnswered();
+  S.resp[o] = v;
+
+  if (S.mode === "scene" && sceneDone(S.scene)) {
+    S.result = {type: "scene", si: S.scene};
+    const nU = D.facets.filter((_, i) => unlockOf(i).lvl > 0).length;
+    toast(`「${D.sceneNames[S.scene]}」完成 · 已解锁 ${nU}/30 个面向`);
+  } else if (S.mode === "tier" && TR.tierItems.includes(totalAnswered())) {
+    S.result = {type: "tier", n: totalAnswered()};
+    const t = TR.tierItems.indexOf(totalAnswered()) + 1;
+    toast(`第 ${t} 层完成`);
+  } else if (S.mode === "classic" && totalAnswered() % 30 === 0) {
+    const rounds = totalAnswered() / 30;
+    if (rounds >= 3) { S.result = {type: "classic", rows: classicRows(),
+                                    withheld: D.facets.map((_, i) => i).filter(i => !unlockOf(i).lvl)}; }
+    toast(`第 ${rounds} 轮完成`);
+  }
+  saveLocal();
+  renderTop(); renderTree(); renderStage();
+  refreshAdapt(); tickCool(); renderResult();
+  if (S.mode === "scene" && sceneDone(S.scene)) {
+    const firstOpen = sceneItems.findIndex((_, i) => !sceneDone(i));
+    if (firstOpen >= 0) S.scene = firstOpen;
+    renderStage();
+  }
+});
+
+/* ── 保存与导出的交互 ───────────────────────────────── */
+(function wireIO() {
+  const menu = document.getElementById("menu");
+  document.getElementById("btn-export").addEventListener("click", (e) => {
+    e.stopPropagation(); menu.classList.toggle("on");
+  });
+  document.addEventListener("click", () => menu.classList.remove("on"));
+  menu.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-x]"); if (!b) return;
+    menu.classList.remove("on");
+    const x = b.dataset.x;
+    if (x === "md") exportMD();
+    else if (x === "json") exportJSON();
+    else if (x === "csv") exportCSV();
+    else if (x === "import") document.getElementById("file").click();
+    else if (x === "copy") {
+      const t = buildReport();
+      if (navigator.clipboard && location.protocol !== "file:")
+        navigator.clipboard.writeText(t).then(() => toast("报告已复制"),
+                                               () => toast("复制被浏览器拒绝，请用导出"));
+      else {
+        // file:// 下 clipboard API 常被拒，退回手选
+        const ta = document.createElement("textarea");
+        ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand("copy"); toast("报告已复制"); }
+        catch (err) { toast("复制不可用，请改用导出"); }
+        ta.remove();
+      }
+    }
+  });
+  document.getElementById("file").addEventListener("change", (e) => {
+    if (e.target.files && e.target.files[0]) importJSON(e.target.files[0]);
+    e.target.value = "";
+  });
+  document.getElementById("btn-clear").addEventListener("click", () => {
+    const n = totalAnswered();
+    if (!n) { toast("还没有作答"); return; }
+    if (!confirm(`清空本机保存的 ${n} 题作答？此操作不可撤销。\n`
+      + `（若想留底，请先「导出 → 存档」）`)) return;
+    S.resp = {}; S.result = null; S.scene = null; clearLocal();
+    document.getElementById("saved").textContent = "";
+    renderTop(); renderTree(); renderStage();
+  refreshAdapt(); tickCool(); renderResult();
+    toast("已清空");
+  });
+})();
+
+document.getElementById("modes").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  document.querySelectorAll("#modes button").forEach(x => x.classList.remove("on"));
+  b.classList.add("on");
+  S.mode = b.dataset.m;
+  S.result = null;
+  if (S.mode === "scene" && S.scene === null) S.scene = 0;
+  if (S.mode === "tier") {
+    const p = TR.order.filter(o => o in S.resp).length;
+    if (TR.tierItems.includes(p)) S.result = {type: "tier", n: p};
+  }
+  renderTop(); renderTree(); renderStage();
+  refreshAdapt(); tickCool(); renderResult();
+});
+
+/* ── 启动：先看本机有没有未完成的作答 ─────────────────── */
+(function boot() {
+  const saved = loadLocal();
+  if (saved && Object.keys(saved.resp).length) {
+    const n = Object.keys(saved.resp).length;
+    const d = new Date(saved.at || Date.now());
+    const p = x => String(x).padStart(2, "0");
+    const when = `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} `
+               + `${p(d.getHours())}:${p(d.getMinutes())}`;
+    if (confirm(`发现本机保存的作答：${n} 题（${when}）。\n\n`
+      + `点「确定」继续作答，点「取消」从头开始（不会删除存档）。`)) {
+      S.resp = {};
+      for (const [k, v] of Object.entries(saved.resp)) S.resp[+k] = +v;
+      if (saved.mode) S.mode = saved.mode;
+      S.scene = saved.scene ?? null;
+      S.coolUntil = saved.coolUntil || 0;      // 冷却跨刷新继续有效
+      document.querySelectorAll("#modes button").forEach(b =>
+        b.classList.toggle("on", b.dataset.m === S.mode));
+      document.getElementById("saved").textContent = `已恢复 ${when}`;
+    } else {
+      document.getElementById("saved").textContent = `本机存档 ${n} 题`;
+    }
+  }
+  renderTop(); renderTree(); renderStage();
+  refreshAdapt(); tickCool();
+})();
+</script>
+</body>
+</html>
