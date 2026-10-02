@@ -199,18 +199,66 @@
     padding:2px 6px 8px}
   @media(max-width:700px){
     .hhint{display:block}
-    .wrap{padding:14px 12px 60px}
-    .card{padding:14px}
-    .panel{padding:14px;min-height:0}
-    .graphbox{padding:4px}
-    /* 手机上让图**占满一屏**：面板折起后，图几乎就是整屏 */
-    .panelwrap{margin-top:8px}
-    .ptoggle{margin-bottom:8px;position:sticky;bottom:0;z-index:3}
-    .nextq{padding:12px}
+    .wrap{padding:10px 8px 60px}
+    /* 卡片的内边距要小：`.wrap` 与 `.card` 是**嵌套**的，14px+14px 一下吃掉 56px
+       宽度，而图是正方形、宽度直接决定高度——把卡片撑满，图才会真的变大（实测
+       图曾被卡在 300×300，就是因为 graphbox 只有 310 宽）。 */
+    .card{padding:8px}
+    .panel{padding:12px;min-height:0}
+    /* ── 作答区固定在屏幕底部（D109）──────────────────────────────
+       先试过「让图与作答区同屏」，但**数学上做不到**：390×844 上
+       页头 226 + 图 364 + 作答区 324 = 914 > 844。硬塞只有两条路——把图压到
+       100px（没法看）或把选项挤出屏幕（没法答）。
+       所以改成底部固定条：选中题后**选项永远在视野里**，页面只在「图 ↔ 结果」
+       之间滚。这正是要的效果——「不用每次上下划动」。
+       折起态、未选中题时它同时就是**推荐条**，所以「推荐常驻」也由它保证。
+       ⚠️ 两个测量出来的坑（别照直觉改）：
+       ① graphbox 必须给 `width:100%`，否则它的宽度由内容决定，svg 里的 `100%`
+          会解析成自己的内禀尺寸（900 单位被矮高度压成 300px），图永远是 300×300；
+       ② 所以 svg 用 `max-height` + `aspect-ratio` 而不是 `width:min(100%, …)`
+          （实验：min(100%, 374px) → 300px，而 calc(100dvh − 348px) 单独用 → 496px）。 */
+    #stage.tree{padding-bottom:0}
+    #stage.tree .graphbox{position:static;padding:4px;margin-bottom:0;min-height:0;
+      width:100%;height:auto}
+    #stage.tree .graphbox svg{display:block;margin:0 auto;width:100%;height:auto;
+      aspect-ratio:1 / 1;max-height:52dvh}
+    #stage.tree .panelwrap{position:static;margin-top:8px}
+    /* 常驻条：底部固定 + 自身可滚（内容多时不会顶穿屏幕；键盘弹出也不盖满屏） */
+    #stage.tree #nextq{position:fixed;left:0;right:0;bottom:0;z-index:30;
+      border-radius:14px 14px 0 0;border-bottom:0;margin:0;
+      max-height:56dvh;overflow:auto;
+      padding:12px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+      box-shadow:0 -8px 24px rgba(0,0,0,.13)}
+    /* 给固定条让位，否则页面最后一段会被它永久遮住 */
+    body{padding-bottom:30dvh}
+    #stage.tree #nextq .qtext.nq{font-size:19px;margin:2px 0 12px}
+    #stage.tree #nextq .opt{padding:11px 14px}
+    #stage.tree #nextq .nqlist .nqpick:nth-child(n + 3){display:none}
+    #stage.tree #nextq .nqpick{padding:8px 10px}
+    #stage.tree #nextq .nqtxt{font-size:13px;line-height:1.35}
+    #stage.tree #nextq .nqmeta{font-size:11px}
+    /* 矮屏（≤700px 高）再收紧：360×640 上按上面的尺寸只放得下 3/5 个选项
+       （实测），而「不用滚动就能答」是这条设计的底线。
+       5 个选项改**两列**：高度直接减半，且手机上一列 5 个按钮本身也不好点。 */
+    @media(max-height:700px){
+      #stage.tree #nextq{max-height:54dvh;
+        padding:9px 10px calc(9px + env(safe-area-inset-bottom, 0px))}
+      #stage.tree #nextq .qtext.nq{font-size:17px;margin:0 0 8px}
+      #stage.tree #nextq .opts{grid-template-columns:1fr 1fr;gap:6px}
+      #stage.tree #nextq .opt{padding:8px 10px;font-size:13.5px;gap:8px}
+      #stage.tree #nextq .opt .k{width:21px;height:21px;font-size:11.5px}
+      #stage.tree #nextq .nqhead{font-size:12.5px;margin-bottom:4px}
+      /* 「这题什么意思」在矮屏是整条里最占地方的一块，折起来时压到一行 */
+      #stage.tree #nextq .why{margin-top:8px;padding-top:8px}
+      body{padding-bottom:26dvh}
+    }
+    /* 增益那段解释在常驻条里太占地方（判断依据已在卡片的「可消除 N%」上） */
+    .nqgain{display:none}
+    /* 图例是重复信息（颜色含义在常驻条里就够），窄屏收掉 */
+    .treelegend{display:none}
+    .ptoggle{margin:8px 0 0}
     .nextq .qtext.nq{font-size:19px}
-    .treelegend{font-size:11px;gap:10px}
-    .treelegend .long{display:none}          /* 长说明留宽屏 */
-    /* 图形的字号也必须放大：SVG 会整体缩放，420px 宽的卡片把 900 单位的图
+    /* 图形的字号也必须放大：SVG 会整体缩放，390px 宽的卡片把 900 单位的图
        压到 0.43 倍，13px 的字只剩 5.6px。这里是按缩放比例反向补偿。 */
     .facetlbl{font-size:20px}
     .domlbl{font-size:24px}
@@ -677,21 +725,34 @@ function gainCeiling(ctx) {
   }
   return t;
 }
-/* 推荐接下来最该答的 k 题
+/* 推荐接下来最该答的 k 题（**两个阶段都给**）
 
    ⚠️ 候选池按**该题自己所属面向的窗口**过滤，不是按「全树最深窗口」。
    写错这一处的症状很隐蔽：池子按全局窗口取（更宽），节点态按本面向窗口判，
    于是会出现**推荐了却点不动**的节点——橙色脉冲是假的。
    （实测已答 45 题时，emotionality 的窗口只到第 2 环，却推荐出它的第 4 环。）
-   `tierNodeState` 与这里必须同源：都用 `facetWindowEnd(fi)`。 */
+   `tierNodeState` 与这里必须同源：都用 `facetWindowEnd(fi)`。
+
+   ⚠️ **第一阶段也给推荐**（D108）：第一环 30 题是强制的，但「强制答完」不等于
+   「必须自己找下一道」。早先这里一进第二阶段才给推荐，第一阶段的常驻区只写
+   「点图上任意亮起的圆圈」——那 30 道题正是最需要顺着答、最不需要手动找的时候。
+   所以现在：第一环未答完时，候选池收在第 1 环内（它们本来就是全开的），
+   仍然按信息增益排序，把「接下来答哪道」直接摆到用户手边。
+   **不给的是「面向结果」，不是「下一题推荐」**——这两件事早先被我混为一谈了。 */
 function recommend(k = 5) {
   const ctx = adaptCtx();
   if (!ctx) return [];
+  const phase1 = !ring1Done();
   const out = [];
   for (const it of D.items) {
     const o = it[0], fi = it[1];
     if (o in S.resp) continue;
-    if (tierRingOfOrder(o) > facetWindowEnd(fi)) continue;   // 本面向窗口外 → 点不动
+    if (phase1) {
+      // 第一阶段：只在第 1 环里挑（全开、且不泄露任何面向信息）
+      if (tierRingOfOrder(o) !== 1) continue;
+    } else if (tierRingOfOrder(o) > facetWindowEnd(fi)) {
+      continue;                                // 本面向窗口外 → 点不动
+    }
     out.push({o, gain: totalGain(o, ctx)});
   }
   out.sort((a, b) => b.gain - a.gain);
@@ -1191,7 +1252,7 @@ function renderTierGraph() {
   document.getElementById("graphbox").innerHTML =
     `<svg viewBox="0 0 ${NETV} ${NETV}" xmlns="http://www.w3.org/2000/svg">${g}</svg>
      <div class="hhint">${narrow
-       ? "点节点作答 · 亮着的是可答，橙色脉冲是推荐的几道"
+       ? "亮着的是可答 · 橙色脉冲是推荐的几道"
        : ""}</div>
      <div class="treelegend">
        <span><i style="background:#fff;border:1.6px solid #4a7c6f"></i>可作答</span>
@@ -1242,19 +1303,37 @@ function nextQuestionHtml() {
   // ── ① 有选中题：它就是「当前要答的题」——**先判这个**（见上方注释）
   if (S.tierSel) return nqAnswerHtml(S.tierSel);
 
-  // ── ② 第一环未答完：这时**不给推荐**（30 个节点地位相同，没有「最该答」的），
-  //    只说明「点任意亮起的圆圈」，并把提示交给图形
-  if (!ring1Done()) {
-    const done = TR.tierRingNodes[0].filter(o => o in S.resp).length;
-    h += `<div class="nqhead"><b>第一阶段 · 第一环</b>
-      <span class="note">${done}/30 题</span></div>
-      <div class="bar" style="margin:8px 0 10px"><i style="width:${done / 30 * 100}%"></i></div>
-      <div class="note">每答一题换一个面向——用最少的题先把 <b>5 个大类</b>立起来。
-      点图上任意<b>亮起的圆圈</b>开始；答满 30 题后，这里会出现推荐的下一题。</div>`;
-    return h + `</div>`;
-  }
+  // ── ② 第一环未答完：**照样给推荐**，只是候选池收在第 1 环内（D108）。
+  //    仍然不给「面向结果」（每个面向只有 1 题，拿它下结论不诚实），
+  //    但「接下来答哪道」必须给——强制答完 30 题 ≠ 让用户自己找 30 次。
+  const phase1 = !ring1Done();
 
-  const list = (S.adaptList && S.adaptList.length) ? S.adaptList : recommend(6);
+  let list = (S.adaptList && S.adaptList.length) ? S.adaptList : recommend(6);
+
+  /* 一题都没答时，**信息增益算不出来**（它要以「已答」为条件），所以推荐必然是空的。
+     这时不能假装算过——但也不能让用户对着一张 30 个圆圈的图自己挑第一道。
+     办法：给一个**诚实来源**的起点。阶梯第 1 题是分层设计定下来的（每层每面向
+     恰好 1 题、并按相关性优化过题序），所以「从这里开始」讲得通；
+     卡片上的措辞也照实说，不谎称是信息增益。答完第一道之后，
+     下面的推荐就全部是按增益算出来的了。 */
+  if (!list.length && phase1) {
+    const o0 = TR.tierRingNodes[0][0];
+    return h + `<div class="nqhead"><b>从这里开始</b>
+      <span class="note">第 1 环 · 30 题</span></div>
+      <div class="bar" style="margin:2px 0 10px"><i style="width:0%"></i></div>
+      <div class="note" style="margin-bottom:10px">先用最少的题把 <b>5 个大类</b>立起来：
+      每答一题换一个面向。<b>这一环不给单个面向的结果</b>（每个面向只有 1 题，
+      拿一道题下结论不诚实）。</div>
+      <div class="nqlist">
+        <button class="nqpick first" data-pick="${o0}">
+          <span class="nqtxt">${esc(itemByOrder[o0][4])}</span>
+          <span class="nqmeta">${esc(D.recs[itemByOrder[o0][1]].zh)} ·
+            分层设计的第 1 题（还没有作答，所以此刻无法按信息增益挑）</span>
+        </button>
+      </div>
+      <div class="note" style="margin-top:8px">答完这一道后，这里就会换成
+      <b>按信息增益挑出的几道</b>——不想在图上点圆圈时，顺着答即可。</div>`;
+  }
 
   // ── ③ 没有选中题：把「推荐的那几道」摆在最上面，点一下即成为当前题
   if (!list.length) {
@@ -1262,7 +1341,16 @@ function nextQuestionHtml() {
       <div class="note">所有能答的题都答完了，或者当前没有信息增益为正的题。
       可以在下面看结果，或用「重来」从头开始。</div></div>`;
   }
-  h += `<div class="nqhead"><b>推荐接下来答</b>
+  if (phase1) {
+    const done = TR.tierRingNodes[0].filter(o => o in S.resp).length;
+    h += `<div class="nqhead"><b>第一阶段 · 第一环</b>
+      <span class="note">${done}/30 题</span></div>
+      <div class="bar" style="margin:2px 0 10px"><i style="width:${done / 30 * 100}%"></i></div>
+      <div class="note" style="margin-bottom:10px">每答一题换一个面向——用最少的题先把
+      <b>5 个大类</b>立起来。<b>这一环不给单个面向的结果</b>（每个面向只有 1 题），
+      但下面这几道是按「信息增益」挑的，顺着答就行。</div>`;
+  }
+  h += `<div class="nqhead"><b>${phase1 ? "建议接着答" : "推荐接下来答"}</b>
     <span class="note">点一下即选中，或直接在图上点圆圈</span></div>
     <div class="nqlist">`;
   for (const x of list) {
@@ -1274,7 +1362,7 @@ function nextQuestionHtml() {
         · 可消除 ${(x.pct * 100).toFixed(0)}%</span></button>`;
   }
   h += `</div>
-    <div class="note" style="margin-top:8px">增益 = (1−R²<sub>f</sub>)·偏相关²，对所有面向求和。
+    <div class="note nqgain">增益 = (1−R²<sub>f</sub>)·偏相关²，对所有面向求和。
     百分数看着小是正常的：分母是<b>全部 30 个面向的剩余不确定性之和</b>，
     而一道题主要只推进 1–2 个面向。</div>`;
   return h + `</div>`;
@@ -1562,18 +1650,19 @@ function readyFacets() {
      · recFrom = 上一次作答的节点
      · recTo   = 当前推荐的几道题（含图形位置，供画边）
 
-   第一阶段（第一环未完成）**不画边**——那时 30 个节点地位相同，
-   没有「推荐」可言，画边是假的。 */
+   **第一阶段也给推荐**（D108）：推荐集在第 1 环内生成，所以图上会开始有橙色脉冲。
+   但第一阶段仍**不画连线**——那时 30 道题地位相同，画「从 A 推荐到 B」的边是假的；
+   脉冲足够表达「接下来答这道」。 */
 function refreshAdapt(lastOrder) {
-  if (!ring1Done()) {
-    S.adaptSet = null; S.adaptList = null;
-    S.recSet = null; S.recTo = null; S.recFrom = null;
-    return;
-  }
-  const list = recommend(5);
+  const phase1 = !ring1Done();
+  const list = recommend(phase1 ? 6 : 5);
   S.adaptList = list;
   S.adaptSet = new Set(list.map(x => x.o));
   S.recSet = S.adaptSet;
+  if (phase1) {                       // 第一阶段：有脉冲、无边
+    S.recTo = null; S.recFrom = null;
+    return;
+  }
   S.recTo = list.map(x => {
     const it = itemByOrder[x.o];
     return {f: it[1], t: tierRingOfOrder(x.o), pct: x.pct, o: x.o};
