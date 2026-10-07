@@ -1,0 +1,21 @@
+{
+ "threshold": 60,
+ "count": 2,
+ "note": "> 60 题的量表才生成天赋树布局（用户规则）",
+ "scales": [
+  {
+   "code": "IPIP-NEO",
+   "file": "ipip-neo.js",
+   "items": 300,
+   "clusters": 30,
+   "rings": 10
+  },
+  {
+   "code": "PID-5",
+   "file": "pid-5.js",
+   "items": 220,
+   "clusters": 25,
+   "rings": 10
+  }
+ ]
+}

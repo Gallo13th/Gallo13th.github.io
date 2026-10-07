@@ -1,0 +1,614 @@
+{
+ "schema_version": "2.0",
+ "_note": "本文件由 tools/build/build_item_structured.py 生成，请勿手改；改动请改 content/item-anchors.json、content/scenes/*.json、content/en-repairs.json 或上游数据后重跑。",
+ "generator": "tools/build/build_item_structured.py",
+ "checker": "tools/check/check_item_structured.py",
+ "redundancy_survey": "tools/survey/survey_note_redundancy.py",
+ "anchor_table": "content/item-anchors.json",
+ "scenes_source": "data/item-scenes.json（合并 content/scenes/*.json）",
+ "en_repairs_source": "content/en-repairs.json（只应用 repairs）",
+ "levels": [
+  "instrument_guide",
+  "scale_guides",
+  "items[].response.options"
+ ],
+ "known_gaps": [
+  {
+   "what": "PROMIS 四册（Anger / Anxiety / Depression / Sleep）的 rarely / sometimes / often / always：**未取到量化定义**",
+   "detail": "复核范围：① 四册 APA 版手册（只给 1=never; 2=rarely; 3=sometimes; 4=often; 5=always 与 7 天窗口，**无次数定义**）；② archive/literature/norms/ 下 4 份 PROMIS CAT scoring manual（2023/2025）——**同样没有**把 rarely/sometimes/often 折算成次数的表述；③ archive/norms/promis/ 的第三方附录（rimed 2021、sunnaas 2021）——只说『7-day recall period + 5-point Likert』，**没有天数**，且属第三方二手来源，按本轮要求不采用。→ 结论：**未取到**，四个词全部转「凭自知」。",
+   "status": "未取到定量依据（已尽力检索；不引第三方二手来源凑数）",
+   "owner": "要真定量，需另找 **PROMIS 官方 short-form scoring manual**（当前未入档）——本仓 archive/ 内已无更多可依据的量化定义"
+  },
+  {
+   "what": "DSM-5-TR L1 的『several days』与『nearly every day』：手册只给词，未给天数",
+   "detail": "L1 手册 Scoring 段的原文只有括号里的标签串：『0=none or not at all; 1=slight or rare, less than a day or two; 2=mild or several days; 3=moderate or more than half the days; 4=severe or nearly every day』。其中 1 档（不到 1–2 天）与 3 档（超过 7 天＝14 天窗口的一半）可定，2 档与 4 档**没有天数**。⚠️ PHQ-9 的 2–6 / 12–14 天**不适用于本册**，故不采用。",
+   "status": "部分取到（1、3 档定量）；2、4 档转「凭自知」",
+   "owner": "无（手册即如此）"
+  },
+  {
+   "what": "DSM-5-TR L2 Substance 的『several days』与『nearly every day』：同上",
+   "detail": "该册 Scoring 段原文：『0=not at all; 1=one or two days; 2=several days; 3=more than half the days; 4=nearly every day』。1 档（1–2 天）与 3 档（>7 天，按该册 past TWO (2) WEEKS 窗口）可定，2 档与 4 档无天数。",
+   "status": "部分取到（1、3 档定量）；2、4 档转「凭自知」",
+   "owner": "无（手册即如此）"
+  },
+  {
+   "what": "IPIP-NEO 的逐档情景说明来自项目自撰（editorial_clarification）",
+   "detail": "IPIP 官方英文只给「Very Inaccurate … Very Accurate」这组准确度标签，**没有**逐档行为学描述，也没有任何量化。逐 facet 的五档阶梯由项目撰写；「没有统一标准」的声明放在锚点级（`quantification_note_zh`），只说一次。",
+   "status": "有依据但非手册原文（basis = project_editorial）+ 锚点级已声明凭自知",
+   "owner": "若要升级为「已发表定义」，需认知访谈（当前未做，标签不得升级）"
+  },
+  {
+   "what": "DSM-5-TR L2 Sleep 手册内部标签不一致",
+   "detail": "该册**作答区**印的是『Not at all / A little bit / Somewhat / Quite a bit / Very much』（与包内 labels 一致），但**Scoring 段**却写『1=never; 2=rarely; 3=sometimes; 4=often; 5=always』（该段疑为同系列其它册的模板文字）。**本表选作答区的理由**：① 作答区是用户实际看到的尺子，五个选项与包内 labels 逐字一致；② Scoring 段那两句与其它册雷同，更像复制模板，且与本册作答区直接冲突，不足为据；③ 若两者都写进界面，用户会看到两把尺子——那是更大的错误。故按作答区处理并把不一致登记在此，供后续仲裁。",
+   "status": "已按作答区处理；手册内部不一致如实登记",
+   "owner": "如需仲裁，须查 PROMIS 官方 Sleep Disturbance 短表材料"
+  },
+  {
+   "what": "Mania / Repetitive / Substance 三册的包内 structure.window 为空",
+   "detail": "时间窗从手册正文取到（Mania/Repetitive: during the past 7 days；Substance: During the past TWO (2) WEEKS），已写入本锚点表；量表包字段仍为空。",
+   "status": "本任务在锚点表里补上并标了出处；量表包字段的补齐属数据层",
+   "owner": "数据层（task-14 范围）"
+  },
+  {
+   "what": "ASRM 第 1 组第 5 句的英文原文有拼写缺陷",
+   "detail": "包内为「I feel happier **of** more cheerful than usual all of the time」（应为 or）。按「text_en 逐字一致」原则原样搬运并登记，未擅自改。",
+   "status": "已知缺陷，待数据层修复",
+   "owner": "数据层（task-14 范围）"
+  }
+ ],
+ "instruments": [
+  {
+   "code": "dsm5tr-l1",
+   "instrument": "DSM5TR-L1",
+   "file": "data/items-structured/dsm5tr-l1.json",
+   "items": 23,
+   "with_text_en": 23,
+   "with_text_zh": 23,
+   "with_options": 23,
+   "options": 115,
+   "scales": 1,
+   "options_quantified": 69,
+   "options_self_report": 46,
+   "items_with_notes": 5,
+   "reverse_keyed": 0,
+   "option_level_meanings": 0,
+   "with_scenario": 23,
+   "with_notes": 5,
+   "text_en_repaired": 0,
+   "quantification_basis_counts": {
+    "manual_derived": 46,
+    "manual_verbatim": 23,
+    "self_report": 46
+   },
+   "scales_used": [
+    "dsm5tr-l1.frequency_0_4"
+   ],
+   "scale_item_counts": {
+    "dsm5tr-l1.frequency_0_4": 23
+   },
+   "sha256": "f2106c206dfddc6a09f3a3ef1103d2cdc85adb305f2abbc32a18eec0e5d5219e"
+  },
+  {
+   "code": "dsm5tr-l2-anger",
+   "instrument": "DSM5TR-L2-Anger",
+   "file": "data/items-structured/dsm5tr-l2-anger.json",
+   "items": 5,
+   "with_text_en": 5,
+   "with_text_zh": 5,
+   "with_options": 5,
+   "options": 25,
+   "scales": 1,
+   "options_quantified": 5,
+   "options_self_report": 20,
+   "items_with_notes": 0,
+   "reverse_keyed": 0,
+   "option_level_meanings": 0,
+   "with_scenario": 5,
+   "with_notes": 0,
+   "text_en_repaired": 0,
+   "quantification_basis_counts": {
+    "manual_derived": 5,
+    "self_report": 20
+   },
+   "scales_used": [
+    "dsm5tr-l2.promis_frequency_1_5"
+   ],
+   "scale_item_counts": {
+    "dsm5tr-l2.promis_frequency_1_5": 5
+   },
+   "sha256": "95d8c49338dae04c05a359c7a72f095df7be083ac7ba3417c72b3db13d7a0ef0"
+  },
+  {
+   "code": "dsm5tr-l2-anxiety",
+   "instrument": "DSM5TR-L2-Anxiety",
+   "file": "data/items-structured/dsm5tr-l2-anxiety.json",
+   "items": 7,
+   "with_text_en": 7,
+   "with_text_zh": 7,
+   "with_options": 7,
+   "options": 35,
+   "scales": 1,
+   "options_quantified": 7,
+   "options_self_report": 28,
+   "items_with_notes": 0,
+   "reverse_keyed": 0,
+   "option_level_meanings": 0,
+   "with_scenario": 7,
+   "with_notes": 0,
+   "text_en_repaired": 0,
+   "quantification_basis_counts": {
+    "manual_derived": 7,
+    "self_report": 28
+   },
+   "scales_used": [
+    "dsm5tr-l2.promis_frequency_1_5"
+   ],
+   "scale_item_counts": {
+    "dsm5tr-l2.promis_frequency_1_5": 7
+   },
+   "sha256": "8be0ca020c8c426404682a3496382d92bcafdaac40b10ba22fbf1d540a0be526"
+  },
+  {
+   "code": "dsm5tr-l2-depression",
+   "instrument": "DSM5TR-L2-Depression",
+   "file": "data/items-structured/dsm5tr-l2-depression.json",
+   "items": 8,
+   "with_text_en": 8,
+   "with_text_zh": 8,
+   "with_options": 8,
+   "options": 40,
+   "scales": 1,
+   "options_quantified": 8,
+   "options_self_report": 32,
+   "items_with_notes": 0,
+   "reverse_keyed": 0,
+   "option_level_meanings": 0,
+   "with_scenario": 8,
+   "with_notes": 0,
+   "text_en_repaired": 0,
+   "quantification_basis_counts": {
+    "manual_derived": 8,
+    "self_report": 32
+   },
+   "scales_used": [
+    "dsm5tr-l2.promis_frequency_1_5"
+   ],
+   "scale_item_counts": {
+    "dsm5tr-l2.promis_frequency_1_5": 8
+   },
+   "sha256": "39380a36d54d56d66004c23689b35e7b84b492061863f9db21bae0dc9dd805ef"
+  },
+  {
+   "code": "dsm5tr-l2-mania",
+   "instrument": "DSM5TR-L2-Mania",
+   "file": "data/items-structured/dsm5tr-l2-mania.json",
+   "items": 5,
+   "with_text_en": 5,
+   "with_text_zh": 5,
+   "with_options": 5,
+   "options": 25,
+   "scales": 1,
+   "options_quantified": 0,
+   "options_self_report": 25,
+   "items_with_notes": 1,
+   "reverse_keyed": 0,
+   "option_level_meanings": 0,
+   "with_scenario": 5,
+   "with_notes": 1,
+   "text_en_repaired": 0,
+   "quantification_basis_counts": {
+    "self_report": 25
+   },
+   "scales_used": [
+    "dsm5tr-l2-mania.asrm_statement_0_4"
+   ],
+   "scale_item_counts": {
+    "dsm5tr-l2-mania.asrm_statement_0_4": 5
+   },
+   "sha256": "4eb1483b3f05a33e668e22cf97dbd2cf498ef427e96d179487400683281c62c3"
+  },
+  {
+   "code": "dsm5tr-l2-repetitive",
+   "instrument": "DSM5TR-L2-Repetitive",
+   "file": "data/items-structured/dsm5tr-l2-repetitive.json",
+   "items": 5,
+   "with_text_en": 5,
+   "with_text_zh": 5,
+   "with_options": 5,
+   "options": 25,
+   "scales": 1,
+   "options_quantified": 5,
+   "options_self_report": 20,
+   "items_with_notes": 1,
+   "reverse_keyed": 0,
+   "option_level_meanings": 25,
+   "with_scenario": 5,
+   "with_notes": 1,
+   "text_en_repaired": 0,
+   "quantification_basis_counts": {
+    "manual_derived": 5,
+    "self_report": 20
+   },
+   "scales_used": [
+    "dsm5tr-l2-repetitive.foci_severity_0_4"
+   ],
+   "scale_item_counts": {
+    "dsm5tr-l2-repetitive.foci_severity_0_4": 5
+   },
+   "sha256": "786a94f5f8244b05c4eb5227bd491c175863cc3d53ed1ac80ad3e880d5a57bc1"
+  },
+  {
+   "code": "dsm5tr-l2-sleep",
+   "instrument": "DSM5TR-L2-Sleep",
+   "file": "data/items-structured/dsm5tr-l2-sleep.json",
+   "items": 8,
+   "with_text_en": 8,
+   "with_text_zh": 8,
+   "with_options": 8,
+   "options": 40,
+   "scales": 1,
+   "options_quantified": 8,
+   "options_self_report": 32,
+   "items_with_notes": 3,
+   "reverse_keyed": 0,
+   "option_level_meanings": 0,
+   "with_scenario": 8,
+   "with_notes": 3,
+   "text_en_repaired": 0,
+   "quantification_basis_counts": {
+    "manual_derived": 8,
+    "self_report": 32
+   },
+   "scales_used": [
+    "dsm5tr-l2-sleep.intensity_1_5"
+   ],
+   "scale_item_counts": {
+    "dsm5tr-l2-sleep.intensity_1_5": 8
+   },
+   "sha256": "acde6bbc8cb156f4b7b76cb70be0db52867b085a340a6ecc95f5d7323e94fca8"
+  },
+  {
+   "code": "dsm5tr-l2-somatic",
+   "instrument": "DSM5TR-L2-Somatic",
+   "file": "data/items-structured/dsm5tr-l2-somatic.json",
+   "items": 15,
+   "with_text_en": 15,
+   "with_text_zh": 15,
+   "with_options": 15,
+   "options": 45,
+   "scales": 1,
+   "options_quantified": 15,
+   "options_self_report": 30,
+   "items_with_notes": 2,
+   "reverse_keyed": 0,
+   "option_level_meanings": 0,
+   "with_scenario": 15,
+   "with_notes": 2,
+   "text_en_repaired": 0,
+   "quantification_basis_counts": {
+    "manual_derived": 15,
+    "self_report": 30
+   },
+   "scales_used": [
+    "dsm5tr-l2-somatic.phq15_0_2"
+   ],
+   "scale_item_counts": {
+    "dsm5tr-l2-somatic.phq15_0_2": 15
+   },
+   "sha256": "3780a9c445942a2a6e23e0a483fe2141d2370ee1638c4220f37c3f2fe297f8b3"
+  },
+  {
+   "code": "dsm5tr-l2-substance",
+   "instrument": "DSM5TR-L2-Substance",
+   "file": "data/items-structured/dsm5tr-l2-substance.json",
+   "items": 10,
+   "with_text_en": 10,
+   "with_text_zh": 10,
+   "with_options": 10,
+   "options": 50,
+   "scales": 1,
+   "options_quantified": 30,
+   "options_self_report": 20,
+   "items_with_notes": 1,
+   "reverse_keyed": 0,
+   "option_level_meanings": 0,
+   "with_scenario": 10,
+   "with_notes": 1,
+   "text_en_repaired": 0,
+   "quantification_basis_counts": {
+    "manual_derived": 20,
+    "manual_verbatim": 10,
+    "self_report": 20
+   },
+   "scales_used": [
+    "dsm5tr-l2-substance.assist_frequency_0_4"
+   ],
+   "scale_item_counts": {
+    "dsm5tr-l2-substance.assist_frequency_0_4": 10
+   },
+   "sha256": "305f7d92dcde732acd0d5359bcbfabfc1e33c04a90f735de2073540f6d03d90f"
+  },
+  {
+   "code": "ipip-neo",
+   "instrument": "IPIP-NEO",
+   "file": "data/items-structured/ipip-neo.json",
+   "items": 300,
+   "with_text_en": 300,
+   "with_text_zh": 300,
+   "with_options": 300,
+   "options": 1500,
+   "scales": 30,
+   "options_quantified": 0,
+   "options_self_report": 1500,
+   "items_with_notes": 51,
+   "reverse_keyed": 148,
+   "option_level_meanings": 0,
+   "with_scenario": 300,
+   "with_notes": 51,
+   "text_en_repaired": 0,
+   "quantification_basis_counts": {
+    "self_report": 1500
+   },
+   "scales_used": [
+    "ipip-neo.accuracy_1_5.achievementstriving",
+    "ipip-neo.accuracy_1_5.activitylevel",
+    "ipip-neo.accuracy_1_5.adventurousness",
+    "ipip-neo.accuracy_1_5.aesthetic_appreciation_artistic_interests",
+    "ipip-neo.accuracy_1_5.altruism",
+    "ipip-neo.accuracy_1_5.anger",
+    "ipip-neo.accuracy_1_5.anxiety",
+    "ipip-neo.accuracy_1_5.assertiveness",
+    "ipip-neo.accuracy_1_5.cautiousness",
+    "ipip-neo.accuracy_1_5.cheerfulness",
+    "ipip-neo.accuracy_1_5.cooperation",
+    "ipip-neo.accuracy_1_5.depression",
+    "ipip-neo.accuracy_1_5.dutifulness",
+    "ipip-neo.accuracy_1_5.emotionality",
+    "ipip-neo.accuracy_1_5.excitementseeking",
+    "ipip-neo.accuracy_1_5.friendliness",
+    "ipip-neo.accuracy_1_5.gregariousness",
+    "ipip-neo.accuracy_1_5.imagination",
+    "ipip-neo.accuracy_1_5.immoderation",
+    "ipip-neo.accuracy_1_5.intellect",
+    "ipip-neo.accuracy_1_5.liberalism",
+    "ipip-neo.accuracy_1_5.modesty_humility",
+    "ipip-neo.accuracy_1_5.morality",
+    "ipip-neo.accuracy_1_5.orderliness",
+    "ipip-neo.accuracy_1_5.selfconsciousness",
+    "ipip-neo.accuracy_1_5.selfdiscipline",
+    "ipip-neo.accuracy_1_5.selfefficacy",
+    "ipip-neo.accuracy_1_5.sympathy",
+    "ipip-neo.accuracy_1_5.trust",
+    "ipip-neo.accuracy_1_5.vulnerability"
+   ],
+   "scale_item_counts": {
+    "ipip-neo.accuracy_1_5.anxiety": 10,
+    "ipip-neo.accuracy_1_5.anger": 10,
+    "ipip-neo.accuracy_1_5.depression": 10,
+    "ipip-neo.accuracy_1_5.selfconsciousness": 10,
+    "ipip-neo.accuracy_1_5.immoderation": 10,
+    "ipip-neo.accuracy_1_5.vulnerability": 10,
+    "ipip-neo.accuracy_1_5.friendliness": 10,
+    "ipip-neo.accuracy_1_5.gregariousness": 10,
+    "ipip-neo.accuracy_1_5.assertiveness": 10,
+    "ipip-neo.accuracy_1_5.activitylevel": 10,
+    "ipip-neo.accuracy_1_5.excitementseeking": 10,
+    "ipip-neo.accuracy_1_5.cheerfulness": 10,
+    "ipip-neo.accuracy_1_5.imagination": 10,
+    "ipip-neo.accuracy_1_5.aesthetic_appreciation_artistic_interests": 10,
+    "ipip-neo.accuracy_1_5.emotionality": 10,
+    "ipip-neo.accuracy_1_5.adventurousness": 10,
+    "ipip-neo.accuracy_1_5.intellect": 10,
+    "ipip-neo.accuracy_1_5.liberalism": 10,
+    "ipip-neo.accuracy_1_5.trust": 10,
+    "ipip-neo.accuracy_1_5.morality": 10,
+    "ipip-neo.accuracy_1_5.altruism": 10,
+    "ipip-neo.accuracy_1_5.cooperation": 10,
+    "ipip-neo.accuracy_1_5.modesty_humility": 10,
+    "ipip-neo.accuracy_1_5.sympathy": 10,
+    "ipip-neo.accuracy_1_5.selfefficacy": 10,
+    "ipip-neo.accuracy_1_5.orderliness": 10,
+    "ipip-neo.accuracy_1_5.dutifulness": 10,
+    "ipip-neo.accuracy_1_5.achievementstriving": 10,
+    "ipip-neo.accuracy_1_5.selfdiscipline": 10,
+    "ipip-neo.accuracy_1_5.cautiousness": 10
+   },
+   "sha256": "d465d1ecc9794a200a00939b769c9369b148b52018e2485a53f0c29dfa2842a6"
+  },
+  {
+   "code": "pid-5",
+   "instrument": "PID-5",
+   "file": "data/items-structured/pid-5.json",
+   "items": 220,
+   "with_text_en": 220,
+   "with_text_zh": 220,
+   "with_options": 220,
+   "options": 880,
+   "scales": 1,
+   "options_quantified": 0,
+   "options_self_report": 880,
+   "items_with_notes": 15,
+   "reverse_keyed": 16,
+   "option_level_meanings": 0,
+   "with_scenario": 220,
+   "with_notes": 15,
+   "text_en_repaired": 23,
+   "quantification_basis_counts": {
+    "self_report": 880
+   },
+   "scales_used": [
+    "pid-5.false_true_0_3"
+   ],
+   "scale_item_counts": {
+    "pid-5.false_true_0_3": 220
+   },
+   "sha256": "ec7a2045c81a9da3a983749f88ce64ac5b08430e977db08b50cc1932210160de"
+  }
+ ],
+ "scale_table": {
+  "pid-5.false_true_0_3": {
+   "label": "PID-5 · 符合度（0–3）",
+   "type": "false_true_likert",
+   "min": 0,
+   "max": 3,
+   "options_source": "table",
+   "anchor_note_zh": "这四档表示这句话与你平时样子的符合程度，从「完全不符合」到「完全符合」。这里问的是**像不像你**，不是「对不对」「好不好」。",
+   "quantification_note_zh": "这四档**没有统一标准**：每个人对「有一点符合」的理解不同——凭你自己的判断作答即可（按你对自己平时的了解）。",
+   "label_source": "archive/scales/PID-5/manual.pdf 的 Scoring 段（『Each item on the measure is rated on a 4-point scale』）+ data/pid5-scoring-keys.json 的 response_format",
+   "meaning_source": "archive/scales/PID-5/manual.pdf 的 4 点锚点标签（very false ↔ very true）+ 包内 response_format；**手册未给逐档情景描述与量化**",
+   "evidence": [
+    "archive/scales/PID-5/manual.pdf",
+    "data/pid5-scoring-keys.json",
+    "data/instruments/pid-5.json"
+   ]
+  },
+  "dsm5tr-l1.frequency_0_4": {
+   "label": "DSM-5-TR Level 1 · 过去两周的严重度/频率（0–4）",
+   "type": "frequency_severity",
+   "min": 0,
+   "max": 4,
+   "options_source": "table",
+   "anchor_note_zh": "这五档按**过去两周内出现的天数**排列，从「完全没有」到「几乎每天」，选最贴近你实际情况的一档。",
+   "quantification_note_zh": "**「有几天」和「几乎每天」没有统一标准**——只有「完全没有」和「不到一两天」有确切天数。凭你自己的判断（按你在这段时间里的整体印象作答即可）。",
+   "label_source": "archive/scales/DSM5TR-L1/manual.pdf（Scoring 段逐字给出 0–4 的五档标签）+ 包内 response_format",
+   "meaning_source": "archive/scales/DSM5TR-L1/manual.pdf 的 Scoring 段；1、3 档可定量，2、4 档手册未定义 → 锚点级声明凭自知",
+   "evidence": [
+    "archive/scales/DSM5TR-L1/manual.pdf",
+    "data/instruments/dsm5tr-l1.json",
+    "data/linkage/dsm5tr-chain.json"
+   ]
+  },
+  "dsm5tr-l2.promis_frequency_1_5": {
+   "label": "DSM-5-TR L2（PROMIS 短表 · Anger/Anxiety/Depression）· 过去 7 天的频率（1–5）",
+   "type": "promis_frequency",
+   "min": 1,
+   "max": 5,
+   "options_source": "table",
+   "anchor_note_zh": "这五档按**过去 7 天内出现的频率**排列，从「从不」到「总是」。",
+   "quantification_note_zh": "**「很少 / 有时 / 经常 / 总是」没有统一标准**，每个人理解不同——凭你自己的判断（按你在这段时间里的整体印象作答即可）。",
+   "label_source": "archive/scales/DSM5TR-L2-{Anger,Anxiety,Depression}/manual.pdf（每册 Scoring 段逐字给 1=never; 2=rarely; 3=sometimes; 4=often; 5=always）+ 包内 response_format",
+   "meaning_source": "手册锚点标签原文 + 时间窗；**手册未给 rarely/sometimes/often/always 的次数定义**（已复核 PROMIS CAT scoring manual 与第三方附录，均无）→ 除「从不」外全部转「凭自知」",
+   "evidence": [
+    "archive/scales/DSM5TR-L2-Anger/manual.pdf",
+    "archive/scales/DSM5TR-L2-Anxiety/manual.pdf",
+    "archive/scales/DSM5TR-L2-Depression/manual.pdf",
+    "archive/literature/norms/healthmeasures2023_promis-anxiety-cat-scoring-manual.pdf"
+   ]
+  },
+  "dsm5tr-l2-sleep.intensity_1_5": {
+   "label": "DSM-5-TR L2 Sleep（PROMIS Sleep Disturbance）· 过去 7 天的程度（1–5）",
+   "type": "intensity_likert",
+   "min": 1,
+   "max": 5,
+   "options_source": "table",
+   "anchor_note_zh": "这五档表示这类睡眠情况在过去 7 天里的**程度**，从「完全没有」到「非常多」。",
+   "quantification_note_zh": "这几档**没有统一标准**，每个人的感受不同——凭你自己的判断（按你在这段时间里的整体印象作答即可）。",
+   "label_source": "archive/scales/DSM5TR-L2-Sleep/manual.pdf 的作答区（逐字印出 Not at all / A little bit / Somewhat / Quite a bit / Very much）+ 包内 response_format",
+   "meaning_source": "手册作答区锚点原文；**手册未给程度量化**（该册 Scoring 段印的是另一套 never…always 标签，与本表采用的作答区不一致——已在 known_gaps 登记）",
+   "evidence": [
+    "archive/scales/DSM5TR-L2-Sleep/manual.pdf",
+    "data/instruments/dsm5tr-l2-sleep.json"
+   ]
+  },
+  "dsm5tr-l2-somatic.phq15_0_2": {
+   "label": "DSM-5-TR L2 Somatic（PHQ-15）· 过去 7 天被困扰的程度（0–2）",
+   "type": "bother_severity",
+   "min": 0,
+   "max": 2,
+   "options_source": "table",
+   "anchor_note_zh": "这三档表示过去 7 天里你被该症状**困扰的程度**，从「完全没有」到「被困扰很多」。",
+   "quantification_note_zh": "**「有一点」「被困扰很多」没有统一标准**——凭你自己的判断（按你在这段时间里的整体印象作答即可）。",
+   "label_source": "archive/scales/DSM5TR-L2-Somatic/manual.pdf（『3-point scale (0=not bothered at all; 1=bothered a little; 2=bothered a lot)』）+ 包内 response_format",
+   "meaning_source": "手册 Scoring 段逐字给出 0/1/2 的语义标签；**未给各档的程度量化** → 除 0 档外转「凭自知」",
+   "evidence": [
+    "archive/scales/DSM5TR-L2-Somatic/manual.pdf",
+    "data/criteria/dsm5tr-l2.json"
+   ]
+  },
+  "dsm5tr-l2-substance.assist_frequency_0_4": {
+   "label": "DSM-5-TR L2 Substance（NIDA-Modified ASSIST 改编）· 过去两周的使用频率（0–4）",
+   "type": "frequency",
+   "min": 0,
+   "max": 4,
+   "options_source": "table",
+   "anchor_note_zh": "这五档按**过去两周内的使用天数**排列。每一题对应一种物质，逐项作答即可。",
+   "quantification_note_zh": "**「有几天」和「几乎每天」没有统一标准**——只有「完全没有」「一两天」和「超过一半」是确切的。凭你自己的判断。",
+   "label_source": "archive/scales/DSM5TR-L2-Substance/manual.pdf 的 Scoring 段与作答区（逐字）+ 包内 items[].options",
+   "meaning_source": "手册 Scoring 段原文；1、3 档可定量，2、4 档未定义 → 锚点级声明凭自知",
+   "evidence": [
+    "archive/scales/DSM5TR-L2-Substance/manual.pdf",
+    "data/criteria/dsm5tr-l2.json"
+   ]
+  },
+  "dsm5tr-l2-mania.asrm_statement_0_4": {
+   "label": "DSM-5-TR L2 Mania（ASRM）· 每组 5 句陈述中选最符合的一句（0–4）",
+   "type": "statement_choice",
+   "min": 0,
+   "max": 4,
+   "options_source": "item",
+   "anchor_note_zh": "每一组的 5 句按程度**从轻到重**排列：请在本组内挑出最贴近你的一句。",
+   "quantification_note_zh": "**「偶尔 / 经常 / 频繁 / 一直」没有统一标准**，每个人理解不同——凭你自己的判断，在本组里选最贴近你的一项即可。",
+   "label_source": "data/instruments/dsm5tr-l2-mania.json 的 items[].options[].text（提取自 archive/scales/DSM5TR-L2-Mania/manual.pdf；task-14 已把选项组规范到 items[].options）",
+   "meaning_source": "",
+   "evidence": [
+    "archive/scales/DSM5TR-L2-Mania/manual.pdf",
+    "data/instruments/dsm5tr-l2-mania.json"
+   ]
+  },
+  "dsm5tr-l2-repetitive.foci_severity_0_4": {
+   "label": "DSM-5-TR L2 Repetitive（改编自 FOCI Part B）· 逐题锚点（0–4）",
+   "type": "item_specific_severity",
+   "min": 0,
+   "max": 4,
+   "options_source": "item",
+   "anchor_note_zh": "每一问用的程度词**不一样**（有的问「时间」，有的问「困扰」，有的问「能不能控制」）——请按该问自己的程度词作答。",
+   "quantification_note_zh": "**除「没有」「完全能控制」外，其余程度词没有统一标准**——凭你自己的判断（按你在这段时间里的整体印象作答即可）。",
+   "label_source": "data/instruments/dsm5tr-l2-repetitive.json 的 items[].options[].text（提取自 archive/scales/DSM5TR-L2-Repetitive/manual.pdf）",
+   "meaning_source": "",
+   "evidence": [
+    "archive/scales/DSM5TR-L2-Repetitive/manual.pdf",
+    "data/instruments/dsm5tr-l2-repetitive.json"
+   ]
+  },
+  "<ipip>": {
+   "label": "IPIP-NEO-300 · 自我描述准确度（1–5）",
+   "type": "accuracy_likert",
+   "min": 1,
+   "max": 5,
+   "options_source": "per_dimension",
+   "anchor_note_zh": "这五档表示「这句话描述得有多准确」，从「非常不符合」到「非常符合」。",
+   "quantification_note_zh": "这五档**没有统一标准**：每个人对「比较符合」的理解不同——凭你自己的判断作答即可（描述你平时一贯的样子，不是你希望的样子）。",
+   "label_source": "archive/ipip/data/OpenScales/scales/ipip/translations/ipip_master_en.json（ipip_likert_1..5 与 ipip_question_head，_translator = Lewis R. Goldberg and colleagues）",
+   "meaning_source": "content/facets/<facet>.record.json 的 administration.anchor_semantics（**逐 facet 特有**的五档行为学阶梯；provenance = editorial_clarification，不是手册原文）",
+   "evidence": [
+    "archive/ipip/data/OpenScales/scales/ipip/translations/ipip_master_en.json",
+    "content/facets/*.record.json"
+   ]
+  }
+ },
+ "quantification_basis_totals": {
+  "manual_derived": 114,
+  "manual_verbatim": 33,
+  "self_report": 2633
+ },
+ "en_repairs": {
+  "applied": 23,
+  "needs_lead_review": 0
+ },
+ "totals": {
+  "items": 606,
+  "with_text_en": 606,
+  "with_text_zh": 606,
+  "with_options": 606,
+  "options": 2780,
+  "scales": 40,
+  "options_quantified": 147,
+  "options_self_report": 2633,
+  "items_with_notes": 79,
+  "reverse_keyed": 164,
+  "option_level_meanings": 25,
+  "with_scenario": 606,
+  "with_notes": 79,
+  "text_en_repaired": 23
+ }
+}
