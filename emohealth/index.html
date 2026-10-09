@@ -493,6 +493,15 @@
   .treenode.ready{stroke:var(--warm);stroke-width:2.8}
   .treenode.ready:not(.done){fill:#fff7e6}
   .treenode.done.ready{stroke:var(--warm)}
+  /* task-43：**因「相关/互补」新解锁**的节点。
+     与其它四态的形状差（不只靠颜色）：
+       · 外圈多一道**虚线光环**（`.bridgehalo`）——色盲/黑白打印也能分辨；
+       · 本体是**实心暖底 + 最粗描边**，比「可答」（浅绿底粗边）更显眼；
+       · 不加在已答节点上（`.done` 优先），因此不损害已答节点的可读性。 */
+  .treenode.bridge{fill:#ffeccf;stroke:var(--warm);stroke-width:3.6}
+  .treenode.bridge.next{stroke-dasharray:3 2}
+  .bridgehalo{fill:none;stroke:var(--warm);stroke-width:1.4;stroke-dasharray:2 3;
+    opacity:.85;pointer-events:none}
   .treelegend{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--ink3);
     margin:2px 0 6px;line-height:1.7}
   .treelegend i{display:inline-block;width:10px;height:10px;border-radius:50%;
@@ -501,6 +510,11 @@
   .treelegend i.ready{background:#fff7e6;border-color:var(--warm)}
   .treelegend i.open{background:var(--accent-soft);border-color:var(--accent)}
   .treelegend i.locked{background:#eee;border-color:#e2e2e2}
+  /* 图例里的「新解锁」用**外环**表示，与图上节点的画法一致（形状线索） */
+  .treelegend i.bridge{background:#ffeccf;border-color:var(--warm);
+    box-shadow:0 0 0 2px #fff, 0 0 0 3.4px var(--warm)}
+  .treebridge{border:1px solid var(--line);border-left:3px solid var(--warm);
+    border-radius:10px;padding:8px 12px;margin:6px 0 4px;background:#fffdf8;font-size:13px}
   /* 下一题推荐卡：暖色左边框 + 浅底，与「推断面板」区分开 */
   .treereco{border:1px solid var(--line);border-left:3px solid var(--warm);border-radius:10px;
     padding:10px 12px;margin:8px 0 6px;background:#fffdf8}
@@ -811,6 +825,9 @@ const S = {
   instResult: null,    // 该量表的计分结果（用户点「看结果」后才有）
   instView: "classic", // 作答方式："classic"（经典逐题）| "tree"（天赋树，仅 > 60 题）
   treeSel: null,       // 天赋树里选中的节点（题号）
+  /* 最近作答的那道题的题号（task-43）：「当前节点」的兜底定义要用它
+     （优先 `treeSel` 且已答；否则用最近作答的题）。 */
+  lastAnsOrder: null,
   /* PID-5 条件常模的**分层参数**（性别 × 年龄）。见下方 STRATUM_* 一段：
      ⚠️ 它是**常模参数**，不是作答数据——单独存、单独清，绝不进 `instResp`/计分/存档作答位。 */
   normStratum: {sex: "", age: ""},
@@ -3226,6 +3243,187 @@ function treeNodeState(layout, order, respById) {
   });
   return done ? "open" : "locked";
 }
+
+/* ══ task-43：各方面各答一题之后的「相关 / 互补解锁」 ═══════════════════════════
+   用户原话：答完**所有方面的问题各一个**之后，开始解锁与**当前选定的已回答节点**
+   信息**最互补 or 最相关**的节点，纳入推荐并在 UI 高亮 —— 要「非线性」的答题感受。
+   ⚠️ 两条设计红线（Lead 定）：
+     ① **结构性解锁保留为下限**（`treeNodeState` 一字不改）：它是防死锁的保底路径
+        （最内环恒开 + support 里有已答节点）。本段只**额外增加**一条解锁路径，
+        **绝不替换**结构判据——否则会出现「一个都没解出来」时无题可答。
+     ② 排序**可复核、不许黑箱**：两腿显式、权重写死在下面，DOM 上带
+        `data-bridge-*` 属性（增益 / 相关 / 名次）供测试与审计核对。 */
+
+/** ① 触发条件：`layout.clusters` 里**每个簇都至少答了 1 题**（各方面各答一题）。 */
+function allFacetsStarted(layout, data) {
+  const clusters = (layout && layout.clusters) || [];
+  if (!clusters.length) return false;
+  const dimOf = treeDimOfOrder(layout);
+  const started = new Set();
+  for (const it of ((data && data.items) || [])) {
+    if (it.id in S.instResp) { const d = dimOf.get(it.order); if (d) started.add(d); }
+  }
+  return clusters.every(c => started.has(c.id));
+}
+
+/** ② 「当前节点」定义（Lead 定死）：
+     优先 `S.treeSel` **且该节点已答**；否则用**最近作答**的那道题
+     （`S.lastAnsOrder`，由作答处理器记录）；再否则取作答集合里最后插入的一道。
+     —— 全都要求「已答」，因为互补/相关是**从已答节点往外长**。 */
+function treeAnchorOrder() {
+  const isDone = o => {
+    if (o == null) return false;
+    const id = TREE_NOW_ID.get(o);
+    return !!(id && id in S.instResp);
+  };
+  if (isDone(S.treeSel)) return S.treeSel;
+  if (isDone(S.lastAnsOrder)) return S.lastAnsOrder;
+  const ids = Object.keys(S.instResp);
+  for (let i = ids.length - 1; i >= 0; i--) {
+    let found = null;
+    TREE_NOW_ID.forEach((id, o) => { if (id === ids[i]) found = o; });
+    if (found != null) return found;
+  }
+  return null;
+}
+
+/** 题↔面向相关（相关腿的唯一来源：`params.item_dim_corr`，不新增数据）。 */
+function treeItemRel(payload, itemId, dimId) {
+  const m = payload && payload.params && payload.params.item_dim_corr;
+  if (!m || !itemId || !dimId) return 0;
+  const row = m[itemId];
+  if (!row) return 0;
+  if (typeof row === "number") return Math.abs(row);
+  const v = row[dimId];
+  return v == null ? 0 : Math.abs(+v);
+}
+
+/* 一次解锁几个：**3**。
+   理由（写死在这里，避免以后随手上调）：解锁区通常有 6–10 个候选，
+   点 2 个像个孤零零的路标、点 3 个才看得出「一条岔路」；4 个以上就开始成片，
+   用户会觉得「怎么一下子全亮了」，非线性感反而消失。 */
+const TREE_BRIDGE_MAX = 3;
+
+let _BRIDGE = {key: null, res: null};
+/** ③ 相关/互补解锁集合（**唯一实现**，渲染与「可答判据」共用）。
+      合成排序（**互补优先、相关次之**，可复核）：
+        腿①互补 = `ui/lib/inference.js` 的 `forecastGains(payload, 已答, 候选)`：
+                 按 `order_by_gain` 的名次（信息增益降序）；并列再看 `unlocks.length`
+                 （能让某个维度**跨过可给结果门槛**的优先）。
+        腿②相关 = `|item_dim_corr[候选][当前节点的面向]|` 降序（题与「当前节点所在的
+                 面向」越相关越先解锁）。
+        再并列：同簇优先 → 邻簇次之 → 题号升序（**保证同一份作答结果稳定、可复现**）。
+        候选池 = 结构性 `locked` 且未答 + （同簇 / 邻簇 / 与当前节点的面向相关 > 0）——
+                 把解锁限制在「当前节点周围的岔路」上，而不是全树任意点。 */
+function treeBridgeUnlock(layout, data) {
+  const active0 = {active: false, anchor: null, orders: new Set(), info: new Map(),
+    ranked: [], poolIds: [], allStarted: false, reason: "", max: TREE_BRIDGE_MAX};
+  if (!layout || !data) return active0;
+  const payload = inferencePayload(S.instCode);
+  const allStarted = allFacetsStarted(layout, data);
+  const key = (S.instCode || "") + "|" + S.ansVer + "|" + allStarted + "|" +
+    (S.treeSel == null ? "-" : S.treeSel) + "|" + (S.lastAnsOrder == null ? "-" : S.lastAnsOrder) +
+    "|" + (payload ? 1 : 0) + "|" + (window.EmoHealthInference ? 1 : 0);
+  if (_BRIDGE.key === key) return _BRIDGE.res;
+  const res = {active: false, anchor: null, orders: new Set(), info: new Map(),
+    allStarted, reason: "", max: TREE_BRIDGE_MAX};
+  if (!allStarted) {
+    res.reason = "还没做到「每个方面各答一题」（此阶段仍按结构性解锁）";
+    _BRIDGE = {key, res};
+    return res;
+  }
+  const anchor = treeAnchorOrder();
+  if (anchor == null) {
+    res.reason = "还没有已答节点可作锚点";
+    _BRIDGE = {key, res};
+    return res;
+  }
+  res.anchor = anchor;
+  const dimOf = treeDimOfOrder(layout);
+  const anchorDim = dimOf.get(anchor);
+  const clusterDist = (() => {
+    const order = (layout.clusters || []).map(c => c.id);
+    const i0 = order.indexOf(anchorDim);
+    const m = new Map();
+    for (const c of (layout.clusters || [])) {
+      const i = order.indexOf(c.id);
+      m.set(c.id, (i0 < 0 || i < 0) ? 99 : Math.abs(i - i0));
+    }
+    return m;
+  })();
+  /* 候选：结构性 locked、未答，且在「当前节点周围」 */
+  const cands = [];
+  for (const it of data.items) {
+    if (it.id in S.instResp) continue;
+    if (treeNodeState(layout, it.order, S.instResp) !== "locked") continue;
+    const d = dimOf.get(it.order);
+    const dist = clusterDist.has(d) ? clusterDist.get(d) : 99;
+    const rel = treeItemRel(payload, it.id, anchorDim);
+    if (dist > 1 && !(rel > 0)) continue;      // 既不相邻、也不相关 → 不进候选
+    cands.push({order: it.order, id: it.id, dim: d, dist, rel});
+  }
+  if (!cands.length) {
+    res.reason = "当前节点周围没有可解锁的节点（仍按结构性解锁）";
+    _BRIDGE = {key, res};
+    return res;
+  }
+  /* 腿①：互补（信息增益）——只有推断库与参数包就绪时才有；否则只用腿②（写出原因） */
+  let gainBy = null, fgUsed = null;
+  const lib = window.EmoHealthInference;
+  if (payload && payload.params && lib && typeof lib.forecastGains === "function") {
+    const answered = data.items.filter(x => x.id in S.instResp).map(x => x.id);
+    let fg = null;
+    try { fg = lib.forecastGains(payload, answered, cands.map(c => c.id)); }
+    catch (e) { fg = null; }
+    fgUsed = fg;
+    if (fg && fg.candidates && fg.candidates.length) {
+      gainBy = new Map();
+      const byGain = (fg.order_by_gain || fg.candidates.map(c => c.item));
+      byGain.forEach((id, i) => gainBy.set(id, i));
+    }
+  }
+  if (!gainBy) res.reason = "推断参数未就绪：本次按「相关」一条腿排序";
+  const ranked = cands.slice().sort((a, b) => {
+    const ga = gainBy ? (gainBy.has(a.id) ? gainBy.get(a.id) : 9999) : 0;
+    const gb = gainBy ? (gainBy.has(b.id) ? gainBy.get(b.id) : 9999) : 0;
+    return (ga - gb)                       // 腿①互补（信息增益名次）
+      || (b.rel - a.rel)                   // 腿②相关（|题↔当前面向相关| 降序）
+      || (a.dist - b.dist)                 // 同簇 → 邻簇
+      || (a.order - b.order);              // 稳定：题号升序
+  });
+  for (const c of ranked.slice(0, TREE_BRIDGE_MAX)) {
+    res.orders.add(c.order);
+    res.info.set(c.order, {
+      gainRank: gainBy ? (gainBy.has(c.id) ? gainBy.get(c.id) : null) : null,
+      rel: c.rel, dist: c.dist, dim: c.dim, id: c.id,
+      why: (gainBy ? `互补名次 ${gainBy.has(c.id) ? gainBy.get(c.id) + 1 : "—"}`
+        : "互补：推断参数未就绪") + `；相关 ${c.rel.toFixed(3)}；簇距 ${c.dist}`,
+    });
+  }
+  /* 可复核用的**完整排序与候选池**（渲染不用，供测试/审计核对「不是随手挑的」）：
+     `ranked` 是按上面两腿排好的全部候选；`orders` 只是它的前 `max` 个。 */
+  res.poolIds = ranked.map(c => c.id);
+  /* 互补腿用到的**原始名次表**（`forecastGains.order_by_gain`，照抄不加工）——
+     测试/审计可以拿它复核 `ranked[*].gainRank`，也方便发现「两次调用不一致」这类问题。 */
+  res.gainOrder = gainBy ? (fgUsed && fgUsed.order_by_gain ? fgUsed.order_by_gain.slice() : null) : null;
+  res.ranked = ranked.map(c => ({
+    order: c.order, id: c.id, dim: c.dim,
+    gainRank: gainBy ? (gainBy.has(c.id) ? gainBy.get(c.id) : null) : null,
+    rel: c.rel, dist: c.dist,
+  }));
+  res.active = res.orders.size > 0;
+  _BRIDGE = {key, res};
+  return res;
+}
+
+/** 有效可答状态 = 结构下限 ∪ 相关/互补新解锁。
+    ⚠️ 结构性那条**仍在** `treeNodeState` 里，这里只做一次并集。 */
+function treeNodeStateEff(layout, order, respById, bridge) {
+  const st = treeNodeState(layout, order, respById);
+  if (st !== "locked") return st;
+  const b = bridge || treeBridgeUnlock(layout, INST_NOW);
+  return (b && b.orders && b.orders.has(+order)) ? "open" : "locked";
+}
 let TREE_NOW_ID = new Map();       // order -> itemId（每次渲染前重建）
 let _TREE_GUIDE = {code: null, sid: null};   // 天赋树里「这把尺子已经说过一次了」的记忆
 function renderInstTree(el) {
@@ -3262,8 +3460,10 @@ function renderInstTree(el) {
   /* ── 下一题推荐（信息增益）+ 解锁图例：与面板同一套 conf_r ── */
   const unlock = treeUnlockState();
   const dimOf = treeDimOfOrder(layout);
+  /* task-43：相关/互补解锁（渲染前算一次，渲染与「可答判据」共用同一份结果） */
+  const bridge = treeBridgeUnlock(layout, data);
   const recoOrder = recommendTreeItem(layout, data);
-  h += renderTreeReco(layout, data, unlock, recoOrder);
+  h += renderTreeReco(layout, data, unlock, recoOrder, bridge);
   h += `<div class="treewrap"><svg class="treesvg" viewBox="0 0 ${W} ${H}" role="img"
         aria-label="答题进度图">`;
 
@@ -3278,30 +3478,53 @@ function renderInstTree(el) {
         x2="${sx(to[0]).toFixed(1)}" y2="${sy(to[1]).toFixed(1)}"/>`;
     }
   }
-  // 节点：结构状态（done/open/locked）× 维度解锁（ready，叠加）
+  // 节点：结构状态（done/open/locked）× 维度解锁（ready，叠加）× 相关/互补新解锁（bridge）
   for (const it of data.items) {
     const p = layout.xy[String(it.order)];
     if (!p) continue;
-    const st = treeNodeState(layout, it.order, S.instResp);
+    const st = treeNodeStateEff(layout, it.order, S.instResp, bridge);
     const dim = dimOf.get(it.order);
     const u = (dim && unlock && unlock.ok) ? unlock.dims[dim] : null;
     /* 硬规则：本维度一道题都没答 → u.display_allowed=false ⇒ **不点亮** */
     const ready = !!(u && u.available);
+    /* task-43：这一节点是不是「因相关/互补新解锁」的？（结构上仍是 locked，
+       但它已经**真的可答**——`treeNodeStateEff` 给的就是 open） */
+    const bInfo = (bridge && bridge.orders && bridge.orders.has(it.order))
+      ? (bridge.info.get(it.order) || {}) : null;
+    const isBridge = !!bInfo && st !== "done";
     const r = st === "done" ? 9 : ready ? 11 : st === "open" ? 10 : 6;
     /* 悬停文字（D118）：只给用户语言。精确 r / 门槛不再出现在 `title` 里
-       （它们仍在 `data-unlocked`、解锁依据表与「依据与出处」里，可查）。 */
-    const ttl = u
+       （它们仍在 `data-unlocked`、解锁依据表与「依据与出处」里，可查）。
+       task-43：新解锁的节点在 title 里说明「为什么它被解锁」（相关/互补），
+       这也是**不靠颜色**的一条线索。 */
+    const ttl = (u
       ? `${(it.zh || it.text).slice(0, 50)}｜维度 ${u.name}｜${
           u.display_allowed ? `可信程度：${confLevel(u).zh}`
             : "这个维度你还没答过题（先不给估计）"}`
-      : `${(it.zh || it.text).slice(0, 50)}`;
+      : `${(it.zh || it.text).slice(0, 50)}`)
+      + (isBridge && bridge.anchor != null
+        ? `｜与当前节点最${bInfo.gainRank == null ? "相关" : "互补/相关"}`
+          + `（${bridge.info.get(it.order).why}）`
+        : "");
     h += `<circle class="treenode ${st}${ready ? " ready" : ""}${
+      isBridge ? " bridge" : ""}${
       recoOrder === it.order && sel !== it.order ? " next" : ""}${
       sel === it.order ? " sel" : ""}"
       data-node="${it.order}" data-dim="${esc(dim || "")}"
       data-unlocked="${ready ? 1 : 0}" data-ready="${ready ? 1 : 0}"
+      data-bridge="${isBridge ? 1 : 0}"${
+      isBridge ? ` data-bridge-gain="${bInfo.gainRank == null ? "" : bInfo.gainRank}"
+        data-bridge-rel="${(+bInfo.rel).toFixed(4)}" data-bridge-dist="${bInfo.dist}"`
+        + ` data-bridge-why="${esc(bInfo.why)}"` : ""}
       cx="${sx(p[0]).toFixed(1)}" cy="${sy(p[1]).toFixed(1)}" r="${r}">
       <title>${esc(ttl)}</title></circle>`;
+    /* 新解锁的**额外外环**：形状线索（色盲可用），且只加在新解锁节点上，
+       已答节点的样子一点不变（不损害可读性）。 */
+    if (isBridge) {
+      h += `<circle class="bridgehalo" data-bridge-halo="${it.order}"
+        cx="${sx(p[0]).toFixed(1)}" cy="${sy(p[1]).toFixed(1)}"
+        r="${r + 4}" aria-hidden="true"></circle>`;
+    }
   }
   h += `</svg></div>`;
   h += renderTreeUnlockBasis(unlock, e, data, layout);
@@ -3353,7 +3576,7 @@ function renderInstTree(el) {
    · 「为什么是它」直接给数字：预计提升哪个维度、提升多少、会不会解锁；
    · 同时列出**旧启发式**（答得最少的维度）会选哪道题——证明两者不是同一套；
    · `data-reco*` 属性供浏览器测试断言。 */
-function renderTreeReco(layout, data, unlock, recoOrder) {
+function renderTreeReco(layout, data, unlock, recoOrder, bridge) {
   const nmOf = d => {
     const p = inferencePayload(S.instCode);
     return (p && p.params && d) ? dimNameOf(p.params, d) : (d || "");
@@ -3361,14 +3584,32 @@ function renderTreeReco(layout, data, unlock, recoOrder) {
   const itemOf = o => data.items.find(it => it.order === o);
   const res = _RECO.res;
   const it = (recoOrder != null) ? itemOf(recoOrder) : null;
-  /* 图例（D118）：只留用户能懂的四类状态。判据/门槛句子移进「依据与出处」
-     （`test_tree_unlock.js` 只数 `.treelegend i` 的个数＝4，所以照过）。 */
+  /* 图例：五类状态。task-43 新增「新解锁（相关/互补）」，用**外环 + 虚线**的形状差
+     区分（不只靠颜色，色盲/黑白打印也能分辨）；推荐节点是**虚线圈**、选中的是暖色实线，
+     与新解锁的「实心 + 外环」互不混淆。 */
+  const bridgeOn = !!(bridge && bridge.active);
   let h = `<div class="treelegend">
     <span><i class="done"></i>已答</span>
     <span><i class="ready"></i>已可估计</span>
     <span><i class="open"></i>可答</span>
     <span><i class="locked"></i>未解锁</span>
+    <span><i class="bridge"></i>新解锁（相关/互补）</span>
   </div>`;
+  /* 解锁阶段说明（只在进入「相关/互补」阶段后出现）：把规则用用户语言说一句，
+     并给一个**可核对**的锚点说明（当前节点是哪道题）。 */
+  if (bridgeOn) {
+    const anchorIt = (bridge.anchor != null) ? itemOf(bridge.anchor) : null;
+    h += `<div class="treebridge" data-bridge-active="1"
+        data-bridge-anchor="${bridge.anchor == null ? "" : bridge.anchor}"
+        data-bridge-n="${bridge.orders.size}">
+      <b>已进入「相关/互补解锁」阶段</b>
+      <div class="note">每个方面都答过至少一题了：现在会在当前节点周围，解锁与它
+        <b>最互补</b>（信息增益最大）或<b>最相关</b>（题↔面向相关最高）的
+        ${bridge.max} 个节点并高亮${anchorIt
+          ? `（当前节点：第 ${anchorIt.order} 题）` : ""}。
+        未高亮的节点仍按原来的「答了才解锁」规则推进。</div>
+    </div>`;
+  }
   if (!it) {
     h += `<div class="treereco" data-reco="0"><b>下一题推荐</b>
       <div class="note">${data.items.every(x => x.id in S.instResp)
@@ -3417,7 +3658,8 @@ function renderTreeReco(layout, data, unlock, recoOrder) {
    原来这里还有：判据公式（`conf_r ≥ dim_ceiling × ceiling_ratio`）、`ceiling_cross`、
    逐维度精确 `conf_r` / 门槛表、`tools/check/calibrate_*.py`、`research/*.md` 出处……
    **全部删除**（用户不需要）。留下的两句是用户真会用到/会影响理解的白话：
-     · 这张图是按维度分组的示意，不是根据答题数据画的相关性图（诚实性）；
+     · 这张图怎么排的（**task-43：环序来自题库自身的题↔面向相关数据**，不是随手排的；
+       但也**不是按你的作答**画的相关性图 —— 这两个「相关」必须区分开）；
      · 授权标注（谁的数据/许可）。
    精确解锁状态仍在对用户不可见的节点 `data-unlocked` 上（机器可读 + 测试契约）。 */
 function renderTreeUnlockBasis(unlock, e, data, layout) {
@@ -3425,10 +3667,18 @@ function renderTreeUnlockBasis(unlock, e, data, layout) {
   const lic = (data && data.license) || e.license || {};
   const basisNote = (layout && layout.meta)
     ? (layout.meta.basis_note || layout.meta.layout_basis || "") : "";
-  /* 布局性质说明：数据层的 basis_note 是给审阅者的长文（含「结构性排布/非实证」等
-     方法学措辞），这里**不直接渲染它**，只用一句白话（数据仍留在 ui/tree-layouts）。 */
-  const plainBasis = "这张图按维度分组排布，用来提示先答哪些题；"
-    + "它不是根据答题数据算出来的相关性图。";
+  /* 布局性质说明（task-43 改写）：task-42 之后环序**确实来自作答数据之外的
+     「题↔面向相关」**（`data/inference/<code>.json` 的 `item_dim_corr`，降序）——
+     旧文案「不是根据答题数据算出来的」现在是**错的**。新文案把两件事分清：
+       ① 环序依据的是**题库自身**的题级相关（人群统计），所以第 1 环 = 每个方面信息量最大的题；
+       ② 它**不是**按**你个人**的作答画出来的图。
+     数据层的 `basis_note` 仍是给审阅者的长文，这里不直接渲染（数据仍在 ui/tree-layouts）。 */
+  const lr = (layout && layout.rings) || null;
+  const plainBasis = "这张图按<b>维度</b>分组，一环就是「每个方面各一题」："
+    + "环序依据这套量表题库里的<b>题↔面向相关</b>（信息量大的题排在内环），"
+    + `所以第 1 环正好是「每个方面各答一题」的那一圈${lr ? `（本量表共 ${lr} 环：`
+      + `最大的面向有多少题，就有多少环）` : ""}。`
+    + "它依据的是<b>题库自身</b>的统计，<b>不是按你个人的作答</b>画出来的相关性图。";
   let h = `<details class="srcfold devfold" data-unlock-fold="1" data-dev="tree-basis">`
     + `<summary>这张图与授权</summary>
     <div class="srcbody">
@@ -3448,8 +3698,11 @@ function renderTreeUnlockBasis(unlock, e, data, layout) {
    兜底：本量表没有推断参数（如 DSM Level 2）、或推断库还没加载好时，
    退回 task-10 的确定性启发式（答得最少的维度），保证天赋树永远可用。 */
 function recommendTreeItem(layout, data) {
+  /* task-43：候选池 = **有效**可答（结构下限 ∪ 相关/互补新解锁）——
+     这样「新解锁」的节点会**纳入推荐**（用户要的就是这个）。 */
+  const bridge = treeBridgeUnlock(layout, data);
   const openOrders = data.items.map(it => it.order)
-    .filter(o => treeNodeState(layout, o, S.instResp) === "open");
+    .filter(o => treeNodeStateEff(layout, o, S.instResp, bridge) === "open");
   if (!openOrders.length) return null;
   const idOfOrder = TREE_NOW_ID;
   const cands = openOrders.map(o => idOfOrder.get(o)).filter(Boolean);
@@ -3908,7 +4161,9 @@ document.addEventListener("click", (e) => {
   if (nd) {
     const order = +nd.dataset.node;
     if (TREE_NOW) {
-      const st = treeNodeState(TREE_NOW, order, S.instResp);
+      /* task-43：可答判据要用**有效状态**（结构下限 ∪ 相关/互补新解锁），
+         否则新解锁的节点点了没反应——那就只是画了个圈。 */
+      const st = treeNodeStateEff(TREE_NOW, order, S.instResp);
       if (st !== "locked") {
         S.treeSel = order;
         renderStage();
@@ -3922,6 +4177,7 @@ document.addEventListener("click", (e) => {
       const id = TREE_NOW_ID.get(S.treeSel);
       if (id) {
         S.instResp[id] = +topt.dataset.v;
+        S.lastAnsOrder = S.treeSel;    // 「最近作答」（task-43 的当前节点兜底）
         S.ansVer++;                    // 推断缓存按作答版本失效
         saveLocal();
         // 答完自动跳到推荐的下一个可答题，省一次点击
@@ -3961,6 +4217,10 @@ document.addEventListener("click", (e) => {
     const li = opt.closest(".institem");
     if (li) {
       S.instResp[li.dataset.item] = +opt.dataset.v;
+      /* 「最近作答」（task-43）：经典页也记，切到天赋树时当前节点定义仍然成立 */
+      const ordIt = (INST_NOW && INST_NOW.items || [])
+        .find(x => x.id === li.dataset.item);
+      if (ordIt) S.lastAnsOrder = ordIt.order;
       S.ansVer++;                      // 推断缓存按作答版本失效
       saveLocal();
       /* ⚠️ 这里**只更新变化的部分**，不整块重绘作答区。
