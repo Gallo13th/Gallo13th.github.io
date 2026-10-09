@@ -2419,12 +2419,60 @@ function anchorGuideHtml(code, scaleId) {
   </div>`;
 }
 
+/* ══ 反向题的选项语义（task-45）═════════════════════════════════════════════
+   用户报的「校对注释，怎么出现了颠倒的问题」：
+   面向级阶梯 `scale_guides[scale_id].options[].meaning_zh` 是**按面向水平从低到高**
+   写的（来自 `content/facets/<facet>.record.json` 的 `administration.anchor_semantics`），
+   而选项 `v` 是「**对题面陈述**的符合程度」。两者在**反向计分题**上是**镜像**的：
+     `ipip_neo_227`「Have a high opinion of myself.」（我对自己评价很高）`key = -1`；
+     v=1（非常不符合题面）⇒ 面向水平**最高**（最谦逊），旧实现却取阶梯第 1 级（最不谦逊）
+     → 整个题的选项语义读反（IPIP-NEO 148/300 道反向题都这样）。
+   映射（**唯一实现**，渲染与测试共用）：
+     · `key > 0` → 取阶梯第 `v` 级
+     · `key < 0` → 取阶梯第 `(min + max − v)` 级   ← **别写死 6−v**：用该 scale 自己的 min/max
+   **两条不许翻**：
+     ① 锚点级 `anchorGuideHtml()`——那是「这把尺子/这个面向」本身的整体说明（低→高），本来就对；
+     ② 题目自己的 `response.options[].meaning_zh`（ASRM 整句陈述、FOCI 逐题锚点）——
+        本来就是按选项写好的。
+   判据一句话：**来源是 `scale_guides[...]` 才翻；来源是题自己的 `response.options[...]` 一律不翻。**
+   取不到对应级时**不静默降级**（那会给出错误语义）：退回题自己的语义；仍没有就不显示，
+   并记一条 miss 供守卫与排查（`optMeaningMisses()`）。 */
+let _OPT_MISS = [];
+function optMeaningMisses() { return _OPT_MISS.slice(); }
+function optMeaningFor(it, st, rf, v) {
+  const code = S.instCode;
+  const sOpts = (st && st.response && st.response.options) || [];
+  const ownOpt = sOpts.find(o => +o.v === +v) || null;
+  const own = (ownOpt && ownOpt.meaning_zh) || "";
+  const sid = (st && st.response && st.response.scale_id) || "";
+  const guide = scaleGuideOf(code, sid);
+  const gOpts = new Map(((guide && guide.options) || []).map(o => [+o.v, o]));
+  const gHere = gOpts.get(+v);
+  const gText = (gHere && gHere.meaning_zh) || "";
+  /* 面向级阶梯缺失 → 本题用**自己的**逐题语义（不翻） */
+  if (!gText) return {text: own, source: own ? "item" : "", v: +v, mapped_v: +v, miss: false};
+  const key = (typeof it.key === "number") ? it.key : (it.reverse_keyed ? -1 : 1);
+  const lo = (guide && guide.min != null) ? +guide.min : +rf.min;
+  const hi = (guide && guide.max != null) ? +guide.max : +rf.max;
+  const mv = (key < 0) ? (lo + hi - (+v)) : (+v);
+  const gMap = (Number.isFinite(mv) && mv >= lo && mv <= hi) ? gOpts.get(mv) : null;
+  if (!gMap || !gMap.meaning_zh) {
+    if (!_OPT_MISS.some(x => x.item === it.id && x.v === +v)) {
+      _OPT_MISS.push({code: code, item: it.id, key: key, v: +v, mapped_v: mv, sid: sid,
+        reason: Number.isFinite(mv) ? "阶梯里没有这一级" : "min/max 不可用"});
+    }
+    return {text: own, source: own ? "item" : "", v: +v, mapped_v: mv, miss: true};
+  }
+  return {text: gMap.meaning_zh, source: "scale_guide", v: +v, mapped_v: mv, miss: false};
+}
+
 /* 选项：中英标签 + **情景说明就地可见**（选项级语义，不含上级句子）。
    ⚠️ `.opt` 必须仍是 `<button>`、`.ot` 必须仍是「整句陈述/标签原文」——
    `tools/check/test_mania_options_ui.js` 钉住这两条读取路径。
    ⚠️ 不要在 `<button>` 里放 `<details>`（交互元素嵌套非法、点击会被吞）。
    标签来源（schema 2.0）：`items[].response.options[]`（逐题锚点如 ASRM/FOCI 的陈述
-   也在题上）；选项语义：`scale_guides[scale_id].options[].meaning_zh`（有则优先）。 */
+   也在题上）；选项语义：`scale_guides[scale_id].options[].meaning_zh`（有则优先，
+   **反向题按 task-45 的映射取镜像级**，见 `optMeaningFor`）。 */
 function itemOptionsHtml(it, st, rf, cur, extraAttr) {
   const code = S.instCode;
   const own = it.options || null;
@@ -2451,13 +2499,17 @@ function itemOptionsHtml(it, st, rf, cur, extraAttr) {
     const ownOpt = own ? own.find(x => +x.v === v) : null;
     const ot = (ownOpt && ownOpt.text) || g.label_en || o.label_en || "";
     const oz = o.label_zh || g.label_zh || "";
-    const meaning = g.meaning_zh || o.meaning_zh || "";
+    /* task-45：面向级阶梯按 key 映射（反向题取镜像级）；题目自己的语义原样用 */
+    const mm = optMeaningFor(it, st, rf, v);
+    const meaning = mm.text;
     h += `<button class="opt${cur === v ? " sel" : ""}" data-v="${v}"${
       extraAttr ? " " + extraAttr : ""}>
       <span class="k">${v}</span><span class="ol">${
       ot ? `<span class="ot" data-f="opt_label_en">${esc(ot)}</span>` : ""}${
       oz ? `<span class="oz" data-f="opt_label_zh">${esc(oz)}</span>` : ""}${
-      meaning ? `<span class="om" data-f="meaning_zh">${md(meaning)}</span>` : ""}</span>
+      meaning ? `<span class="om" data-f="meaning_zh" data-meaning-source="${
+        esc(mm.source)}" data-meaning-mapped-v="${esc(mm.mapped_v)}">${
+        md(meaning)}</span>` : ""}</span>
     </button>`;
   }
   return h + `</div>`;
